@@ -1,0 +1,65 @@
+---
+title: 'Homework - CUNY DATA 624 Sum I'
+subtitle: 'Group 1: Daniel Sullivan, Jeff Parks, Lwin Shwe, Matthew Katz'
+format:
+  docx:
+    highlight-style: arrow
+page-layout: article
+editor: visual
+---
+
+```{r setup, include=FALSE}
+# chunks
+knitr::opts_chunk$set(echo=TRUE, eval=TRUE, include=TRUE, message=FALSE, 
+warning=FALSE, fig.show="hold", out.width="100%", fig.height=3)
+
+# libraries
+library(tidyverse)
+library(kableExtra)
+library(fpp2)
+
+# ggplot
+theme_set(theme_light())
+```
+
+## HA Exercise 2.1
+
+**Use the help function to explore what the series `gold`, `woolyrnq` and `gas` represent.**
+
+-   `gold` is a time-series dataset of daily morning gold prices in US dollars, from Jan 1, 1985 through Mar 31, 1989.
+-   `woolyrng` is a time-series dataset of quarterly production of woolen yarn in Australia, in metric tons (tonnes), from Mar 1965 through Sep 1994.
+-   `gas` is a time-series dataset of monthly gas production in Australia, units unknown, from 1956 through 1995.
+
+------------------------------------------------------------------------
+
+a.  **Use `autoplot()` to plot each of these in separate plots.**
+
+```{r}
+autoplot(gold) +
+  ggtitle("Daily Morning Gold Prices") +
+  xlab("Days") +
+  ylab("US Dollars")
+```
+
+{{< pagebreak >}}
+
+```{r}
+autoplot(woolyrnq) +
+  ggtitle("Quarterly Woollen Yarn Production: Australia") +
+  xlab("Year") +
+  ylab("Metric Tons")
+```
+
+```{r}
+autoplot(gas) +
+  ggtitle("Monthly Gas Production: Australia") +
+  xlab("Years") +
+  ylab("Units")
+```
+
+b.  **What is the frequency of each series? Hint: apply the `frequency()` function.**
+    -   The frequency of `gold` is `r frequency(gold)` (daily)
+    -   The frequency of `woolyrnq` is `r frequency(woolyrnq)` (quarterly)
+    -   The frequency of `gas` is `r frequency(gas)` (yearly)\
+c.  **Use `which.max()` to spot the outlier in the `gold` series. Which observation was it?**
+    -   The maximum value in the `gold` series is observation **`r which.max(gold)`** with a value of **`r gold[770]`**.
