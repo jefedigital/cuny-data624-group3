@@ -1,9 +1,10 @@
 ---
 title: 'Homework - CUNY DATA 624 Sum I'
-subtitle: 'Group 1: Daniel Sullivan, Jeff Parks, Lwin Shwe, Matthew Katz'
+subtitle: 'Group 3: Daniel Sullivan, Jeff Parks, Lwin Shwe, Matthew Katz'
 format:
   docx:
     highlight-style: arrow
+    reference-doc: word-custom-theme-doc.docx
 page-layout: article
 editor: visual
 ---
