@@ -83,7 +83,10 @@ merged_obj_na <- na.locf(merged_obj)
 my_ts <- ts(coredata(merged_obj_na)[,1], start = c(year(min(my_data$dates)), yday(min(my_data$dates))), frequency=365) 
 
 
+
+##
 ## analysis
+##
 
 # check stats
 start(my_ts)
