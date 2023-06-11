@@ -1,0 +1,181 @@
+---
+title: "midterm_project_jparks"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+    theme: united
+editor: visual
+---
+
+## Category S02
+
+```{r setup, include=FALSE}
+# chunks
+knitr::opts_chunk$set(echo=TRUE, eval=TRUE, include=TRUE, message=FALSE, 
+warning=FALSE, fig.show="hold", out.width="100%", fig.height=4)
+
+# libraries
+library(tidyverse)
+library(fpp2)
+library(readxl)
+library(zoo)
+library(seasonal)
+library(kableExtra)
+
+# ggplot
+theme_set(theme_light())
+```
+
+```{r functions, include=FALSE}
+nice_table <- function(df, cap=NULL, cols=NULL, dig=3, fw=F){
+  if (is.null(cols)) {c <- colnames(df)} else {c <- cols}
+  table <- df %>% 
+    kable(caption=cap, col.names=c, digits=dig) %>% 
+    kable_styling(
+      bootstrap_options = c("striped", "hover", "condensed"),
+      html_font = 'monospace',
+      full_width = fw)
+  return(table)
+}
+```
+
+```{r}
+# load data
+df <- read_xls('data/Data Set for Class.xls', sheet='Set for Class') %>%
+  mutate(Date = as.Date(SeriesInd-2, origin = '1900-01-01'))
+```
+
+```{r}
+df_s02 <- df %>%
+  filter(category == 'S02') %>%
+  mutate(Date_index = row_number()) %>%
+  select(c(Date_index,Date,Var02,Var03)) %>%
+  head(1622)
+```
+
+```{r}
+data_s02_v02 <- df_s02 %>%
+  select(dates=Date,values=Var02) %>%
+  drop_na() 
+
+data_s02_v03 <- df_s02 %>%
+  select(dates=Date,values=Var03) %>%
+  drop_na() 
+```
+
+### Variable 02
+
+```{r}
+## dates option 1 - use date_index and force new start date '2000-01-01'
+my_ts <- ts(data_s02_v02$values, start = c(2000,1), frequency=365) 
+```
+
+```{r}
+# check stats
+start(my_ts)
+end(my_ts)
+frequency(my_ts)
+```
+
+```{r}
+# simple graphs
+autoplot(my_ts)
+```
+
+```{r}
+# seasonality
+ggAcf(my_ts, lag=30)
+ggseasonplot(my_ts)
+ggsubseriesplot(my_ts)
+gglagplot(my_ts)
+```
+
+```{r}
+decompose(my_ts) %>%
+  autoplot()
+```
+
+```{r}
+# moving averages
+my_ts_ma15 <- ma(my_ts, order=15, centre=TRUE)
+autoplot(my_ts_ma15)
+```
+
+```{r}
+# exponential smoothing
+
+```
+
+```{r}
+forecast(my_ts, h=140) %>%
+  autoplot()
+
+forecast(my_ts_ma15, h=140) %>%
+  autoplot()
+```
+
+#### Forecast Var02
+
+```{r}
+forecast_s02_v02 <- forecast(my_ts, h=140)
+forecast_s02_v02 %>% nice_table()
+```
+
+### Variable 03
+
+```{r}
+## dates option 1 - use date_index and force new start date '2000-01-01'
+my_ts <- ts(data_s02_v03$values, start = c(2000,1), frequency=365) 
+```
+
+```{r}
+# check stats
+start(my_ts)
+end(my_ts)
+frequency(my_ts)
+```
+
+```{r}
+# simple graphs
+autoplot(my_ts)
+```
+
+```{r}
+# seasonality
+ggAcf(my_ts, lag=30)
+ggseasonplot(my_ts)
+ggsubseriesplot(my_ts)
+gglagplot(my_ts)
+```
+
+```{r}
+decompose(my_ts) %>%
+  autoplot()
+```
+
+```{r}
+# moving averages
+my_ts_ma15 <- ma(my_ts, order=15, centre=TRUE)
+autoplot(my_ts_ma15)
+```
+
+```{r}
+# exponential smoothing
+
+```
+
+```{r}
+forecast(my_ts, h=140) %>%
+  autoplot()
+
+forecast(my_ts_ma15, h=140) %>%
+  autoplot()
+```
+
+#### Forecast Var03
+
+```{r}
+forecast_s02_v03 <- forecast(my_ts, h=140)
+forecast_s02_v03 %>% nice_table()
+```
