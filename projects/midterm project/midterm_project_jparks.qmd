@@ -91,13 +91,23 @@ ggsubseriesplot(my_ts)
 gglagplot(my_ts)
 ```
 
+#### Classical Decomposition
 ```{r}
+# classical decomp
 decompose(my_ts) %>%
   autoplot()
 ```
+### STL Decomposition
 
 ```{r}
-# moving averages
+# stl decomp
+mstl(my_ts) %>%
+  autoplot()
+```
+
+
+```{r}
+# 15-MA moving averages
 my_ts_ma15 <- ma(my_ts, order=15, centre=TRUE)
 autoplot(my_ts_ma15)
 ```
@@ -107,19 +117,27 @@ autoplot(my_ts_ma15)
 
 ```
 
-```{r}
-forecast(my_ts, h=140) %>%
-  autoplot()
-
-forecast(my_ts_ma15, h=140) %>%
-  autoplot()
-```
-
 #### Forecast Var02
 
 ```{r}
-forecast_s02_v02 <- forecast(my_ts, h=140)
-forecast_s02_v02 %>% nice_table()
+# ets forecast
+forecast(my_ts, h=140) %>%
+  autoplot()
+
+# ets forecast with 15-MA moving average
+forecast(my_ts_ma15, h=140) %>%
+  autoplot()
+
+# seasonally adjusted stl forecast
+mstl(my_ts) %>% 
+  seasadj() %>%
+  forecast(h=140) %>%
+  autoplot
+```
+
+```{r}
+# forecast_s02_v02 <- forecast(my_ts, h=140)
+# forecast_s02_v02$mean %>% nice_table()
 ```
 
 ### Variable 03
@@ -149,8 +167,17 @@ ggsubseriesplot(my_ts)
 gglagplot(my_ts)
 ```
 
+#### Classical Decomposition
+
 ```{r}
 decompose(my_ts) %>%
+  autoplot()
+```
+
+### STL Decomposition
+
+```{r}
+mstl(my_ts) %>%
   autoplot()
 ```
 
@@ -165,17 +192,25 @@ autoplot(my_ts_ma15)
 
 ```
 
-```{r}
-forecast(my_ts, h=140) %>%
-  autoplot()
-
-forecast(my_ts_ma15, h=140) %>%
-  autoplot()
-```
-
 #### Forecast Var03
 
 ```{r}
-forecast_s02_v03 <- forecast(my_ts, h=140)
-forecast_s02_v03 %>% nice_table()
+# ets forecast
+forecast(my_ts, h=140) %>%
+  autoplot()
+
+# ets forecast with 15-MA moving average
+forecast(my_ts_ma15, h=140) %>%
+  autoplot()
+
+# seasonally adjusted stl forecast
+mstl(my_ts) %>% 
+  seasadj() %>%
+  forecast(h=140) %>%
+  autoplot
+```
+
+```{r}
+# forecast_s02_v03 <- forecast(my_ts, h=140)
+# forecast_s02_v03$mean %>% nice_table()
 ```
