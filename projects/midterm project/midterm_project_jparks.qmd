@@ -13,7 +13,7 @@ editor: visual
 ```{r setup, include=FALSE}
 # chunks
 knitr::opts_chunk$set(echo=TRUE, eval=TRUE, include=TRUE, message=FALSE, 
-warning=FALSE, fig.show="hold", out.width="100%", fig.height=4)
+warning=FALSE, fig.show="hold", fig.height=4)
 
 # libraries
 library(tidyverse)
@@ -27,7 +27,31 @@ library(kableExtra)
 theme_set(theme_light())
 ```
 
-```{r functions, include=FALSE}
+```{r}
+expand_dates <- function(my_data){
+  
+  # create full date sequence
+  date_seq <- seq(min(my_data$dates), max(my_data$dates), by = "day")
+
+  # convert original data frame to a zoo object
+  zoo_obj <- zooreg(my_data$values, order.by = my_data$dates, frequency=365)
+
+  # merge with a zoo object containing consecutive dates
+  merged_obj <- merge(zoo_obj, zooreg(, order.by = date_seq, frequency=365))
+
+  # replace NA with 0
+  merged_obj_na <- merged_obj %>% replace(is.na(.), 0)
+
+  # convert to a ts object
+  my_ts <- ts(coredata(merged_obj_na)[,1], 
+              start = c(year(min(my_data$dates)),
+                        yday(min(my_data$dates))), frequency=365) 
+  
+  return(my_ts)
+}
+```
+
+```{r include=FALSE}
 nice_table <- function(df, cap=NULL, cols=NULL, dig=3, fw=F){
   if (is.null(cols)) {c <- colnames(df)} else {c <- cols}
   table <- df %>% 
@@ -67,124 +91,122 @@ data_s02_v03 <- df_s02 %>%
 ### Variable 02
 
 ```{r}
-## dates option 1 - use date_index and force new start date '2000-01-01'
-my_ts <- ts(data_s02_v02$values, start = c(2000,1), frequency=365) 
+## expand to include missing dates, impute 0 for NA
+ts_s02_v02 <- expand_dates(data_s02_v02)
 ```
 
 ```{r}
 # check stats
-start(my_ts)
-end(my_ts)
-frequency(my_ts)
+start(ts_s02_v02)
+end(ts_s02_v02)
+frequency(ts_s02_v02)
 ```
 
 ```{r}
 # simple graphs
-autoplot(my_ts)
+autoplot(ts_s02_v02)
 ```
 
 ```{r}
+# 7-MA moving averages
+ts_s02_v02_ma7 <- ma(ts_s02_v02, order=7, centre=TRUE)
+autoplot(ts_s02_v02_ma7)
+```
+
+```{r}
+#! layout-ncol: 2
+
 # seasonality
-ggAcf(my_ts, lag=30)
-ggseasonplot(my_ts)
-ggsubseriesplot(my_ts)
-gglagplot(my_ts)
+ggAcf(ts_s02_v02_ma7, lag=30)
+ggseasonplot(ts_s02_v02_ma7)
+ggsubseriesplot(ts_s02_v02_ma7)
+gglagplot(ts_s02_v02_ma7)
 ```
 
 #### Classical Decomposition
+
 ```{r}
 # classical decomp
-decompose(my_ts) %>%
+decompose(ts_s02_v02_ma7) %>%
   autoplot()
 ```
+
 ### STL Decomposition
 
 ```{r}
 # stl decomp
-mstl(my_ts) %>%
+mstl(ts_s02_v02_ma7) %>%
   autoplot()
 ```
 
+#### Forecast
 
 ```{r}
-# 15-MA moving averages
-my_ts_ma15 <- ma(my_ts, order=15, centre=TRUE)
-autoplot(my_ts_ma15)
-```
+# ets forecast with 7-MA moving average
+f_s02_v02_ma7 <- forecast(ts_s02_v02_ma7, h=140) 
 
-```{r}
-# exponential smoothing
-
-```
-
-#### Forecast Var02
-
-```{r}
-# ets forecast
-forecast(my_ts, h=140) %>%
+f_s02_v02_ma7 %>%
   autoplot()
+```
 
-# ets forecast with 15-MA moving average
-forecast(my_ts_ma15, h=140) %>%
-  autoplot()
+#### Diagnostics
 
-# seasonally adjusted stl forecast
-mstl(my_ts) %>% 
-  seasadj() %>%
-  forecast(h=140) %>%
-  autoplot
+```{r}
+accuracy(f_s02_v02_ma7)
 ```
 
 ```{r}
-# forecast_s02_v02 <- forecast(my_ts, h=140)
+# forecast_s02_v02 <- forecast(ts_s02_v02_ma7, h=140)
 # forecast_s02_v02$mean %>% nice_table()
 ```
 
 ### Variable 03
 
 ```{r}
-## dates option 1 - use date_index and force new start date '2000-01-01'
-my_ts <- ts(data_s02_v03$values, start = c(2000,1), frequency=365) 
+## expand to include missing dates, impute 0 for NA
+ts_s02_v03 <- expand_dates(data_s02_v03)
 ```
 
 ```{r}
 # check stats
-start(my_ts)
-end(my_ts)
-frequency(my_ts)
+start(ts_s02_v03)
+end(ts_s02_v03)
+frequency(ts_s02_v03)
 ```
 
 ```{r}
 # simple graphs
-autoplot(my_ts)
+autoplot(ts_s02_v03)
+```
+
+```{r}
+# 7-MA moving averages
+ts_s02_v03_ma7 <- ma(ts_s02_v03, order=7, centre=TRUE)
+autoplot(ts_s02_v03_ma7)
 ```
 
 ```{r}
 # seasonality
-ggAcf(my_ts, lag=30)
-ggseasonplot(my_ts)
-ggsubseriesplot(my_ts)
-gglagplot(my_ts)
+ggAcf(ts_s02_v03_ma7, lag=30)
+ggseasonplot(ts_s02_v03_ma7)
+ggsubseriesplot(ts_s02_v03_ma7)
+gglagplot(ts_s02_v03_ma7)
 ```
 
 #### Classical Decomposition
 
 ```{r}
-decompose(my_ts) %>%
+# classical decomp
+decompose(ts_s02_v03_ma7) %>%
   autoplot()
 ```
 
 ### STL Decomposition
 
 ```{r}
-mstl(my_ts) %>%
+# stl decomp
+mstl(ts_s02_v03_ma7) %>%
   autoplot()
-```
-
-```{r}
-# moving averages
-my_ts_ma15 <- ma(my_ts, order=15, centre=TRUE)
-autoplot(my_ts_ma15)
 ```
 
 ```{r}
@@ -194,23 +216,17 @@ autoplot(my_ts_ma15)
 
 #### Forecast Var03
 
+
 ```{r}
-# ets forecast
-forecast(my_ts, h=140) %>%
-  autoplot()
+# ets forecast with 7-MA moving average
+f_s02_v03_ma7 <- forecast(ts_s02_v03_ma7, h=140) 
 
-# ets forecast with 15-MA moving average
-forecast(my_ts_ma15, h=140) %>%
+f_s02_v03_ma7 %>%
   autoplot()
-
-# seasonally adjusted stl forecast
-mstl(my_ts) %>% 
-  seasadj() %>%
-  forecast(h=140) %>%
-  autoplot
 ```
 
+#### Diagnostics
+
 ```{r}
-# forecast_s02_v03 <- forecast(my_ts, h=140)
-# forecast_s02_v03$mean %>% nice_table()
+accuracy(f_s02_v03_ma7)
 ```
