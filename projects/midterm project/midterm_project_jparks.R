@@ -141,4 +141,60 @@ forecast(my_ts_ma15, h=140) %>%
 
 # seasonally-adjusted forecasts
 
+#
+## TEST
+#
 
+df_s02 <- df %>%
+  filter(category == 'S02') %>%
+  mutate(Date_index = row_number()) %>%
+  select(c(Date_index,Date,Var02,Var03)) %>%
+  head(1622)
+
+my_data <- df_s02 %>%
+  select(dates=Date,values=Var02) %>%
+  drop_na() 
+
+# create full date sequence
+date_seq <- seq(min(my_data$dates), max(my_data$dates), by = "day")
+
+# Convert original data frame to a zoo object
+zoo_obj <- zooreg(my_data$values, order.by = my_data$dates, frequency=365)
+
+# Merge with a zoo object containing consecutive dates
+merged_obj <- merge(zoo_obj, zooreg(, order.by = date_seq, frequency=365))
+
+# Impute missing values 
+#merged_obj_na <- na.locf(merged_obj) # carry-forward last observed
+merged_obj_na <- merged_obj %>% replace(is.na(.), 0) # replace na with 0
+
+# Convert to a time series object
+# as.ts seems to drop dates and/or frequency
+my_ts <- ts(coredata(merged_obj_na)[,1], 
+            start = c(year(min(my_data$dates)),
+                      yday(min(my_data$dates))), frequency=365) 
+
+start(my_ts)
+end(my_ts)
+frequency(my_ts)
+
+
+my_ts_ma7 <- ma(my_ts, order=7, centre=TRUE)
+
+autoplot(my_ts)
+autoplot(my_ts_ma7)
+
+ggAcf(my_ts, lag=30)
+ggAcf(my_ts_ma7, lag=30)
+
+decompose(my_ts) %>% autoplot()
+decompose(my_ts_ma7) %>% autoplot()
+
+mstl(my_ts) %>% autoplot()
+mstl(my_ts_ma7) %>% autoplot()
+
+forecast(my_ts, h=140) %>% autoplot()
+forecast(my_ts_ma7, h=140) %>% autoplot()
+
+f <- forecast(my_ts_ma7, h=140)
+accuracy(f)
