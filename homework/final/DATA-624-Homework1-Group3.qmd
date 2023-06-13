@@ -1,0 +1,73 @@
+---
+title: 'Homework 1 - CUNY DATA 624 Sum I'
+subtitle: 'Group 3: Daniel Sullivan, Jeff Parks, Lwin Shwe, Matthew Katz'
+format:
+  docx:
+    highlight-style: arrow
+    reference-doc: word-custom-theme-doc.docx
+page-layout: article
+editor: visual
+---
+
+```{r setup, include=FALSE}
+# chunks
+knitr::opts_chunk$set(echo=TRUE, eval=TRUE, include=TRUE, message=FALSE, 
+warning=FALSE, fig.show="hold", out.width="100%", fig.height=3)
+
+# libraries
+library(tidyverse)
+library(kableExtra)
+library(fpp2)
+
+# ggplot
+theme_set(theme_light())
+```
+
+```{r functions, include=FALSE}
+nice_table <- function(df, cap=NULL, cols=NULL, dig=3, fw=F){
+  if (is.null(cols)) {c <- colnames(df)} else {c <- cols}
+  table <- df %>% 
+    kable(caption=cap, col.names=c, digits=dig) %>% 
+    kable_styling(
+      bootstrap_options = c("striped", "hover", "condensed"),
+      html_font = 'monospace',
+      full_width = fw)
+  return(table)
+}
+```
+
+## HA Exercise 2.1
+
+**Use the help function to explore what the series `gold`, `woolyrnq` and `gas` represent.** a. **Use `autoplot()` to plot each of these in separate plots.**
+
+b.  What is the frequency of each series? Hint: apply the `frequency()` function.
+
+c.  Use `which.max()` to spot the outlier in the `gold` series. Which observation was it?
+
+{{< pagebreak >}}
+
+## HA Exercise 2.3
+
+Download some monthly Australian retail data from the book website. These represent retail sales in various categories for different Australian states, and are stored in a MS-Excel file.
+
+Select one of the time series ... explore your chosen retail time series using the following functions: autoplot(), ggseasonplot(), ggsubseriesplot(), gglagplot(), ggAcf()
+
+Can you spot any seasonality, cyclicity and trend? What do you learn about the series?
+
+{{< pagebreak >}}
+
+## HA Exercise 6.2
+
+The `plastics` data set consists of the monthly sales (in thousands) of product A for a plastics manufacturer for five years.
+
+a.  Plot the time series of sales of product A. Can you identify seasonal fluctuations and/or a trend-cycle?
+
+b.  Use a classical multiplicative decomposition to calculate the trend-cycle and seasonal indices.
+
+c.  Do the results support the graphical interpretation from part a?
+
+d.  Compute and plot the seasonally adjusted data.
+
+e.  Change one observation to be an outlier (e.g., add 500 to one observation), and recompute the seasonally adjusted data. What is the effect of the outlier?
+
+f.  Does it make any difference if the outlier is near the end rather than in the middle of the time series?

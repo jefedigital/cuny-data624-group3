@@ -1,0 +1,280 @@
+---
+title: 'Midterm Project'
+subtitle: 'CUNY DATA 624 - 2023 Summer I'
+author: 'Group 3: Daniel Sullivan, Jeff Parks, Lwin Shwe, Matthew Katz'
+# abstract: 'abstract text'
+format:
+  docx:
+    highlight-style: arrow
+    reference-doc: quarto-word-template.docx
+page-layout: article
+editor: visual
+---
+
+```{r setup, include=FALSE}
+# chunks
+knitr::opts_chunk$set(echo=TRUE, eval=TRUE, include=FALSE, message=FALSE, 
+warning=FALSE, fig.show="hold", out.width="100%", fig.height=4)
+
+# libraries
+library(tidyverse)
+library(fpp2)
+library(readxl)
+library(zoo)
+library(seasonal)
+library(kableExtra)
+
+# ggplot
+theme_set(theme_light())
+```
+
+```{r functions}
+expand_dates <- function(my_data){
+  
+  # create full date sequence
+  date_seq <- seq(min(my_data$dates), max(my_data$dates), by = "day")
+
+  # convert original data frame to a zoo object
+  zoo_obj <- zooreg(my_data$values, order.by = my_data$dates, frequency=365)
+
+  # merge with a zoo object containing consecutive dates
+  merged_obj <- merge(zoo_obj, zooreg(, order.by = date_seq, frequency=365))
+
+  # replace NA with 0
+  merged_obj_na <- merged_obj %>% replace(is.na(.), 0)
+
+  # convert to a ts object
+  my_ts <- ts(coredata(merged_obj_na)[,1], 
+              start = c(year(min(my_data$dates)),
+                        yday(min(my_data$dates))), frequency=365) 
+  
+  return(my_ts)
+}
+
+nice_table <- function(df, cap=NULL, cols=NULL, dig=3, fw=F){
+  if (is.null(cols)) {c <- colnames(df)} else {c <- cols}
+  table <- df %>% 
+    kable(caption=cap, col.names=c, digits=dig) %>% 
+    kable_styling(
+      bootstrap_options = c("striped", "hover", "condensed"),
+      html_font = 'monospace',
+      full_width = fw)
+  return(table)
+}
+```
+
+```{r load-data}
+# load data
+df <- read_xls('../data/Data Set for Class.xls', sheet='Set for Class') %>%
+  mutate(Date = as.Date(SeriesInd-2, origin = '1900-01-01'))
+```
+
+------------------------------------------------------------------------
+
+## Objective
+
+Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec. Aenean non diam interdum, tincidunt dui in, maximus orci. Praesent eget enim id erat volutpat euismod. Vivamus euismod turpis nec sollicitudin accumsan. Duis maximus finibus auctor. Phasellus quis ornare nunc, id porttitor elit. Donec sit amet vulputate arcu. Nulla sodales lacinia nisl, sed hendrerit ex consectetur eget.
+
+## Category 01
+
+Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec.
+
+```{r data_s01}
+df_s01 <- df %>%
+  filter(category == 'S01') %>%
+  select(c(Date,Var01,Var02)) %>%
+  head(1622)
+```
+
+### Variable 01
+
+Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec.
+
+#### Analysis
+
+#### Forecast
+
+### Variable 02
+
+#### Analysis
+
+#### Forecast
+
+{{< pagebreak >}}
+
+## Category 02
+
+```{r data_s02, include=TRUE}
+df_s02 <- df %>%
+  filter(category == 'S02') %>%
+  select(c(Date,Var02,Var03)) %>%
+  head(1622)
+
+ts_s02_v02 <- df_s02 %>%
+  select(dates=Date,values=Var02) %>%
+  drop_na() %>%
+  expand_dates()
+
+ts_s02_v03 <- df_s02 %>%
+  select(dates=Date,values=Var03) %>%
+  drop_na() %>%
+  expand_dates()
+```
+
+### Variable 02
+
+```{r, include=TRUE}
+# 7-MA moving average
+ts_s02_v02_ma7 <- ma(ts_s02_v02, order=7, centre=TRUE)
+autoplot(ts_s02_v02_ma7)
+```
+
+#### Analysis
+
+```{r}
+#! layout-ncol: 2
+
+# seasonality
+ggAcf(ts_s02_v02_ma7, lag=90)
+
+# stl decomp
+mstl(ts_s02_v02_ma7) %>% autoplot()
+```
+
+#### Forecast
+
+```{r}
+# ets forecast with 7-MA moving average
+f_s02_v02_ma7 <- forecast(ts_s02_v02_ma7, h=140) 
+f_s02_v02_ma7 %>% autoplot()
+```
+
+### Variable 03
+
+```{r}
+# 7-MA moving average
+ts_s02_v03_ma7 <- ma(ts_s02_v03, order=7, centre=TRUE)
+autoplot(ts_s02_v03_ma7)
+```
+
+#### Analysis
+
+```{r}
+#! layout-ncol: 2
+
+# seasonality
+ggAcf(ts_s02_v03_ma7, lag=90)
+
+# stl decomp
+mstl(ts_s02_v03_ma7) %>% autoplot()
+```
+
+#### Forecast
+
+```{r}
+# ets forecast with 7-MA moving average
+f_s02_v03_ma7 <- forecast(ts_s02_v03_ma7, h=140) 
+f_s02_v03_ma7 %>% autoplot()
+```
+
+{{< pagebreak >}}
+
+## Category 03
+
+```{r data_s03}
+df_s03 <- df %>%
+  filter(category == 'S03') %>%
+  select(c(Date,Var05,Var07)) %>%
+  head(1622)
+```
+
+### Variable 05
+
+#### Analysis
+
+#### Forecast
+
+### Variable 07
+
+#### Analysis
+
+#### Forecast
+
+{{< pagebreak >}}
+
+## Category 04
+
+```{r data_s04}
+df_s04 <- df %>%
+  filter(category == 'S04') %>%
+  select(c(Date,Var01,Var02)) %>%
+  head(1622)
+```
+
+### Variable 01
+
+#### Analysis
+
+#### Forecast
+
+### Variable 02
+
+#### Analysis
+
+#### Forecast
+
+{{< pagebreak >}}
+
+## Category 05
+
+```{r data_s05}
+df_s05 <- df %>%
+  filter(category == 'S05') %>%
+  select(c(Date,Var02,Var03)) %>%
+  head(1622)
+```
+
+### Variable 02
+
+#### Analysis
+
+#### Forecast
+
+### Variable 03
+
+#### Analysis
+
+#### Forecast
+
+{{< pagebreak >}}
+
+## Category 06
+
+```{r data_s06}
+df_s06 <- df %>%
+  filter(category == 'S06') %>%
+  select(c(Date,Var05,Var07)) %>%
+  head(1622)
+```
+
+### Variable 02
+
+#### Analysis
+
+#### Forecast
+
+### Variable 03
+
+#### Analysis
+
+#### Forecast
+
+{{< pagebreak >}}
+
+## Conclusions
+
+{{< pagebreak >}}
+
+## Appendix
+
+### R Code

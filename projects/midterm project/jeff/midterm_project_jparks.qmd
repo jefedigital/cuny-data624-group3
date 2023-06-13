@@ -216,7 +216,6 @@ mstl(ts_s02_v03_ma7) %>%
 
 #### Forecast Var03
 
-
 ```{r}
 # ets forecast with 7-MA moving average
 f_s02_v03_ma7 <- forecast(ts_s02_v03_ma7, h=140) 
