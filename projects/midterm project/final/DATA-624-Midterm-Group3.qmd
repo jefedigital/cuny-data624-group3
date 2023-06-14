@@ -6,15 +6,19 @@ author: 'Group 3: Daniel Sullivan, Jeff Parks, Lwin Shwe, Matthew Katz'
 format:
   docx:
     highlight-style: arrow
+    number-sections: false
+    number-depth: 3
     reference-doc: quarto-word-template.docx
+    toc: true
+    toc-depth: 1
+    toc-title: Contents
 page-layout: article
 editor: visual
 ---
 
 ```{r setup, include=FALSE}
 # chunks
-knitr::opts_chunk$set(echo=TRUE, eval=TRUE, include=FALSE, message=FALSE, 
-warning=FALSE, fig.show="hold", out.width="100%", fig.height=4)
+knitr::opts_chunk$set(echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE)
 
 # libraries
 library(tidyverse)
@@ -69,13 +73,19 @@ df <- read_xls('../data/Data Set for Class.xls', sheet='Set for Class') %>%
   mutate(Date = as.Date(SeriesInd-2, origin = '1900-01-01'))
 ```
 
-------------------------------------------------------------------------
+{{< pagebreak >}}
 
-## Objective
+# Overview
 
-Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec. Aenean non diam interdum, tincidunt dui in, maximus orci. Praesent eget enim id erat volutpat euismod. Vivamus euismod turpis nec sollicitudin accumsan. Duis maximus finibus auctor. Phasellus quis ornare nunc, id porttitor elit. Donec sit amet vulputate arcu. Nulla sodales lacinia nisl, sed hendrerit ex consectetur eget.
+Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec. Aenean non diam interdum, tincidunt dui in, maximus orci. 
 
-## Category 01
+Praesent eget enim id erat volutpat euismod. Vivamus euismod turpis nec sollicitudin accumsan. Duis maximus finibus auctor. Phasellus quis ornare nunc, id porttitor elit. Donec sit amet vulputate arcu. Nulla sodales lacinia nisl, sed hendrerit ex consectetur eget.
+
+Vivamus euismod turpis nec sollicitudin accumsan. Duis maximus finibus auctor. Phasellus quis ornare nunc, id porttitor elit. Donec sit amet vulputate arcu. Nulla sodales lacinia nisl, sed hendrerit ex consectetur eget.
+
+{{< pagebreak >}}
+
+# Series One
 
 Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec.
 
@@ -86,25 +96,33 @@ df_s01 <- df %>%
   head(1622)
 ```
 
-### Variable 01
+## Variables
 
 Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec.
 
-#### Analysis
+## Analysis
 
-#### Forecast
+Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa.
 
-### Variable 02
+```{r}
 
-#### Analysis
+```
 
-#### Forecast
+## Forecast
+
+Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa.
+
+```{r}
+
+```
 
 {{< pagebreak >}}
 
-## Category 02
+# Series Two
 
-```{r data_s02, include=TRUE}
+Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec. Aenean non diam interdum, tincidunt dui in, maximus orci. 
+
+```{r data_s02}
 df_s02 <- df %>%
   filter(category == 'S02') %>%
   select(c(Date,Var02,Var03)) %>%
@@ -121,65 +139,89 @@ ts_s02_v03 <- df_s02 %>%
   expand_dates()
 ```
 
-### Variable 02
+## Variables
+
+Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa.
 
 ```{r, include=TRUE}
+#| layout-ncol: 2
+
 # 7-MA moving average
 ts_s02_v02_ma7 <- ma(ts_s02_v02, order=7, centre=TRUE)
-autoplot(ts_s02_v02_ma7)
-```
 
-#### Analysis
+autoplot(ts_s02_v02_ma7) + 
+ggtitle('7-MA - Variable 2') +
+xlab('Year') + ylab('')
 
-```{r}
-#! layout-ncol: 2
-
-# seasonality
-ggAcf(ts_s02_v02_ma7, lag=90)
-
-# stl decomp
-mstl(ts_s02_v02_ma7) %>% autoplot()
-```
-
-#### Forecast
-
-```{r}
-# ets forecast with 7-MA moving average
-f_s02_v02_ma7 <- forecast(ts_s02_v02_ma7, h=140) 
-f_s02_v02_ma7 %>% autoplot()
-```
-
-### Variable 03
-
-```{r}
 # 7-MA moving average
 ts_s02_v03_ma7 <- ma(ts_s02_v03, order=7, centre=TRUE)
-autoplot(ts_s02_v03_ma7)
+
+autoplot(ts_s02_v03_ma7) + 
+ggtitle('7-MA - Variable 3') +
+xlab('Year') + ylab('')
 ```
 
-#### Analysis
+## Analysis
+
+Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec. Aenean non diam interdum, tincidunt dui in, maximus orci. 
 
 ```{r}
-#! layout-ncol: 2
+#| layout-ncol: 2
 
 # seasonality
-ggAcf(ts_s02_v03_ma7, lag=90)
+ggAcf(ts_s02_v02_ma7, lag=90)  + 
+  ggtitle('ACF - Variable 2') +
+  xlab('Year')
 
 # stl decomp
-mstl(ts_s02_v03_ma7) %>% autoplot()
+mstl(ts_s02_v02_ma7) %>% 
+  autoplot() + 
+  ggtitle('STL Decomp - Variable 2') +
+  xlab('Year')
+
 ```
 
-#### Forecast
+Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. 
 
 ```{r}
+#| layout-ncol: 2
+# seasonality
+ggAcf(ts_s02_v03_ma7, lag=90) + 
+  ggtitle('ACF - Variable 3') +
+  xlab('Year')
+
+# stl decomp
+mstl(ts_s02_v03_ma7) %>% 
+  autoplot() + 
+  ggtitle('STL Decomp - Variable 3') +
+  xlab('Year')
+```
+
+## Forecast
+
+Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec. Aenean non diam interdum, tincidunt dui in, maximus orci. 
+
+```{r}
+#| layout-ncol: 2
+
+# ets forecast with 7-MA moving average
+f_s02_v02_ma7 <- forecast(ts_s02_v02_ma7, h=140) 
+
+autoplot(f_s02_v02_ma7) + 
+  ggtitle('ETS Forecast - Variable 1') +
+  xlab('Year') + ylab('')
+
 # ets forecast with 7-MA moving average
 f_s02_v03_ma7 <- forecast(ts_s02_v03_ma7, h=140) 
-f_s02_v03_ma7 %>% autoplot()
+
+autoplot(f_s02_v03_ma7) + 
+  ggtitle('ETS Forecast - Variable 2') +
+  xlab('Year') + ylab('')
 ```
 
 {{< pagebreak >}}
 
-## Category 03
+# Series Three
 
 ```{r data_s03}
 df_s03 <- df %>%
@@ -188,21 +230,28 @@ df_s03 <- df %>%
   head(1622)
 ```
 
-### Variable 05
+## Variables
 
-#### Analysis
+```{r}
 
-#### Forecast
+```
 
-### Variable 07
+## Analysis
 
-#### Analysis
+```{r}
 
-#### Forecast
+```
+
+## Forecast
+
+```{r}
+
+```
+
 
 {{< pagebreak >}}
 
-## Category 04
+# Series Four
 
 ```{r data_s04}
 df_s04 <- df %>%
@@ -211,21 +260,27 @@ df_s04 <- df %>%
   head(1622)
 ```
 
-### Variable 01
+## Variables
 
-#### Analysis
+```{r}
 
-#### Forecast
+```
 
-### Variable 02
+## Analysis
 
-#### Analysis
+```{r}
 
-#### Forecast
+```
+
+## Forecast
+
+```{r}
+
+```
 
 {{< pagebreak >}}
 
-## Category 05
+# Series Five
 
 ```{r data_s05}
 df_s05 <- df %>%
@@ -234,21 +289,27 @@ df_s05 <- df %>%
   head(1622)
 ```
 
-### Variable 02
+## Variables
 
-#### Analysis
+```{r}
 
-#### Forecast
+```
 
-### Variable 03
+## Analysis
 
-#### Analysis
+```{r}
 
-#### Forecast
+```
+
+## Forecast
+
+```{r}
+
+```
 
 {{< pagebreak >}}
 
-## Category 06
+# Series Six
 
 ```{r data_s06}
 df_s06 <- df %>%
@@ -257,24 +318,30 @@ df_s06 <- df %>%
   head(1622)
 ```
 
-### Variable 02
+## Variables
 
-#### Analysis
+```{r}
 
-#### Forecast
+```
 
-### Variable 03
+## Analysis
 
-#### Analysis
+```{r}
 
-#### Forecast
+```
+
+## Forecast
+
+```{r}
+
+```
 
 {{< pagebreak >}}
 
-## Conclusions
+# Conclusions
 
 {{< pagebreak >}}
 
-## Appendix
+# Appendix
 
-### R Code
+## R Code
