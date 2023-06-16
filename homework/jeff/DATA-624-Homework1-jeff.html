@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.361">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Jeff Parks">
+
+<title>Homework 1</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="DATA-624-Homework1-jeff_files/libs/clipboard/clipboard.min.js"></script>
+<script src="DATA-624-Homework1-jeff_files/libs/quarto-html/quarto.js"></script>
+<script src="DATA-624-Homework1-jeff_files/libs/quarto-html/popper.min.js"></script>
+<script src="DATA-624-Homework1-jeff_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="DATA-624-Homework1-jeff_files/libs/quarto-html/anchor.min.js"></script>
+<link href="DATA-624-Homework1-jeff_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="DATA-624-Homework1-jeff_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="DATA-624-Homework1-jeff_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="DATA-624-Homework1-jeff_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="DATA-624-Homework1-jeff_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Homework 1</h1>
+<p class="subtitle lead">CUNY DATA 624 - 2023 Summer I</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Jeff Parks </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="exercise-key" class="level1">
+<h1>Exercise Key</h1>
+<ul>
+<li><strong>KJ</strong> - <em>Applied Predictive Modeling</em> (Kuhn, Johnson)</li>
+<li><strong>HA</strong> - <em>Forecasting: Principles and Practice, 2nd Ed.</em> (Hyndman, Athanasopoulos)</li>
+</ul>
+</section>
+<section id="ha-exercise-2.1" class="level1">
+<h1>HA Exercise 2.1</h1>
+<p>Use the help function to explore what the series&nbsp;<code>gold</code>,&nbsp;<code>woolyrnq</code>&nbsp;and&nbsp;<code>gas</code>&nbsp;represent.</p>
+<ul>
+<li>The series <code>gold</code> is a time-series dataset of daily morning gold prices in US dollars, from Jan 1, 1985 through Mar 31, 1989.</li>
+<li>The series <code>woolyrng</code> is a time-series dataset of quarterly production of woolen yarn in Australia, in metric tons (tonnes), from Mar 1965 through Sep 1994.</li>
+<li>The series <code>gas</code> is a time-series dataset of monthly gas production in Australia, units unknown, from 1956 through 1995.</li>
+</ul>
+<ol type="a">
+<li>Use&nbsp;<code>autoplot()</code>&nbsp;to plot each of these in separate plots.</li>
+</ol>
+<div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(gold) <span class="sc">+</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Daily Morning Gold Prices"</span>) <span class="sc">+</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Days"</span>) <span class="sc">+</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"US Dollars"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(woolyrnq) <span class="sc">+</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Quarterly Woollen Yarn Production: Australia"</span>) <span class="sc">+</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Year"</span>) <span class="sc">+</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"Metric Tons"</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(gas) <span class="sc">+</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Monthly Gas Production: Australia"</span>) <span class="sc">+</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Years"</span>) <span class="sc">+</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"Units"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-1-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-1-3.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+<ol start="2" type="a">
+<li>What is the frequency of each series? Hint: apply the&nbsp;<code>frequency()</code>&nbsp;function.</li>
+</ol>
+<ul>
+<li>The frequency of <code>gold</code> is 1 (daily)</li>
+<li>The frequency of <code>woolyrnq</code> is 4 (quarterly)</li>
+<li>The frequency of <code>gas</code> is 12 (yearly)</li>
+</ul>
+<ol start="2" type="a">
+<li>Use&nbsp;<code>which.max()</code>&nbsp;to spot the outlier in the&nbsp;<code>gold</code>&nbsp;series. Which observation was it?</li>
+</ol>
+<ul>
+<li>The maximum value in the <code>gold</code> series is observation <strong>770</strong> with a value of <strong>593.7</strong>.</li>
+</ul>
+</section>
+<section id="ha-exercise-2.3" class="level1">
+<h1>HA Exercise 2.3</h1>
+<p>Download some monthly Australian retail data from the book website. These represent retail sales in various categories for different Australian states, and are stored in a MS-Excel file.</p>
+<ol type="a">
+<li><p>Select one of the time series … explore your chosen retail time series using the following functions: <code>autoplot()</code>, <code>ggseasonplot()</code>, <code>ggsubseriesplot()</code>, <code>gglagplot()</code>, <code>ggAcf()</code></p></li>
+<li><p>Can you spot any seasonality, cyclicity and trend? What do you learn about the series?</p></li>
+</ol>
+<p>We’ve selected product <code>A3349790V</code>, which appears to display a gradually increasing trend over the 30 years with strong annual seasonality in the month of December, when sales spike dramatically and then quickly drop. There may also be a cyclic pattern present (though very slight) as the overall trend seems to increase and level off again every 10 years.</p>
+<p>This simple time-series plot suggests the product in question might be a long-lived, high-selling item during the traditional holiday season, and that it may in fact be somewhat demand-inelastic during times of economic recession.</p>
+<div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>retaildata <span class="ot">&lt;-</span> readxl<span class="sc">::</span><span class="fu">read_excel</span>(<span class="st">'data/retail.xlsx'</span>, <span class="at">skip=</span><span class="dv">1</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>myts <span class="ot">&lt;-</span> <span class="fu">ts</span>(retaildata[,<span class="st">'A3349790V'</span>], <span class="at">frequency=</span><span class="dv">12</span>, <span class="at">start=</span><span class="fu">c</span>(<span class="dv">1982</span>,<span class="dv">4</span>))</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(myts) <span class="sc">+</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">'Monthly Product Sales: A3349790V'</span>) <span class="sc">+</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">'Year'</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">'Sales'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+<p>The seasonal time-series <code>ggseasonplot</code> supports this hypothesis, demonstrating a consistent seasonal trend with sales spiking every December.</p>
+<p>Another view of this seasonality is provided by <code>ggsubseriesplot</code>, demonstrating that average product sales seem to double during the month of December, versus their normal monthly sales levels.</p>
+<p>However we also note that overall sales in all months seem to have leveled off in recent years, illustrated by the flattening curves towards the right of each monthly subseries.</p>
+<div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggseasonplot</span>(myts) <span class="sc">+</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">'Seasonal Plot: A3349790V'</span>) <span class="sc">+</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">'Month'</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">'Sales'</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsubseriesplot</span>(myts) <span class="sc">+</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">'Subseries Plot: A3349790V'</span>) <span class="sc">+</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">'Month'</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">'Sales'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-3-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+<p>The observation that a strong, 12-month seasonal cycle is present in these sales data is backed up by the <code>gglagplot</code>, which shows almost-perfect alignment at “lag 12”.</p>
+<p>The Autocorrelation Function (ACF) also supports this observation, with strong autocorrelations at multiples of the 12-month seasonal frequency.</p>
+<div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gglagplot</span>(myts) <span class="sc">+</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">'Lag Plot: A3349790V'</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggAcf</span>(myts) <span class="sc">+</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">'ACF Plot: A3349790V'</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-4-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="ha-exercise-6.2" class="level1">
+<h1>HA Exercise 6.2</h1>
+<p>The <code>plastics</code> data set consists of the monthly sales (in thousands) of product A for a plastics manufacturer for five years.</p>
+<ol type="a">
+<li>Plot the time series of sales of product A. Can you identify seasonal fluctuations and/or a trend-cycle?</li>
+</ol>
+<p>Before applying any calculations, we can observe a rising trend-cycle over the five years, with an annual seasonality where sales peak towards mid-year and then drop off rapidly.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(plastics) <span class="sc">+</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">'Monthly Plastics Sales'</span>) <span class="sc">+</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">'Units Sold'</span>) <span class="sc">+</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">'Year'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<ol start="2" type="a">
+<li>Use a classical multiplicative decomposition to calculate the trend-cycle and seasonal indices.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>plastics <span class="sc">%&gt;%</span> <span class="fu">decompose</span>(<span class="at">type=</span><span class="st">'multiplicative'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>() <span class="sc">+</span> </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">'Year'</span>) <span class="sc">+</span> </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Monthly Plastics Sales: Classical Mult Decomp"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<ol start="3" type="a">
+<li>Do the results support the graphical interpretation from part a?</li>
+</ol>
+<p>The results of the Classical Decomposition do seem to support the graphical interpretation. The trend-cycle decomposition shows a clear, increasing trend throughout the five years, and the seasonal decomposition shows a clear, repetitive annual cycle with a mid-year sales peak.</p>
+<ol start="4" type="a">
+<li>Compute and plot the seasonally adjusted data.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>plastics_decomp <span class="ot">&lt;-</span> plastics <span class="sc">%&gt;%</span> <span class="fu">decompose</span>(<span class="at">type=</span><span class="st">'multiplicative'</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>plastics_decomp<span class="sc">$</span>seasonal_adj <span class="ot">&lt;-</span> plastics_decomp<span class="sc">$</span>x <span class="sc">/</span> plastics_decomp<span class="sc">$</span>seasonal</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(plastics_decomp<span class="sc">$</span>x, <span class="at">series=</span><span class="st">'Data'</span>) <span class="sc">+</span> </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autolayer</span>(plastics_decomp<span class="sc">$</span>seasonal_adj, <span class="at">series=</span><span class="st">'Seasonally Adj'</span>) <span class="sc">+</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">'Monthly Plastic Sales'</span>) <span class="sc">+</span> </span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">'Year'</span>) <span class="sc">+</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">'Sales'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<ol start="5" type="a">
+<li>Change one observation to be an outlier (e.g., add 500 to one observation), and recompute the seasonally adjusted data. What is the effect of the outlier?</li>
+</ol>
+<p>The addition of an outlier near the middle of the dataset produces a spike in both the non-decomposed data and the seasonally adjusted data. However the overall trend-cycle and seasonality seem to return to their established patterns immediately.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>plastics_out <span class="ot">&lt;-</span> plastics</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>plastics_out[<span class="dv">36</span>] <span class="ot">&lt;-</span> plastics_out[<span class="dv">36</span>] <span class="sc">+</span> <span class="dv">500</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>plastics_out_decomp <span class="ot">&lt;-</span> plastics_out <span class="sc">%&gt;%</span> <span class="fu">decompose</span>(<span class="at">type=</span><span class="st">'multiplicative'</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>plastics_out_decomp<span class="sc">$</span>seasonal_adj <span class="ot">&lt;-</span> plastics_out_decomp<span class="sc">$</span>x <span class="sc">/</span> plastics_out_decomp<span class="sc">$</span>seasonal</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(plastics_out_decomp<span class="sc">$</span>x, <span class="at">series=</span><span class="st">'Data'</span>) <span class="sc">+</span> </span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autolayer</span>(plastics_out_decomp<span class="sc">$</span>seasonal_adj, <span class="at">series=</span><span class="st">'Seasonally Adj'</span>) <span class="sc">+</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">'Monthly Plastic Sales'</span>) <span class="sc">+</span> </span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">'Year'</span>) <span class="sc">+</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">'Sales'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<ol start="6" type="a">
+<li>Does it make any difference if the outlier is near the end rather than in the middle of the time series?</li>
+</ol>
+<p>The addition of an outlier towards the end of the dataset produces a spike in both the non-decomposed data and the seasonally adjusted data. However the overall trend-cycle and seasonality seem to return to their established patterns immediately - it does not seem to make much difference where this new outlier is placed.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>plastics_out2 <span class="ot">&lt;-</span> plastics</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>plastics_out2[<span class="dv">58</span>] <span class="ot">&lt;-</span> plastics_out[<span class="dv">58</span>] <span class="sc">+</span> <span class="dv">500</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>plastics_out2_decomp <span class="ot">&lt;-</span> plastics_out2 <span class="sc">%&gt;%</span> <span class="fu">decompose</span>(<span class="at">type=</span><span class="st">'multiplicative'</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>plastics_out2_decomp<span class="sc">$</span>seasonal_adj <span class="ot">&lt;-</span> plastics_out2_decomp<span class="sc">$</span>x <span class="sc">/</span> plastics_out2_decomp<span class="sc">$</span>seasonal</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(plastics_out2_decomp<span class="sc">$</span>x, <span class="at">series=</span><span class="st">'Data'</span>) <span class="sc">+</span> </span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autolayer</span>(plastics_out2_decomp<span class="sc">$</span>seasonal_adj, <span class="at">series=</span><span class="st">'Seasonally Adj'</span>) <span class="sc">+</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">'Monthly Plastic Sales'</span>) <span class="sc">+</span> </span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">'Year'</span>) <span class="sc">+</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">'Sales'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="kj-exercise-3.1" class="level1">
+<h1>KJ Exercise 3.1</h1>
+<p>The UC Irvine Machine Learning Repository contains a data set related to glass identification. The data consist of 214 glass samples labeled as one of seven class categories. There are nine predictors, including the refractive index and percentages of eight elements: Na, Mg, Al, Si, K, Ca, Ba, and Fe.</p>
+<ol type="a">
+<li><p>Using visualizations, explore the predictor variables to understand their distributions as well as the relationships between predictors.</p></li>
+<li><p>Do there appear to be any outliers in the data? Are any predictors skewed?</p></li>
+<li><p>Are there any relevant transformations of one or more predictors that might improve the classification model?</p></li>
+</ol>
+<p>Five of the predictors (<code>Al</code>, <code>Ca</code>, <code>Na</code>, <code>Rl</code>, <code>Si</code>) appear to have somewhat normal distributions, while three (<code>Ba</code>, <code>Fe</code>, <code>K</code>) are very right-skewed. The ninth, <code>Mg</code> appears to be either bimodal, or have some outlier values at the bottom of the distribution.</p>
+<p>There appear to be some instances of strong correlation (both positive and negative) between some of the predictors. The correlation matrix indicated a high degree of positive correlation between <code>Ca</code> and <code>Rl</code>, and strong negative correlations betwen <code>Si</code> and <code>Rl</code>, <code>Ba</code> and <code>Mg</code>, and <code>Al</code> and <code>Mg</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(moments)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mlbench)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(Glass)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>df_glass <span class="ot">&lt;-</span> Glass</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>df_glass_num <span class="ot">&lt;-</span> df_glass <span class="sc">%&gt;%</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">!</span><span class="fu">c</span>(Type))</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># histograms</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>df_glass_num <span class="sc">%&gt;%</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">everything</span>(),<span class="at">names_to =</span> <span class="fu">c</span>(<span class="st">'variables'</span>),<span class="at">values_to =</span> <span class="fu">c</span>(<span class="st">'values'</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">x=</span>values, <span class="at">y =</span> ..density..), <span class="at">alpha=</span><span class="fl">0.5</span>, <span class="at">colour=</span><span class="st">'black'</span>, <span class="at">size=</span><span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(variables), <span class="at">scales=</span><span class="st">"free"</span>)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co"># correlation matrix</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggcorrplot)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>df_glass_num <span class="sc">%&gt;%</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cor</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggcorrplot</span>(<span class="at">type=</span><span class="st">'upper'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-11-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>df_glass_num <span class="sc">%&gt;%</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">skewness</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">round</span>(<span class="dv">2</span>) <span class="sc">%&gt;%</span> <span class="fu">sort</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Mg    Si    Na    Al    RI    Fe    Ca    Ba     K 
+-1.14 -0.73  0.45  0.90  1.61  1.74  2.03  3.39  6.51 </code></pre>
+</div>
+</div>
+<p>The classification model might be improved by making the distributions more normal via centering, scaling or using power transformations such as Box-Cox.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># BoxCox Transform</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>preproc <span class="ot">&lt;-</span><span class="fu">preProcess</span>(df_glass_num, <span class="at">method=</span><span class="fu">c</span>(<span class="st">'BoxCox'</span>))</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>df_glass_norm <span class="ot">&lt;-</span> <span class="fu">predict</span>(preproc, df_glass_num)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>df_glass_norm <span class="sc">%&gt;%</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">everything</span>(),<span class="at">names_to =</span> <span class="fu">c</span>(<span class="st">'variables'</span>),<span class="at">values_to =</span> <span class="fu">c</span>(<span class="st">'values'</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">x=</span>values, <span class="at">y =</span> ..density..), <span class="at">alpha=</span><span class="fl">0.5</span>, <span class="at">colour=</span><span class="st">'black'</span>, <span class="at">size=</span><span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(variables), <span class="at">scales=</span><span class="st">"free"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>df_glass_norm <span class="sc">%&gt;%</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">skewness</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">round</span>(<span class="dv">2</span>) <span class="sc">%&gt;%</span> <span class="fu">sort</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Mg    Si    Ca    Na    Al    RI    Fe    Ba     K 
+-1.14 -0.66 -0.20  0.03  0.09  1.58  1.74  3.39  6.51 </code></pre>
+</div>
+</div>
+<p>As we can see, some of the predictors are still pretty resistant to the BoxCox transform, where we have high levels of skewness. We can use another transformation method, SpatialSign, to bring outliers closer to the central range (rather than removing them entirely from the model.)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SpatialSign Transform</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>preproc_cs <span class="ot">&lt;-</span><span class="fu">preProcess</span>(df_glass_num, <span class="at">method=</span><span class="fu">c</span>(<span class="st">'center'</span>,<span class="st">'scale'</span>))</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>df_glass_cs <span class="ot">&lt;-</span> <span class="fu">predict</span>(preproc_cs, df_glass_num)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>df_glass_ss <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">spatialSign</span>(df_glass_cs))</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>df_glass_ss <span class="sc">%&gt;%</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">everything</span>(),<span class="at">names_to =</span> <span class="fu">c</span>(<span class="st">'variables'</span>),<span class="at">values_to =</span> <span class="fu">c</span>(<span class="st">'values'</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">x=</span>values, <span class="at">y =</span> ..density..), <span class="at">alpha=</span><span class="fl">0.5</span>, <span class="at">colour=</span><span class="st">'black'</span>, <span class="at">size=</span><span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(variables), <span class="at">scales=</span><span class="st">"free"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>df_glass_ss <span class="sc">%&gt;%</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">skewness</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">round</span>(<span class="dv">2</span>) <span class="sc">%&gt;%</span> <span class="fu">sort</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Mg    Si    Na    Al     K    RI    Ca    Fe    Ba 
+-0.79 -0.42  0.10  0.25  0.40  0.52  0.72  0.89  2.06 </code></pre>
+</div>
+</div>
+<p>This appears to be successful - we can see that <code>Mg</code> is indeed bimodal, but overall we can use SpatialSign to reduce skewness while keeping all available information in the model.</p>
+</section>
+<section id="kj-exercise-3.2" class="level1">
+<h1>KJ Exercise 3.2</h1>
+<p>The UC Irvine Machine Learning Repository contains a data set related to soybeans. Data were collected to predict disease in 683 soybeans. The 35 predictors are mostly categorical and include information on the environmental conditions (e.g., temperature, precipitation) and plant conditions (e.g., left spots, mold growth). The outcome labels consist of 19 distinct classes.</p>
+<ol type="a">
+<li><p>Investigate the frequency distributions for the categorical predictors. Are any of the distributions degenerate in the ways discussed earlier in this chapter?</p></li>
+<li><p>Roughly 18 % of the data are missing. Are there particular predictors that are more likely to be missing? Is the pattern of missing data related to the classes?</p></li>
+<li><p>Develop a strategy for handling missing data, either by eliminating predictors or imputation.</p></li>
+</ol>
+<p>By examining bar plots of the frequencies, we can see that all variables have more than one possible outcome, so they are not ‘degenerate distributions’ in the strictest sense. However, several only have two possible outcomes with a huge imbalance (such as <code>shriveling</code> and <code>leaf.maif</code>), so these might be considered to fall into this category.</p>
+<p>Using the <code>naniar</code> package to visualize missing data, we can see that certain predictors (e.g.&nbsp;<code>sever</code>, <code>seed.tmt</code>, <code>lodging</code> and <code>hail</code>) are missing data for over 15% of the observations. However can also see this missingness is restricted to just five soybean Classes.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(naniar)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mlbench)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(Soybean)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>df_soybean <span class="ot">&lt;-</span> Soybean</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co"># factors: ordered to regular; drop NAs and 'Class'</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>df_soybean_freq <span class="ot">&lt;-</span> df_soybean <span class="sc">%&gt;%</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">!</span>Class) <span class="sc">%&gt;%</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_if</span>(is.ordered, <span class="sc">~</span> <span class="fu">factor</span>(., <span class="at">ordered =</span> <span class="cn">FALSE</span>)) </span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="co"># matrixed bar plots</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>df_soybean_freq <span class="sc">%&gt;%</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">everything</span>(), <span class="at">names_to =</span> <span class="fu">c</span>(<span class="st">'variables'</span>), <span class="at">values_to =</span> <span class="fu">c</span>(<span class="st">'values'</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span> <span class="fu">geom_bar</span>(<span class="fu">aes</span>(<span class="at">x=</span>values)) <span class="sc">+</span></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(variables), <span class="at">scales=</span><span class="st">"free"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>On closer examination, we can see that several classes (<code>2-4-d-injury</code>, <code>cyst-nematode</code>, <code>herbicide-injury</code>) are missing 100% of data for most of the predictor variables. Altogether these only represent 38 observations or about 6% of the total. Unless there is a compelling reason to keep these three classes, we might consider dropping them from the model, and using a robust imputation method (such as MICE) on the two other classes for which we have partial data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># missing data by predictor</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">gg_miss_var</span>(df_soybean, <span class="at">show_pct=</span><span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># missing data by predictor and class</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">gg_miss_var</span>(df_soybean, <span class="at">facet =</span> Class, <span class="at">show_pct=</span><span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-18-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>df_soybean_missing <span class="ot">&lt;-</span> df_soybean <span class="sc">%&gt;%</span> </span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Class <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">'2-4-d-injury'</span>,<span class="st">'cyst-nematode'</span>,<span class="st">'diaporthe-pod-&amp;-stem-blight'</span>,</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                      <span class="st">'herbicide-injury'</span>,<span class="st">'phytophthora-rot'</span>))</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a> df_soybean_missing <span class="sc">%&gt;%</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gg_miss_var</span>(<span class="at">facet =</span> Class, <span class="at">show_pct=</span><span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a> <span class="fu">table</span>(df_soybean<span class="sc">$</span>Class) <span class="sc">%&gt;%</span> <span class="fu">sort</span>() <span class="co">#53</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+           herbicide-injury               cyst-nematode 
+                          8                          14 
+diaporthe-pod-&amp;-stem-blight                2-4-d-injury 
+                         15                          16 
+           bacterial-blight           bacterial-pustule 
+                         20                          20 
+               charcoal-rot       diaporthe-stem-canker 
+                         20                          20 
+               downy-mildew      phyllosticta-leaf-spot 
+                         20                          20 
+             powdery-mildew           purple-seed-stain 
+                         20                          20 
+       rhizoctonia-root-rot                 anthracnose 
+                         20                          44 
+             brown-stem-rot            phytophthora-rot 
+                         44                          88 
+        alternarialeaf-spot          frog-eye-leaf-spot 
+                         91                          91 
+                 brown-spot 
+                         92 </code></pre>
+</div>
+</div>
+</section>
+<section id="ha-exercise-7.1" class="level1">
+<h1>HA Exercise 7.1</h1>
+<p>Consider the&nbsp;<code>pigs</code>&nbsp;series — the number of pigs slaughtered in Victoria each month.</p>
+<ol type="a">
+<li><p>Use the&nbsp;<code>ses()</code>&nbsp;function in R to find the optimal values of&nbsp;α&nbsp;and&nbsp;ℓ0, and generate forecasts for the next four months.</p></li>
+<li><p>Compute a 95% prediction interval for the first forecast using&nbsp;^y±1.96s&nbsp;where&nbsp;s&nbsp;is the standard deviation of the residuals. Compare your interval with the interval produced by R.</p></li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># library(fpp2)</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(pigs)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>df_pigs<span class="ot">&lt;-</span> pigs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="ha-exercise-7.2" class="level1">
+<h1>HA Exercise 7.2</h1>
+<p>Write your own function to implement simple exponential smoothing. The function should take arguments&nbsp;<code>y</code>&nbsp;(the time series),&nbsp;<code>alpha</code>&nbsp;(the smoothing parameter&nbsp;α) and&nbsp;<code>level</code>(the initial level&nbsp;ℓ0). It should return the forecast of the next observation in the series. Does it give the same forecast as&nbsp;<code>ses()</code>?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="ha-exercise-7.3" class="level1">
+<h1>HA Exercise 7.3</h1>
+<p>Modify your function from the previous exercise to return the sum of squared errors rather than the forecast of the next observation. Then use the&nbsp;<code>optim()</code>&nbsp;function to find the optimal values of&nbsp;α&nbsp;and&nbsp;ℓ0. Do you get the same values as the&nbsp;<code>ses()</code>&nbsp;function?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="ha-exercise-8.1" class="level1">
+<h1>HA Exercise 8.1</h1>
+<p>Figure&nbsp;<a href="https://otexts.com/fpp2/arima-exercises.html#fig:wnacfplus">8.31</a>&nbsp;shows the ACFs for 36 random numbers, 360 random numbers and 1,000 random numbers.</p>
+<p><img src="images/Screenshot%202023-06-15%20at%2011.57.37.png" class="img-fluid"></p>
+<ol type="a">
+<li><p>Explain the differences among these figures. Do they all indicate that the data are white noise?</p></li>
+<li><p>Why are the critical values at different distances from the mean of zero? Why are the autocorrelations different in each figure when they each refer to white noise?</p></li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="ha-exercise-8.2" class="level1">
+<h1>HA Exercise 8.2</h1>
+<p>A classic example of a non-stationary series is the daily closing IBM stock price series (data set&nbsp;<code>ibmclose</code>). Use R to plot the daily closing prices for IBM stock and the ACF and PACF. Explain how each plot shows that the series is non-stationary and should be differenced.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="ha-exercise-8.6" class="level1">
+<h1>HA Exercise 8.6</h1>
+<p>Use R to simulate and plot some data from simple ARIMA models.</p>
+<ol type="a">
+<li>Use the following R code to generate data from an AR(1) model with&nbsp;ϕ1=0.6&nbsp;and&nbsp;σ2=1. The process starts with&nbsp;y1=0.</li>
+</ol>
+<pre><code>y &lt;- ts(numeric(100))
+e &lt;- rnorm(100)
+for(i in 2:100)
+  y[i] &lt;- 0.6*y[i-1] + e[i]</code></pre>
+<ol start="2" type="a">
+<li><p>Produce a time plot for the series. How does the plot change as you change&nbsp;ϕ1?</p></li>
+<li><p>Write your own code to generate data from an MA(1) model with&nbsp;θ1=0.6&nbsp;and&nbsp;σ2=1.</p></li>
+<li><p>Produce a time plot for the series. How does the plot change as you change&nbsp;θ1?</p></li>
+<li><p>Generate data from an ARMA(1,1) model with&nbsp;ϕ1=0.6,&nbsp;θ1=0.6&nbsp;and&nbsp;σ2=1.</p></li>
+<li><p>Generate data from an AR(2) model with&nbsp;ϕ1=−0.8,&nbsp;ϕ2=0.3&nbsp;and&nbsp;σ2=1. (Note that these parameters will give a non-stationary series.)</p></li>
+<li><p>Graph the latter two series and compare them.</p></li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="ha-exercise-8.8" class="level1">
+<h1>HA Exercise 8.8</h1>
+<p>Consider&nbsp;<code>austa</code>, the total international visitors to Australia (in millions) for the period 1980-2015.</p>
+<ol type="a">
+<li><p>Use&nbsp;<code>auto.arima()</code>&nbsp;to find an appropriate ARIMA model. What model was selected. Check that the residuals look like white noise. Plot forecasts for the next 10 periods.</p></li>
+<li><p>Plot forecasts from an ARIMA(0,1,1) model with no drift and compare these to part a. Remove the MA term and plot again.</p></li>
+<li><p>Plot forecasts from an ARIMA(2,1,3) model with drift. Remove the constant and see what happens.</p></li>
+<li><p>Plot forecasts from an ARIMA(0,0,1) model with a constant. Remove the MA term and plot again.</p></li>
+<li><p>Plot forecasts from an ARIMA(0,2,1) model with no constant.</p></li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

@@ -35,7 +35,6 @@ autoplot(plastics) +
   ggtitle('Monthly Plastics Sales') +
   ylab('Units Sold') +
   xlab('Year')
-
 ```
 
 {{< pagebreak >}}

@@ -1,0 +1,470 @@
+---
+title: 'Homework 1'
+subtitle: 'CUNY DATA 624 - 2023 Summer I'
+author: 'Jeff Parks'
+# abstract: 'abstract text'
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+    theme: united
+# format:
+  # docx:
+  #   highlight-style: arrow
+  #   number-sections: false
+  #   number-depth: 3
+  #   reference-doc: quarto-word-template.docx
+  #   toc: true
+  #   toc-depth: 1
+  #   toc-title: Contents
+page-layout: article
+editor: visual
+---
+
+```{r setup, include=FALSE}
+# chunks
+knitr::opts_chunk$set(echo=TRUE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE)
+
+# libraries
+library(tidyverse)
+library(fpp2)
+library(readxl)
+library(zoo)
+library(seasonal)
+library(kableExtra)
+
+# ggplot
+theme_set(theme_light())
+```
+
+```{r functions, include=FALSE}
+nice_table <- function(df, cap=NULL, cols=NULL, dig=3, fw=F){
+  if (is.null(cols)) {c <- colnames(df)} else {c <- cols}
+  table <- df %>% 
+    kable(caption=cap, col.names=c, digits=dig) %>% 
+    kable_styling(
+      bootstrap_options = c("striped", "hover", "condensed"),
+      html_font = 'monospace',
+      full_width = fw)
+  return(table)
+}
+```
+
+# Exercise Key
+
+-   **KJ** - *Applied Predictive Modeling* (Kuhn, Johnson)
+-   **HA** - *Forecasting: Principles and Practice, 2nd Ed.* (Hyndman, Athanasopoulos)
+
+# HA Exercise 2.1
+
+Use the help function to explore what the series `gold`, `woolyrnq` and `gas` represent.
+
+-   The series `gold` is a time-series dataset of daily morning gold prices in US dollars, from Jan 1, 1985 through Mar 31, 1989.
+-   The series `woolyrng` is a time-series dataset of quarterly production of woolen yarn in Australia, in metric tons (tonnes), from Mar 1965 through Sep 1994.
+-   The series `gas` is a time-series dataset of monthly gas production in Australia, units unknown, from 1956 through 1995.
+
+a.  Use `autoplot()` to plot each of these in separate plots.
+
+```{r}
+#| layout-ncol: 2
+autoplot(gold) +
+  ggtitle("Daily Morning Gold Prices") +
+  xlab("Days") +
+  ylab("US Dollars")
+
+autoplot(woolyrnq) +
+  ggtitle("Quarterly Woollen Yarn Production: Australia") +
+  xlab("Year") +
+  ylab("Metric Tons")
+
+autoplot(gas) +
+  ggtitle("Monthly Gas Production: Australia") +
+  xlab("Years") +
+  ylab("Units")
+```
+
+b.  What is the frequency of each series? Hint: apply the `frequency()` function.
+
+-   The frequency of `gold` is `r frequency(gold)` (daily)
+-   The frequency of `woolyrnq` is `r frequency(woolyrnq)` (quarterly)
+-   The frequency of `gas` is `r frequency(gas)` (yearly)
+
+b.  Use `which.max()` to spot the outlier in the `gold` series. Which observation was it?
+
+-   The maximum value in the `gold` series is observation **`r which.max(gold)`** with a value of **`r gold[770]`**.
+
+# HA Exercise 2.3
+
+Download some monthly Australian retail data from the book website. These represent retail sales in various categories for different Australian states, and are stored in a MS-Excel file.
+
+a.  Select one of the time series ... explore your chosen retail time series using the following functions: `autoplot()`, `ggseasonplot()`, `ggsubseriesplot()`, `gglagplot()`, `ggAcf()`
+
+b.  Can you spot any seasonality, cyclicity and trend? What do you learn about the series?
+
+We've selected product `A3349790V`, which appears to display a gradually increasing trend over the 30 years with strong annual seasonality in the month of December, when sales spike dramatically and then quickly drop. There may also be a cyclic pattern present (though very slight) as the overall trend seems to increase and level off again every 10 years.
+
+This simple time-series plot suggests the product in question might be a long-lived, high-selling item during the traditional holiday season, and that it may in fact be somewhat demand-inelastic during times of economic recession.
+
+```{r}
+#| layout-ncol: 2
+retaildata <- readxl::read_excel('data/retail.xlsx', skip=1)
+myts <- ts(retaildata[,'A3349790V'], frequency=12, start=c(1982,4))
+
+autoplot(myts) +
+  ggtitle('Monthly Product Sales: A3349790V') +
+  xlab('Year') + ylab('Sales')
+```
+
+The seasonal time-series `ggseasonplot` supports this hypothesis, demonstrating a consistent seasonal trend with sales spiking every December.
+
+Another view of this seasonality is provided by `ggsubseriesplot`, demonstrating that average product sales seem to double during the month of December, versus their normal monthly sales levels.
+
+However we also note that overall sales in all months seem to have leveled off in recent years, illustrated by the flattening curves towards the right of each monthly subseries.
+
+```{r}
+#| layout-ncol: 2
+ggseasonplot(myts) +
+  ggtitle('Seasonal Plot: A3349790V') +
+  xlab('Month') + ylab('Sales')
+
+
+ggsubseriesplot(myts) +
+  ggtitle('Subseries Plot: A3349790V') +
+  xlab('Month') + ylab('Sales')
+```
+
+The observation that a strong, 12-month seasonal cycle is present in these sales data is backed up by the `gglagplot`, which shows almost-perfect alignment at "lag 12".
+
+The Autocorrelation Function (ACF) also supports this observation, with strong autocorrelations at multiples of the 12-month seasonal frequency.
+
+```{r}
+#| layout-ncol: 2
+
+gglagplot(myts) +
+  ggtitle('Lag Plot: A3349790V')
+
+ggAcf(myts) +
+  ggtitle('ACF Plot: A3349790V') 
+```
+
+# HA Exercise 6.2
+
+The `plastics` data set consists of the monthly sales (in thousands) of product A for a plastics manufacturer for five years.
+
+a.  Plot the time series of sales of product A. Can you identify seasonal fluctuations and/or a trend-cycle?
+
+Before applying any calculations, we can observe a rising trend-cycle over the five years, with an annual seasonality where sales peak towards mid-year and then drop off rapidly.
+
+```{r}
+autoplot(plastics) +
+  ggtitle('Monthly Plastics Sales') +
+  ylab('Units Sold') +
+  xlab('Year')
+```
+
+b.  Use a classical multiplicative decomposition to calculate the trend-cycle and seasonal indices.
+
+```{r}
+plastics %>% decompose(type='multiplicative') %>%
+  autoplot() + 
+  xlab('Year') + 
+  ggtitle("Monthly Plastics Sales: Classical Mult Decomp")
+```
+
+c.  Do the results support the graphical interpretation from part a?
+
+The results of the Classical Decomposition do seem to support the graphical interpretation. The trend-cycle decomposition shows a clear, increasing trend throughout the five years, and the seasonal decomposition shows a clear, repetitive annual cycle with a mid-year sales peak.
+
+d.  Compute and plot the seasonally adjusted data.
+
+```{r}
+plastics_decomp <- plastics %>% decompose(type='multiplicative')
+
+plastics_decomp$seasonal_adj <- plastics_decomp$x / plastics_decomp$seasonal
+
+autoplot(plastics_decomp$x, series='Data') + 
+  autolayer(plastics_decomp$seasonal_adj, series='Seasonally Adj') +
+  ggtitle('Monthly Plastic Sales') + 
+  xlab('Year') +
+  ylab('Sales')
+```
+
+e.  Change one observation to be an outlier (e.g., add 500 to one observation), and recompute the seasonally adjusted data. What is the effect of the outlier?
+
+The addition of an outlier near the middle of the dataset produces a spike in both the non-decomposed data and the seasonally adjusted data. However the overall trend-cycle and seasonality seem to return to their established patterns immediately.
+
+```{r}
+plastics_out <- plastics
+plastics_out[36] <- plastics_out[36] + 500
+
+plastics_out_decomp <- plastics_out %>% decompose(type='multiplicative')
+plastics_out_decomp$seasonal_adj <- plastics_out_decomp$x / plastics_out_decomp$seasonal
+
+autoplot(plastics_out_decomp$x, series='Data') + 
+  autolayer(plastics_out_decomp$seasonal_adj, series='Seasonally Adj') +
+  ggtitle('Monthly Plastic Sales') + 
+  xlab('Year') +
+  ylab('Sales')
+```
+
+f.  Does it make any difference if the outlier is near the end rather than in the middle of the time series?
+
+The addition of an outlier towards the end of the dataset produces a spike in both the non-decomposed data and the seasonally adjusted data. However the overall trend-cycle and seasonality seem to return to their established patterns immediately - it does not seem to make much difference where this new outlier is placed.
+
+```{r}
+plastics_out2 <- plastics
+plastics_out2[58] <- plastics_out[58] + 500
+
+plastics_out2_decomp <- plastics_out2 %>% decompose(type='multiplicative')
+plastics_out2_decomp$seasonal_adj <- plastics_out2_decomp$x / plastics_out2_decomp$seasonal
+
+autoplot(plastics_out2_decomp$x, series='Data') + 
+  autolayer(plastics_out2_decomp$seasonal_adj, series='Seasonally Adj') +
+  ggtitle('Monthly Plastic Sales') + 
+  xlab('Year') +
+  ylab('Sales')
+```
+
+# KJ Exercise 3.1
+
+The UC Irvine Machine Learning Repository contains a data set related to glass identification. The data consist of 214 glass samples labeled as one of seven class categories. There are nine predictors, including the refractive index and percentages of eight elements: Na, Mg, Al, Si, K, Ca, Ba, and Fe.
+
+a.  Using visualizations, explore the predictor variables to understand their distributions as well as the relationships between predictors.
+
+b.  Do there appear to be any outliers in the data? Are any predictors skewed?
+
+c.  Are there any relevant transformations of one or more predictors that might improve the classification model?
+
+Five of the predictors (`Al`, `Ca`, `Na`, `Rl`, `Si`) appear to have somewhat normal distributions, while three (`Ba`, `Fe`, `K`) are very right-skewed. The ninth, `Mg` appears to be either bimodal, or have some outlier values at the bottom of the distribution.
+
+There appear to be some instances of strong correlation (both positive and negative) between some of the predictors. The correlation matrix indicated a high degree of positive correlation between `Ca` and `Rl`, and strong negative correlations betwen `Si` and `Rl`, `Ba` and `Mg`, and `Al` and `Mg`.
+
+```{r}
+library(caret)
+library(moments)
+library(mlbench)
+
+data(Glass)
+df_glass <- Glass
+```
+
+```{r}
+#| layout-ncol: 2
+df_glass_num <- df_glass %>%
+  dplyr::select(!c(Type))
+
+# histograms
+df_glass_num %>%
+  pivot_longer(everything(),names_to = c('variables'),values_to = c('values')) %>% 
+  ggplot() +
+  geom_histogram(aes(x=values, y = ..density..), alpha=0.5, colour='black', size=0.2) +
+  facet_wrap(vars(variables), scales="free")
+
+# correlation matrix
+library(ggcorrplot)
+
+df_glass_num %>%
+  cor() %>%
+  ggcorrplot(type='upper')
+```
+
+```{r}
+df_glass_num %>%
+  skewness() %>%
+  round(2) %>% sort()
+```
+The classification model might be improved by making the distributions more normal via centering, scaling or using power transformations such as Box-Cox.
+
+```{r}
+# BoxCox Transform
+preproc <-preProcess(df_glass_num, method=c('BoxCox'))
+
+df_glass_norm <- predict(preproc, df_glass_num)
+
+df_glass_norm %>%
+  pivot_longer(everything(),names_to = c('variables'),values_to = c('values')) %>% 
+  ggplot() +
+  geom_histogram(aes(x=values, y = ..density..), alpha=0.5, colour='black', size=0.2) +
+  facet_wrap(vars(variables), scales="free")
+```
+```{r}
+df_glass_norm %>%
+  skewness() %>%
+  round(2) %>% sort()
+```
+As we can see, some of the predictors are still pretty resistant to the BoxCox transform, where we have high levels of skewness.  We can use another transformation method, SpatialSign, to bring outliers closer to the central range (rather than removing them entirely from the model.)
+
+```{r}
+# SpatialSign Transform
+preproc_cs <-preProcess(df_glass_num, method=c('center','scale'))
+df_glass_cs <- predict(preproc_cs, df_glass_num)
+
+df_glass_ss <- as.data.frame(spatialSign(df_glass_cs))
+
+df_glass_ss %>%
+  pivot_longer(everything(),names_to = c('variables'),values_to = c('values')) %>% 
+  ggplot() +
+  geom_histogram(aes(x=values, y = ..density..), alpha=0.5, colour='black', size=0.2) +
+  facet_wrap(vars(variables), scales="free")
+```
+```{r}
+df_glass_ss %>%
+  skewness() %>%
+  round(2) %>% sort()
+```
+This appears to be successful - we can see that `Mg` is indeed bimodal, but overall we can use SpatialSign to reduce skewness while keeping all available information in the model.
+
+
+# KJ Exercise 3.2
+
+The UC Irvine Machine Learning Repository contains a data set related to soybeans. Data were collected to predict disease in 683 soybeans. The 35 predictors are mostly categorical and include information on the environmental conditions (e.g., temperature, precipitation) and plant conditions (e.g., left spots, mold growth). The outcome labels consist of 19 distinct classes.
+
+a.  Investigate the frequency distributions for the categorical predictors. Are any of the distributions degenerate in the ways discussed earlier in this chapter?
+
+b.  Roughly 18 % of the data are missing. Are there particular predictors that are more likely to be missing? Is the pattern of missing data related to the classes?
+
+c.  Develop a strategy for handling missing data, either by eliminating predictors or imputation.
+
+By examining bar plots of the frequencies, we can see that all variables have more than one possible outcome, so they are not 'degenerate distributions' in the strictest sense.  However, several only have two possible outcomes with a huge imbalance (such as `shriveling` and `leaf.maif`), so these might be considered to fall into this category.
+
+Using the `naniar` package to visualize missing data, we can see that certain predictors (e.g. `sever`, `seed.tmt`, `lodging` and `hail`) are missing data for over 15% of the observations.  However can also see this missingness is restricted to just five soybean Classes.
+
+
+
+```{r}
+library(naniar)
+library(mlbench)
+data(Soybean)
+df_soybean <- Soybean
+
+# factors: ordered to regular; drop NAs and 'Class'
+df_soybean_freq <- df_soybean %>%
+  dplyr::select(!Class) %>%
+  drop_na() %>%
+  mutate_if(is.ordered, ~ factor(., ordered = FALSE)) 
+
+# matrixed bar plots
+df_soybean_freq %>%
+  pivot_longer(everything(), names_to = c('variables'), values_to = c('values')) %>%
+  ggplot() + geom_bar(aes(x=values)) +
+  facet_wrap(vars(variables), scales="free")
+```
+
+On closer examination, we can see that several classes (`2-4-d-injury`, `cyst-nematode`, `herbicide-injury`) are missing 100% of data for most of the predictor variables.  Altogether these only represent 38 observations or about 6% of the total. Unless there is a compelling reason to keep these three classes, we might consider dropping them from the model, and using a robust imputation method (such as MICE) on the two other classes for which we have partial data.
+
+```{r}
+# missing data by predictor
+gg_miss_var(df_soybean, show_pct=TRUE)
+
+# missing data by predictor and class
+gg_miss_var(df_soybean, facet = Class, show_pct=TRUE)
+```
+```{r}
+df_soybean_missing <- df_soybean %>% 
+  filter(Class %in% c('2-4-d-injury','cyst-nematode','diaporthe-pod-&-stem-blight',
+                      'herbicide-injury','phytophthora-rot'))
+
+ df_soybean_missing %>%
+  gg_miss_var(facet = Class, show_pct=TRUE)
+ 
+ table(df_soybean$Class) %>% sort()
+```
+
+# HA Exercise 7.1
+
+Consider the `pigs` series --- the number of pigs slaughtered in Victoria each month.
+
+a.  Use the `ses()` function in R to find the optimal values of α and ℓ0, and generate forecasts for the next four months.
+
+b.  Compute a 95% prediction interval for the first forecast using \^y±1.96s where s is the standard deviation of the residuals. Compare your interval with the interval produced by R.
+
+```{r}
+# library(fpp2)
+data(pigs)
+df_pigs<- pigs
+```
+
+# HA Exercise 7.2
+
+Write your own function to implement simple exponential smoothing. The function should take arguments `y` (the time series), `alpha` (the smoothing parameter α) and `level`(the initial level ℓ0). It should return the forecast of the next observation in the series. Does it give the same forecast as `ses()`?
+
+```{r}
+# code here
+```
+
+# HA Exercise 7.3
+
+Modify your function from the previous exercise to return the sum of squared errors rather than the forecast of the next observation. Then use the `optim()` function to find the optimal values of α and ℓ0. Do you get the same values as the `ses()` function?
+
+```{r}
+# code here
+```
+
+# HA Exercise 8.1
+
+Figure [8.31](https://otexts.com/fpp2/arima-exercises.html#fig:wnacfplus) shows the ACFs for 36 random numbers, 360 random numbers and 1,000 random numbers.
+
+![](images/Screenshot%202023-06-15%20at%2011.57.37.png)
+
+a.  Explain the differences among these figures. Do they all indicate that the data are white noise?
+
+b.  Why are the critical values at different distances from the mean of zero? Why are the autocorrelations different in each figure when they each refer to white noise?
+
+```{r}
+# code here
+```
+
+# HA Exercise 8.2
+
+A classic example of a non-stationary series is the daily closing IBM stock price series (data set `ibmclose`). Use R to plot the daily closing prices for IBM stock and the ACF and PACF. Explain how each plot shows that the series is non-stationary and should be differenced.
+
+```{r}
+# code here
+```
+
+# HA Exercise 8.6
+
+Use R to simulate and plot some data from simple ARIMA models.
+
+a.  Use the following R code to generate data from an AR(1) model with ϕ1=0.6 and σ2=1. The process starts with y1=0.
+
+```         
+y <- ts(numeric(100))
+e <- rnorm(100)
+for(i in 2:100)
+  y[i] <- 0.6*y[i-1] + e[i]
+```
+
+b.  Produce a time plot for the series. How does the plot change as you change ϕ1?
+
+c.  Write your own code to generate data from an MA(1) model with θ1=0.6 and σ2=1.
+
+d.  Produce a time plot for the series. How does the plot change as you change θ1?
+
+e.  Generate data from an ARMA(1,1) model with ϕ1=0.6, θ1=0.6 and σ2=1.
+
+f.  Generate data from an AR(2) model with ϕ1=−0.8, ϕ2=0.3 and σ2=1. (Note that these parameters will give a non-stationary series.)
+
+g.  Graph the latter two series and compare them.
+
+```{r}
+# code here
+```
+
+# HA Exercise 8.8
+
+Consider `austa`, the total international visitors to Australia (in millions) for the period 1980-2015.
+
+a.  Use `auto.arima()` to find an appropriate ARIMA model. What model was selected. Check that the residuals look like white noise. Plot forecasts for the next 10 periods.
+
+b.  Plot forecasts from an ARIMA(0,1,1) model with no drift and compare these to part a. Remove the MA term and plot again.
+
+c.  Plot forecasts from an ARIMA(2,1,3) model with drift. Remove the constant and see what happens.
+
+d.  Plot forecasts from an ARIMA(0,0,1) model with a constant. Remove the MA term and plot again.
+
+e.  Plot forecasts from an ARIMA(0,2,1) model with no constant.
+
+```{r}
+# code here
+```

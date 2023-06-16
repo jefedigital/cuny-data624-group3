@@ -1,23 +1,32 @@
 ---
-title: 'Homework 1 - CUNY DATA 624 Sum I'
-subtitle: 'Group 3: Daniel Sullivan, Jeff Parks, Lwin Shwe, Matthew Katz'
+title: 'Homework 1'
+subtitle: 'CUNY DATA 624 - 2023 Summer I'
+author: 'Group 3: Daniel Sullivan, Jeff Parks, Lwin Shwe, Matthew Katz'
+# abstract: 'abstract text'
 format:
   docx:
     highlight-style: arrow
-    reference-doc: word-custom-theme-doc.docx
+    number-sections: false
+    number-depth: 3
+    reference-doc: quarto-word-template.docx
+    toc: true
+    toc-depth: 1
+    toc-title: Contents
 page-layout: article
 editor: visual
 ---
 
 ```{r setup, include=FALSE}
 # chunks
-knitr::opts_chunk$set(echo=TRUE, eval=TRUE, include=TRUE, message=FALSE, 
-warning=FALSE, fig.show="hold", out.width="100%", fig.height=3)
+knitr::opts_chunk$set(echo=TRUE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE)
 
 # libraries
 library(tidyverse)
-library(kableExtra)
 library(fpp2)
+library(readxl)
+library(zoo)
+library(seasonal)
+library(kableExtra)
 
 # ggplot
 theme_set(theme_light())
@@ -36,27 +45,45 @@ nice_table <- function(df, cap=NULL, cols=NULL, dig=3, fw=F){
 }
 ```
 
-## HA Exercise 2.1
+# Exercise Key
 
-**Use the help function to explore what the series `gold`, `woolyrnq` and `gas` represent.** a. **Use `autoplot()` to plot each of these in separate plots.**
+**KJ** - *Applied Predictive Modeling* (Kuhn, Johnson)
+
+**HA** - *Forecasting: Principles and Practice, 2nd Ed.* (Hyndman, Athanasopoulos)
+
+{{< pagebreak >}}
+
+# HA Exercise 2.1
+
+Use the help function to explore what the series `gold`, `woolyrnq` and `gas` represent.
+
+a.  Use `autoplot()` to plot each of these in separate plots.
 
 b.  What is the frequency of each series? Hint: apply the `frequency()` function.
 
 c.  Use `which.max()` to spot the outlier in the `gold` series. Which observation was it?
 
+```{r}
+# code here
+```
+
 {{< pagebreak >}}
 
-## HA Exercise 2.3
+# HA Exercise 2.3
 
 Download some monthly Australian retail data from the book website. These represent retail sales in various categories for different Australian states, and are stored in a MS-Excel file.
 
-Select one of the time series ... explore your chosen retail time series using the following functions: autoplot(), ggseasonplot(), ggsubseriesplot(), gglagplot(), ggAcf()
+a. Select one of the time series ... explore your chosen retail time series using the following functions: `autoplot()`, `ggseasonplot()`, `ggsubseriesplot()`, `gglagplot()`, `ggAcf()`
 
-Can you spot any seasonality, cyclicity and trend? What do you learn about the series?
+b. Can you spot any seasonality, cyclicity and trend? What do you learn about the series?
+
+```{r}
+# code here
+```
 
 {{< pagebreak >}}
 
-## HA Exercise 6.2
+# HA Exercise 6.2
 
 The `plastics` data set consists of the monthly sales (in thousands) of product A for a plastics manufacturer for five years.
 
@@ -71,3 +98,154 @@ d.  Compute and plot the seasonally adjusted data.
 e.  Change one observation to be an outlier (e.g., add 500 to one observation), and recompute the seasonally adjusted data. What is the effect of the outlier?
 
 f.  Does it make any difference if the outlier is near the end rather than in the middle of the time series?
+
+```{r}
+# code here
+```
+
+{{< pagebreak >}}
+
+# KJ Exercise 3.1
+
+The UC Irvine Machine Learning Repository contains a data set related to glass identification. The data consist of 214 glass samples labeled as one of seven class categories. There are nine predictors, including the refractive index and percentages of eight elements: Na, Mg, Al, Si, K, Ca, Ba, and Fe.
+
+a.  Using visualizations, explore the predictor variables to understand their distributions as well as the relationships between predictors.
+
+b.  Do there appear to be any outliers in the data? Are any predictors skewed?
+
+c.  Are there any relevant transformations of one or more predictors that might improve the classification model?
+
+```{r}
+# code here
+library(mlbench)
+data(Glass)
+
+```
+
+{{< pagebreak >}}
+
+# KJ Exercise 3.2
+
+The UC Irvine Machine Learning Repository contains a data set related to soybeans. Data were collected to predict disease in 683 soybeans. The 35 predictors are mostly categorical and include information on the environmen- tal conditions (e.g., temperature, precipitation) and plant conditions (e.g., left spots, mold growth). The outcome labels consist of 19 distinct classes.
+
+a.  Investigate the frequency distributions for the categorical predictors. Are any of the distributions degenerate in the ways discussed earlier in this chapter?
+
+b.  Roughly 18 % of the data are missing. Are there particular predictors that are more likely to be missing? Is the pattern of missing data related to the classes?
+
+c.  Develop a strategy for handling missing data, either by eliminating predictors or imputation.
+
+```{r}
+# code here
+data(Soybean)
+```
+
+{{< pagebreak >}}
+
+# HA Exercise 7.1
+
+Consider the `pigs` series --- the number of pigs slaughtered in Victoria each month.
+
+a. Use the `ses()` function in R to find the optimal values of α and ℓ0, and generate forecasts for the next four months.
+
+b. Compute a 95% prediction interval for the first forecast using ^y±1.96s where s is the standard deviation of the residuals. Compare your interval with the interval produced by R.
+
+```{r}
+# code here
+```
+
+{{< pagebreak >}}
+
+# HA Exercise 7.2
+
+Write your own function to implement simple exponential smoothing. The function should take arguments `y` (the time series), `alpha` (the smoothing parameter α) and `level`(the initial level ℓ0). It should return the forecast of the next observation in the series. Does it give the same forecast as `ses()`?
+
+```{r}
+# code here
+```
+
+{{< pagebreak >}}
+
+# HA Exercise 7.3
+
+Modify your function from the previous exercise to return the sum of squared errors rather than the forecast of the next observation. Then use the `optim()` function to find the optimal values of α and ℓ0. Do you get the same values as the `ses()` function?
+
+```{r}
+# code here
+```
+
+{{< pagebreak >}}
+
+# HA Exercise 8.1
+
+Figure [8.31](https://otexts.com/fpp2/arima-exercises.html#fig:wnacfplus) shows the ACFs for 36 random numbers, 360 random numbers and 1,000 random numbers.
+
+![](images/Screenshot 2023-06-15 at 11.57.37.png)
+
+a. Explain the differences among these figures. Do they all indicate that the data are white noise?
+
+b. Why are the critical values at different distances from the mean of zero? Why are the autocorrelations different in each figure when they each refer to white noise?
+
+```{r}
+# code here
+```
+
+{{< pagebreak >}}
+
+# HA Exercise 8.2
+
+A classic example of a non-stationary series is the daily closing IBM stock price series (data set `ibmclose`). Use R to plot the daily closing prices for IBM stock and the ACF and PACF. Explain how each plot shows that the series is non-stationary and should be differenced.
+
+```{r}
+# code here
+```
+
+{{< pagebreak >}}
+
+# HA Exercise 8.6
+
+Use R to simulate and plot some data from simple ARIMA models.
+
+a. Use the following R code to generate data from an AR(1) model with ϕ1=0.6 and σ2=1. The process starts with y1=0.
+
+```         
+y <- ts(numeric(100))
+e <- rnorm(100)
+for(i in 2:100)
+  y[i] <- 0.6*y[i-1] + e[i]
+```
+
+b. Produce a time plot for the series. How does the plot change as you change ϕ1?
+
+c. Write your own code to generate data from an MA(1) model with θ1=0.6 and σ2=1.
+
+d. Produce a time plot for the series. How does the plot change as you change θ1?
+
+e. Generate data from an ARMA(1,1) model with ϕ1=0.6, θ1=0.6 and σ2=1.
+
+f. Generate data from an AR(2) model with ϕ1=−0.8, ϕ2=0.3 and σ2=1. (Note that these parameters will give a non-stationary series.)
+
+g. Graph the latter two series and compare them.
+
+```{r}
+# code here
+```
+
+{{< pagebreak >}}
+
+# HA Exercise 8.8
+
+Consider `austa`, the total international visitors to Australia (in millions) for the period 1980-2015.
+
+a. Use `auto.arima()` to find an appropriate ARIMA model. What model was selected. Check that the residuals look like white noise. Plot forecasts for the next 10 periods.
+
+b. Plot forecasts from an ARIMA(0,1,1) model with no drift and compare these to part a. Remove the MA term and plot again.
+
+c. Plot forecasts from an ARIMA(2,1,3) model with drift. Remove the constant and see what happens.
+
+d. Plot forecasts from an ARIMA(0,0,1) model with a constant. Remove the MA term and plot again.
+
+e. Plot forecasts from an ARIMA(0,2,1) model with no constant.
+
+```{r}
+# code here
+```
