@@ -520,94 +520,27 @@ We can see that conditional and un-conditional variable importance is same for C
 
 HA 8.2 Use a simulation to show tree bias with different granularities.
 ```{r}
-V1 <- runif(1000, 2,1000)
-V2 <- runif(1000, 50,500)
-V3 <- rnorm(1000, 500,10)
-y <- V2 + V1 
 
-df <- data.frame(V1, V2, V3, y)
-model5 <- cforest(y ~ ., data = df)
-
-#unconditional
-cfImp_cond <- varimp(model5, conditional = FALSE)
-```
-With V1 having more distinct values, the random forest gives this variable the highest score. V2 has a higher score compared to V3 since V2 has more distinct values than V3.
-
-
-```{r}
-barplot(sort(cfImp_cond),horiz = TRUE, main = 'Unconditional')
-```
-HA 8.6 Return to the permeability problem described in Exercises 6.2 and 7.4.
-Train several tree-based models and evaluate the resampling and test set
-performance:
-(a) Which tree-based model gives the optimal resampling and test set performance?
-(b) Do any of these models outperform the covariance or non-covariance
-based regression models you have previously developed for these data?
-What criteria did you use to compare models’ performance?
-(c) Of all the models you have developed thus far, which, if any, would you
-recommend to replace the permeability laboratory experiment?
-```{r}
-library(AppliedPredictiveModeling)
-data(permeability)
-fingerprints1 <- as.data.frame(fingerprints)
-permeability1 <- as.data.frame(permeability)
-
-fingerprints1 <- fingerprints1[, -nearZeroVar(fingerprints1)]
-
-trainingRows <- createDataPartition(permeability1$permeability, p = 0.8, list= FALSE)
-fingerprints_train <- fingerprints1[trainingRows,]
-fingerprints_test <- fingerprints1[-trainingRows,]
-
-permeability_train <- permeability1[trainingRows, ]
-permeability_test <- permeability1[-trainingRows, ]
-```
-
-
-```{r}
-ctrl <- trainControl(method = "cv", preProc = c("center", "scale"))
-
-plsTune3  <- train(x = fingerprints_train, y = permeability_train, method = "pls", trControl = ctrl)
-rpartTune3  <- train(x = fingerprints_train, y = permeability_train, method = "rpart2", trControl = ctrl)
-rfTune3  <- train(x = fingerprints_train, y = permeability_train, method = "rf", trControl = ctrl)
-
-gbmGrid <- expand.grid(interaction.depth = seq(1, 7, by = 2), n.trees = seq(100, 1000, by = 50), shrinkage = c(0.01, 0.1), n.minobsinnode = 10)
-gbmTune3 <- train(x = fingerprints_train, y = permeability_train, method = "gbm", tuneGrid = gbmGrid, verbose = FALSE)
-
-cubistTune3 <- train(x = fingerprints_train, y = permeability_train, method = "cubist")
 ```
 
 ```{r}
-pls_RMSE3 <- min(plsTune3$results$RMSE)
-rpart_RMSE3 <- min(rpartTune3$results$RMSE)
-rf_RMSE3 <- min(rfTune3$results$RMSE)
-gbm_RMSE3 <- min(gbmTune3$results$RMSE)
-cubist_RMSE3 <- min(cubistTune3$results$RMSE)
 
-result3 <- data.frame(Model = c("pls", "rpart", "rf", "gbm", "cubist"), RMSE = c(pls_RMSE3, rpart_RMSE3, rf_RMSE3, gbm_RMSE3, cubist_RMSE3))
-
-result3
-```
-None of these models outperform the covariance or non-covariance based regression models than SVM radial model. I am using RMSE to compare model's performance.
-
-```{r}
-ctrl <- trainControl(method = "cv", preProc = c("center", "scale", "knnImpute"))
-
-knnTune3 <- train(x = fingerprints_train, y = permeability_train, method = "knn", tuneLength = 10)
-
-marsGrid <- expand.grid(degree = 1:2, nprune = 1:20)
-marsTune3 <- train(x = fingerprints_train, y = permeability_train, method = "earth", tuneGrid = marsGrid, trControl = ctrl)
-
-svmRTune3 <- train(x = fingerprints_train, y = permeability_train, method = "svmRadial", tuneLength = 20, trControl = ctrl)
 ```
 
 ```{r}
-knn_RMSE3 <- min(knnTune3$results$RMSE)
-mars_RMSE3 <- min(marsTune3$results$RMSE)
-svmR_RMSE3 <- min(svmRTune3$results$RMSE)
 
-result4 <- data.frame(Model = c("knn", "mars", "svmR"), RMSE = c(knn_RMSE3, mars_RMSE3, svmR_RMSE3))
-
-result4
 ```
-I would recommend SVM model with svmRadial method, because it generate lowest RMSEvalue.
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
 
