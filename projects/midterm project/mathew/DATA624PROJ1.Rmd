@@ -1,0 +1,122 @@
+---
+title: "Data624Proj1"
+author: "Mathew Katz"
+date: "2023-06-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(MLmetrics)
+library(fpp2)
+library(readxl)
+library(tidyverse)
+library(imputeTS)
+library(dplyr)
+```
+
+```{r}
+getwd
+df <- read_xls('Desktop/CunySPS/Data Set for Class.xls')
+```
+
+```{r}
+df
+```
+
+```{r}
+s04 <- subset(df, category == 'S04', select = c(SeriesInd, Var01, Var02)) %>%
+  mutate(date = as.Date(SeriesInd, origin = "1900-01-01"))
+summary(s04)
+```
+
+```{r}
+str(s04)
+```
+
+```{r}
+s04_1 <- s04 %>% select(Var01)
+s04_1 <- s04_1[1:1622,]
+```
+
+```{r}
+s04_2 <- s04 %>% select(Var02)
+s04_2 <- s04_2[1:1622,]
+```
+
+```{r}
+ggplot(s04, aes(x=date, y=Var01))+geom_line()+ xlab("Time") + ylab("S04_V01")
+
+```
+
+```{r}
+ggplot(s04, aes(x=date, y=Var02))+geom_line()+ xlab("Time") + ylab("S05_V02")
+```
+
+```{r}
+s04_1 <- na_interpolation(s04_1)
+```
+
+```{r}
+s04_2 <- na_interpolation(s04_2)
+```
+
+```{r}
+s04_1 <- ts(s04_1)
+```
+
+```{r}
+s04_2 <- ts(s04_2)
+```
+
+```{r}
+s04_1 <- tsclean(s04_1)
+s04_2 <- tsclean(s04_2)
+```
+
+```{r}
+V1train <- window(s04_1, end = as.integer(length(s04_1)*0.8))
+V2train <- window(s04_2, end = as.integer(length(s04_2)*0.8))
+```
+
+```{r}
+farimafit_1 <- V1train %>% auto.arima(lambda = (BoxCox.lambda(s04_1)), stepwise = FALSE) %>% forecast(h = 325)
+farimafit_2 <- V2train %>% auto.arima(lambda = (BoxCox.lambda(s04_2)), stepwise = FALSE) %>% forecast(h = 325)
+```
+
+```{r}
+naive_1 <- naive(V1train, h=325)
+naive_2 <- naive(V2train, h=325)
+```
+
+```{r}
+accuracy(farimafit_1, s04_1)["Test set", "MAPE"]
+```
+
+```{r}
+accuracy(farimafit_2, s04_2)["Test set", "MAPE"]
+```
+
+```{r}
+accuracy(naive_1, s04_1)["Test set", "MAPE"]
+```
+
+```{r}
+accuracy(naive_2, s04_2)["Test set", "MAPE"]
+```
+
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
