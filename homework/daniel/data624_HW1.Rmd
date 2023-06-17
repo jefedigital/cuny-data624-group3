@@ -1,0 +1,481 @@
+---
+title: "Homework 1 Data624"
+author: "Daniel Sullivan"
+date: "2023-06-09"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(TSA)
+library(forecast)
+library(fpp2)
+library(mlbench)
+library(Hmisc)
+library(corrplot)
+library(ggcorrplot)
+library(tidyverse)
+```
+
+# 2.10.1. use the help function to explore what the series gold, woolyrnq and gas represent.
+
+The gold data set shows the daily gold production in dollars per troy ounce for the trading days of 2005. woolyrnq shows the quarterly production in Australia of woolen yarn. and gas shows the monthly gas production in Australia. all of these are time series data sets.
+
+```{r}
+help(woolyrnq)
+help(gas)
+help(gold)
+
+```
+
+###a. Use autoplot() to plot each of these in separate plots.
+```{r}
+autoplot(gold)
+```
+```{r}
+autoplot(woolyrnq)
+```
+```{r}
+autoplot(gas)
+```
+###b. What is the frequency of each series? Hint: apply the frequency() function.
+
+The frequancy of gold is daily, the frequancy of woolyrnq is quarterly, and the frequancy of gas is monthly.  
+
+```{r}
+frequency(gold)
+frequency(woolyrnq)
+frequency(gas)
+```
+###c. Use which.max() to spot the outlier in the gold series. Whichobservation was it?
+
+The outlier or maximum of the gold series is the 770 entry which is equal to 593.7 which is confirmed after consulting a graph. 
+
+```{r}
+which.max(gold)
+gold[770]
+```
+# 2.10.3 Download some monthly Australian retail data from the book website. Theserepresent retail sales in various categories for dierent Australian states,and are stored in a MS-Excel le.
+
+### a. You can read the data into R with the following script:The second argument (skip=1) is required because the Excel sheet hastwo header rows.
+
+```{r}
+retaildata <- readxl::read_excel("retail.xlsx", skip=1)
+
+```
+
+### b. Select one of the time series as follows (but replace the column namewith your own chosen column):
+
+```{r}
+
+
+dans_ts <- ts(retaildata[,"A3349338X"],
+  frequency=12, start=c(1982,4))
+
+retaildata
+dans_ts
+
+```
+
+### c. Explore your chosen retail time series using the following functions:autoplot(), ggseasonplot(), ggsubseriesplot(), gglagplot(),ggAcf()Can you spot any seasonality, cyclicity and trend? What do you learnabout the series
+
+In this data set it does not seem to have any seasonality. There could be an argument that in december there is an increase compared to the other months however this may not be statistically relevent. One thing is clear is that there is a cyclical nature to the data as seen with the sub series plot. Where there is a clear increase as the month continues. the plots also show that as a general trend the total gradually increases every year with some exceptions around 2001 and 2011. 
+
+```{r}
+autoplot(dans_ts)
+ggseasonplot(dans_ts)
+ggsubseriesplot(dans_ts)
+gglagplot(dans_ts)
+ggAcf(dans_ts)
+
+```
+
+
+# 6.9.2 the plastics data set consists of the monthly sales (in thousands) ofproduct A for a plastics manufacturer for five years.
+
+```{r}
+help(plastics)
+head(plastics)
+print(plastics)
+
+
+```
+
+
+### a. Plot the time series of sales of product A. Can you identify seasonal fluctuations and/or a trend-cycle?
+
+Yes there is a clear trend cycle where we have a big hump peaking around august and september. It is clear the sales start to increase around april may peak around september/august and start to decrease around october and stay low through march with the lowest sales month being february. 
+```{r}
+autoplot(plastics)
+seasonplot(plastics)
+```
+
+
+### b. Use a classical multiplicative decomposition to calculate the trend-cycle and seasonal indices.
+
+```{r}
+plastic_decomp<-plastics %>%decompose(type="multiplicative")
+autoplot(plastic_decomp) +xlab("Year") +ggtitle("Classical multiplicative decomposition of plastics")
+
+```
+
+### c. Do the results support the graphical interpretation from part a?
+
+from the graphs above it is clear that there is an obvious seasonal cycle to the data. However one issue that i see is that the remainder has runs of values and the pattern looks cyclical. This would suggest that there is an aspect of seasonality that is not maching up fully and that the model is not picking up. 
+
+### d. Compute and plot the seasonally adjusted data.
+```{r}
+adj_plastics= (plastics / plastic_decomp$seasonal)
+
+#for (i in 1:length(plastics)){
+#  adj_plastics[i]<-plastics[i]-plastic_decomp$seasonal[i]
+#  print(c(adj_plastics[i],plastics[i],plastic_decomp$seasonal[i]))
+#}
+
+autoplot(adj_plastics)
+autoplot(plastics)
+```
+
+
+
+
+### e. Change one observation to be an outlier (e.g., add 500 to oneobservation), and recompute the seasonally adjusted data. What is the effect of the outlier?
+
+It seems that where the outlier landed it had a significant impact on how the model saw the seasonal trand of the data. essentially including a spike in the dataset where the outlier was that went forward to future years. 
+
+```{r}
+#length(plastics)
+plastics[10]<-plastics[10]+500
+
+plastic_decomp<-plastics %>%decompose(type="multiplicative")
+autoplot(plastic_decomp) +xlab("Year") +ggtitle("Classical multiplicative decomposition of plastics")
+
+adj_plastics= (plastics / plastic_decomp$seasonal)
+autoplot(adj_plastics)
+autoplot(plastics)
+plastics[10]<-plastics[10]-500
+```
+
+
+
+### f. Does it make any dierence if the outlier is near the end rather than inthe middle of the time series?
+
+It seems that the location of the data has a significant impact on how trends are picked up by the dcomposition algorithms. It seems that if an outlier is present in the earlier portion ofthe dataset the more it will impact the seasonla cyle outpuyted by the algorithm. However as the outlier gets later in the dataset the less it will effect the trends. 
+
+```{r}
+#length(plastics)
+plastics[13]<-plastics[13]+500
+
+plastic_decomp<-plastics %>%decompose(type="multiplicative")
+autoplot(plastic_decomp) +xlab("Year") +ggtitle("Classical multiplicative decomposition of plastics")
+
+adj_plastics= (plastics / plastic_decomp$seasonal)
+autoplot(adj_plastics)
+autoplot(plastics)
+plastics[13]<-plastics[13]-500
+```
+
+```{r}
+#length(plastics)
+plastics[30]<-plastics[30]+500
+
+plastic_decomp<-plastics %>%decompose(type="multiplicative")
+autoplot(plastic_decomp) +xlab("Year") +ggtitle("Classical multiplicative decomposition of plastics")
+
+adj_plastics= (plastics / plastic_decomp$seasonal)
+autoplot(adj_plastics)
+autoplot(plastics)
+plastics[30]<-plastics[30]-500
+```
+```{r}
+#length(plastics)
+plastics[50]<-plastics[50]+500
+
+plastic_decomp<-plastics %>%decompose(type="multiplicative")
+autoplot(plastic_decomp) +xlab("Year") +ggtitle("Classical multiplicative decomposition of plastics")
+
+adj_plastics= (plastics / plastic_decomp$seasonal)
+autoplot(adj_plastics)
+autoplot(plastics)
+plastics[50]<-plastics[50]-500
+```
+```{r}
+#length(plastics)
+plastics[55]<-plastics[55]+500
+
+plastic_decomp<-plastics %>%decompose(type="multiplicative")
+autoplot(plastic_decomp) +xlab("Year") +ggtitle("Classical multiplicative decomposition of plastics")
+
+adj_plastics= (plastics / plastic_decomp$seasonal)
+autoplot(adj_plastics)
+autoplot(plastics)
+plastics[55]<-plastics[55]-500
+```
+
+
+# 3.1 The UC Irvine Machine Learning Repository contains a data set related to glass identification. The data consist of 214 glass samples labeled as one of seven class categories. There are nine predictors, including the refractive index and percentages of eight elements: Na, Mg, Al, Si, K, Ca, Ba, and Fe
+
+```{r}
+
+data("Glass")
+Glass
+Glass<-Glass%>%select(c(!Type))
+str(Glass)
+#help(Glass)
+```
+
+
+### a. Using visualizations, explore the predictor variables to understand their distributions as well as the relationships between predictors.
+
+
+```{r}
+
+#Glass<-drop_na(Glass)
+#Glass$Type<-as.numeric(Glass$Type)
+#Glass<-sapply(Glass, is.numeric)
+ggcorrplot(cor(as.matrix(Glass)))
+GlassM<-as.matrix(Glass)
+corrplot(cor(GlassM),na.rm=TRUE)
+cor(Glass)
+Glass
+
+ggplot(data=Glass, aes(y=Glass[,1], x=v))+geom_point()
+ggplot(data=Glass, aes(y=Glass[,2], x=v))+geom_point()
+ggplot(data=Glass, aes(y=Glass[,3], x=v))+geom_point()
+ggplot(data=Glass, aes(y=Glass[,4], x=v))+geom_point()
+ggplot(data=Glass, aes(y=Glass[,5], x=v))+geom_point()
+ggplot(data=Glass, aes(y=Glass[,6], x=v))+geom_point()
+ggplot(data=Glass, aes(y=Glass[,7], x=v))+geom_point()
+ggplot(data=Glass, aes(y=Glass[,8], x=v))+geom_point()
+ggplot(data=Glass, aes(y=Glass[,9], x=v))+geom_point()
+```
+There is a high amount of positive correlation between ca and Ri with Ba and Al showing the second most. One interesting thing is that most of the minerals are negativly correlated with Si and Ri with the strongest negative correlation and Ba/Mg and Al/Mg close behind.
+
+
+### b. Do there appear to be any outliers in the data? Are any predictors skewed?
+
+AS far as skew is concerned most f the graphs are mostly normal. However  K Ba and Fe all have left skews while Mg is the only major right skew. Most of the predictors have around 10 outliers with the most being Ca, Ba, and Ri and Mg and K with the fewest
+
+### c.Are there any relevant transformations of one or more predictors that might improve the classification model?
+
+Both NA and Al seem like they would model beeter with a log transformation. 
+
+
+# 3.2 The soybean data can also be found at the UC Irvine Machine Learning Repository. Data were collected to predict disease in 683 soybeans. The 35 predictors are mostly categorical and include information on the environmental conditions (e.g., temperature, precipitation) and plant conditions (e.g., left spots, mold growth). The outcome labels consist of 19 distinct classes.
+
+The data can be loaded via:
+```{r}
+ 
+data(Soybean)
+Soybean 
+```
+ 
+### a. Investigate the frequency distributions for the categorical predictors. Are any of the distributions degenerate in the ways discussed earlier in this chapter?
+
+Yes there are a few that are lopsided for example lodging, leaf.mild, leaf.malf, leaves,mycelium, ,sclorotia, mold.growth, seed.discolor, and seed.size are all very lopsided in their distribution with ycelium essentially only having 6 of one of the two metrics so all of these would be considerations for removal. 
+
+```{r}
+#str(Soybean)
+summary(Soybean)
+matrix(Soybean)
+corrplot(cor(soyB),na.rm=TRUE)
+
+ggplot(Soybean, aes()) +
+  geom_histogram()
+#> `stat_bin()` using `bins = 30`. Pick better value with `binwidth`
+```
+
+
+
+### b.  Roughly 18 % of the data are missing. Are there particular predictors that are more likely to be missing? Is the pattern of missing data related to the classes?
+
+yeas there are a number of predictors that tend to have more Na values typically charecteristics that involve damage or issues with the plant are the least empty then the more empty ones typically involve anatomy of the plant in question. The most compleate data are of course the more metadata such as date and class. the Class does play a role in most represented data points. a vast majority of empty datapoints were part of the 2-4-d injury, diaporthe-pod-&-stem-blight, cyst-nematode, herbicide-injury and phytophthora-rot Classes with most of the other classes unchanged. 
+
+```{r}
+count(soybean)
+count(Soybean)
+bean<-drop_na(Soybean)
+summary(Soybean$Class)
+summary(bean$Class)
+```
+
+
+
+### c. Develop a strategy for handling missing data, either by eliminatingpredictors or imputation
+
+Personally with this data set i think there are two directions to go for filling in data points. First is the easiest where you just use the drop_na command as there would only be a drop of 684 to 562 data points where most analysis still has plenty of variables to perform well. The second is to take a more domain specific route and check for redundances. Essentialy with my limited knowledge of planst i am curious if anything could be back filled by saying the leave type might have an impact on leave spot  or if there is a good amount of overlap between leaf shredding and sever. however this would be more domain specific and not be achievable in all cases. 
+
+
+
+# 7.8.1 Consider the pigs series — the number of pigs slaughtered in Victoria each month
+
+### a. use the ses function in r to find the optimal values of  
+α and ℓ 0, and generate forecasts for the next four months.
+
+```{r}
+  data(pigs)
+autoplot(pigs)
+
+pigs
+
+train<-window(pigs,end = 1992)
+test <- window(pigs,start = 1992)
+
+
+alpha <- seq(.01, .99, by = .01)
+error <- NA
+for(i in seq_along(alpha)) {
+  fit <- ses(train, alpha = alpha[i],h = 4)
+  
+  error[i] <- MAPE(y_pred=fit$mean,y_true=test)
+  #print(c(fit1$mean[i],test1[i]))
+ # print(error1[i])
+}
+error
+final_fit<-ses(pigs, alpha = 0.41,h = 4)
+final_fit$mean
+
+```
+
+
+### b.Compute a 95% prediction interval for the first forecast using is the standard deviation of the residuals. Compare your interval with the interval produced by R
+```{r}
+sd_resid<-sd(final_fit$residuals)
+sd_resid
+
+final_fit$mean[1]+1.96*sd_resid
+final_fit$mean[1]-1.96*sd_resid
+
+final_fit$upper[1]
+final_fit$lower[1]
+
+```
+
+
+# 7.8.2 Write your own function to implement simple exponential smoothing. The function should take arguments y (the time series), alpha (the smoothing parameter α) and level (the initial level ℓ0). It should return the forecast of the next observation in the series. Does it give the same forecast as ses()
+
+Yes this gives the same value as the predicted value of ses
+
+```{r}
+#length(pigs)
+#length(pigs)
+dsSES <- function(time_series, alpha, l){
+  y<-c()
+  y_hat<-l
+  #length(time_series)
+  for(i in 1:(length(time_series))){
+    #print(pigs[i])
+    #print(alpha)
+    #print(l)
+     j=i-1
+      y_hat <- ((alpha*time_series[i]) + (1 - alpha)*y_hat)
+      #print(y_hat)
+      y[i]<-y_hat
+      
+      #print(y[i,])
+  }
+  return(y)
+}
+#y_hat
+#final_fit$model$par[1]
+#final_fit$model$par[2]
+ds_pigs<-dsSES(time_series=pigs, alpha=0.41, l=74043.21)
+ds_pigs[188]
+final_fit$mean[1]
+final_fit$residuals[188]
+pigs[188]
+
+#final_fit$model$par[1]
+```
+# 7.8.3 Modify your function from the previous exercise to return the sum of squared errors rather than the forecast of the next observation. Then use the optim() function to find the optimal values of α and  ℓ0. Do you get the same values as the ses() function?
+
+**wasnt able to wrap this one up **
+
+```{r}
+dsSSE <- function(time_series, alpha, l){
+  y<-c()
+  y_hat<-l
+  sse<-0
+  err<-0
+  #length(time_series)
+  for(i in 1:(length(time_series))){
+   
+      err<-(time_series[i]-y_hat)
+      sse<-sse+(err**2)
+      y_hat <- ((alpha*time_series[i]) + (1 - alpha)*y_hat)
+      #print(y_hat)
+      
+      #print(y[i,])
+  }
+  return(sse)
+}
+
+sse_pigs<-dsSSE(time_series=pigs, alpha=0.41, l=74043.21)
+sse_pigs
+#sse=0
+```
+
+# 8.11.1  Figure 8.31 shows the ACFs for 36 random numbers, 360 random numbers and 1,000 random numbers.
+
+### a. Explain the differences among these figures. Do they all indicate that the data are white noise? 
+
+the primary difference between these datasets is that the confidence interval within the correlation varies and thus the blue line marked on the ACFplot seems to shrink from series one to series 3. However since all of the lag values are below this confidenece interval it is safe to assume no correlation and therefore that all of these are in fact white noise. 
+
+### b. Why are the critical values at different distances from the mean of zero? Why are the autocorrelations different in each figure when they each refer to white noise?
+
+This is determined by the dataset. Essentially the critical values are based off of a confidence interval therefore different datasets will have variying critical values. 
+
+# 8.11.2 A classic example of a non-stationary series is the daily closing IBM stock price series (data set ibmclose). Use R to plot the daily closing prices for IBM stock and the ACF and PACF. Explain how each plot shows that the series is non-stationary and should be differenced.
+
+For starters in our first graph we can see that the as the data goes through the time series the data appears to have plateaus or tiers. It is clear that the time points go through periods of rapid increase and stall and then dip again. Just the fact that the data is tiered like this with non white noise like rising and falling shows non-stationarity. in the second plot(ACF) we see an extraordinarily high level of correlation with previous points. with significance into lag 25. this contributes to the rise and run aspect of non-stationarity.
+
+```{r}
+data("ibmclose")
+autoplot(ibmclose)
+Acf(ibmclose)
+Pacf(ibmclose)
+```
+# 8.11.6 Use R to simulate and plot some data from simple ARIMA models.
+
+### a. Use the following R code to generate data from an AR(1) model with  ϕ1=0.6  and σ2=1 . The process starts with y1=0.
+```{r}
+y <- ts(numeric(100))
+e <- rnorm(100)
+for(i in 2:100){ 
+  y[i] <- 0.6*y[i-1] + e[i]
+  }
+y
+```
+
+### b. Produce a time plot for the series. How does the plot change as you change  ϕ1 ?
+```{r}
+
+```
+
+### c. Write your own code to generate data from an MA(1) model with  θ1=0.6  and σ2=1.
+```{r}
+
+```
+
+### d. Produce a time plot for the series. How does the plot change as you change θ1 ?
+```{r}
+
+```
+
+### e. Generate data from an ARMA(1,1) model with ϕ1=0.6 , θ1=0.6  and σ2=1 .
+```{r}
+
+```
+
+### f.Generate data from an AR(2) model with  
+ϕ1=−0.8 , ϕ2=0.3  and σ2=1. (Note that these parameters will give a non-stationary series.)
+```{r}
+
+```
+
+###g. Graph the latter two series and compare them.
+```{r}
+
+```
+
