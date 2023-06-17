@@ -69,6 +69,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="DATA-624-Homework1-jeff_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="DATA-624-Homework1-jeff_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 </head>
 
@@ -479,7 +481,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a> <span class="fu">table</span>(df_soybean<span class="sc">$</span>Class) <span class="sc">%&gt;%</span> <span class="fu">sort</span>() <span class="co">#53</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a> <span class="fu">table</span>(df_soybean<span class="sc">$</span>Class) <span class="sc">%&gt;%</span> <span class="fu">sort</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
            herbicide-injury               cyst-nematode 
@@ -509,47 +511,188 @@ diaporthe-pod-&amp;-stem-blight                2-4-d-injury
 <h1>HA Exercise 7.1</h1>
 <p>Consider the&nbsp;<code>pigs</code>&nbsp;series — the number of pigs slaughtered in Victoria each month.</p>
 <ol type="a">
-<li><p>Use the&nbsp;<code>ses()</code>&nbsp;function in R to find the optimal values of&nbsp;α&nbsp;and&nbsp;ℓ0, and generate forecasts for the next four months.</p></li>
-<li><p>Compute a 95% prediction interval for the first forecast using&nbsp;^y±1.96s&nbsp;where&nbsp;s&nbsp;is the standard deviation of the residuals. Compare your interval with the interval produced by R.</p></li>
+<li><p>Use the&nbsp;<code>ses()</code>&nbsp;function in R to find the optimal values of <span class="math inline">\(\alpha\)</span> and&nbsp;<span class="math inline">\(\ell_0\)</span>, and generate forecasts for the next four months.</p></li>
+<li><p>Compute a 95% prediction interval for the first forecast using&nbsp;<span class="math inline">\(\hat{y} \pm 1.96s\)</span>&nbsp;where&nbsp;s&nbsp;is the standard deviation of the residuals. Compare your interval with the interval produced by R.</p></li>
 </ol>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># library(fpp2)</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(pigs)</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>df_pigs<span class="ot">&lt;-</span> pigs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>pigs_ses <span class="ot">&lt;-</span> <span class="fu">ses</span>(pigs, <span class="at">h=</span><span class="dv">4</span>)</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(pigs_ses)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Forecast method: Simple exponential smoothing
+
+Model Information:
+Simple exponential smoothing 
+
+Call:
+ ses(y = pigs, h = 4) 
+
+  Smoothing parameters:
+    alpha = 0.2971 
+
+  Initial states:
+    l = 77260.0561 
+
+  sigma:  10308.58
+
+     AIC     AICc      BIC 
+4462.955 4463.086 4472.665 
+
+Error measures:
+                   ME    RMSE      MAE       MPE     MAPE      MASE       ACF1
+Training set 385.8721 10253.6 7961.383 -0.922652 9.274016 0.7966249 0.01282239
+
+Forecasts:
+         Point Forecast    Lo 80    Hi 80    Lo 95    Hi 95
+Sep 1995       98816.41 85605.43 112027.4 78611.97 119020.8
+Oct 1995       98816.41 85034.52 112598.3 77738.83 119894.0
+Nov 1995       98816.41 84486.34 113146.5 76900.46 120732.4
+Dec 1995       98816.41 83958.37 113674.4 76092.99 121539.8</code></pre>
 </div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>pigs_ses <span class="sc">%&gt;%</span> <span class="fu">autoplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">forecast</span>(pigs_ses)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>         Point Forecast    Lo 80    Hi 80    Lo 95    Hi 95
+Sep 1995       98816.41 85605.43 112027.4 78611.97 119020.8
+Oct 1995       98816.41 85034.52 112598.3 77738.83 119894.0
+Nov 1995       98816.41 84486.34 113146.5 76900.46 120732.4
+Dec 1995       98816.41 83958.37 113674.4 76092.99 121539.8</code></pre>
+</div>
+</div>
+<p>The optimal parameter values determined by the ets model are 0.3 for <span class="math inline">\(\alpha\)</span>, and 7.726006^{4} for <span class="math inline">\(\ell\)</span>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>pigs_ses<span class="sc">$</span>mean[<span class="dv">1</span>] <span class="co"># point forecast</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 98816.41</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># PI from model</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>pigs_ses<span class="sc">$</span>lower[,<span class="st">'95%'</span>][<span class="dv">1</span>] <span class="co"># 78611.97</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 78611.97</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>pigs_ses<span class="sc">$</span>upper[,<span class="st">'95%'</span>][<span class="dv">1</span>] <span class="co"># 119020.8</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 119020.8</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># PI calculated</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="co"># these are estimates .. more accurate PIs provided in the model</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>pigs_ses_sd <span class="ot">&lt;-</span> <span class="fu">sd</span>(pigs_ses<span class="sc">$</span>residuals)</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>pigs_ses<span class="sc">$</span>mean[<span class="dv">1</span>] <span class="sc">-</span> pigs_ses_sd <span class="co"># 88542.71</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 88542.71</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>pigs_ses<span class="sc">$</span>mean[<span class="dv">1</span>] <span class="sc">+</span> pigs_ses_sd <span class="co"># 109090.1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 109090.1</code></pre>
+</div>
+</div>
+<p>Our point forecast for the first period is 9.881641^{4} with an estimated standard deviation of 1.027369^{4}, producing a 95% confidence interval from 8.854271^{4} to 1.090901^{5}.</p>
 </section>
 <section id="ha-exercise-7.2" class="level1">
 <h1>HA Exercise 7.2</h1>
 <p>Write your own function to implement simple exponential smoothing. The function should take arguments&nbsp;<code>y</code>&nbsp;(the time series),&nbsp;<code>alpha</code>&nbsp;(the smoothing parameter&nbsp;α) and&nbsp;<code>level</code>(the initial level&nbsp;ℓ0). It should return the forecast of the next observation in the series. Does it give the same forecast as&nbsp;<code>ses()</code>?</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>exp_smooth <span class="ot">&lt;-</span> <span class="cf">function</span>(ts,alpha,lambda){</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  levels <span class="ot">=</span> <span class="fu">as.vector</span>(lambda)</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (y <span class="cf">in</span> ts){</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>    l <span class="ot">&lt;-</span> (alpha <span class="sc">*</span> y) <span class="sc">+</span> ((<span class="dv">1</span><span class="sc">-</span>alpha) <span class="sc">*</span> <span class="fu">last</span>(levels))</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>    levels <span class="ot">&lt;-</span> <span class="fu">append</span>(levels,l)</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>  forecast <span class="ot">=</span> <span class="fu">last</span>(levels)</span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(forecast)</span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a><span class="fu">exp_smooth</span>(pigs, <span class="fl">0.2971</span>, <span class="fl">77260.0561</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 98816.45</code></pre>
 </div>
+</div>
+<p>Using the <code>pigs</code> time series and parameters from the last exercise (<span class="math inline">\(\alpha = 0.2971\)</span>, <span class="math inline">\(\ell = 77260.0561\)</span>), we get the same result for a one-step forecast of 9.881645^{4}.</p>
 </section>
 <section id="ha-exercise-7.3" class="level1">
 <h1>HA Exercise 7.3</h1>
 <p>Modify your function from the previous exercise to return the sum of squared errors rather than the forecast of the next observation. Then use the&nbsp;<code>optim()</code>&nbsp;function to find the optimal values of&nbsp;α&nbsp;and&nbsp;ℓ0. Do you get the same values as the&nbsp;<code>ses()</code>&nbsp;function?</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>exp_smooth_sse <span class="ot">&lt;-</span> <span class="cf">function</span>(ts,alpha,lambda){</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  levels <span class="ot">=</span> <span class="fu">as.vector</span>(lambda)</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (y <span class="cf">in</span> ts){</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>    l <span class="ot">&lt;-</span> (alpha <span class="sc">*</span> y) <span class="sc">+</span> ((<span class="dv">1</span><span class="sc">-</span>alpha) <span class="sc">*</span> <span class="fu">last</span>(levels))</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>    levels <span class="ot">&lt;-</span> <span class="fu">append</span>(levels,l)</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>  residuals <span class="ot">&lt;-</span> ts[<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(ts)] <span class="sc">-</span> levels[<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(ts)]</span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">sum</span>(residuals<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a><span class="fu">exp_smooth_sse</span>(pigs, <span class="fl">0.2971</span>, <span class="fl">77260.0561</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 19765613579</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># come back for the optim() portion</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="ha-exercise-8.1" class="level1">
 <h1>HA Exercise 8.1</h1>
 <p>Figure&nbsp;<a href="https://otexts.com/fpp2/arima-exercises.html#fig:wnacfplus">8.31</a>&nbsp;shows the ACFs for 36 random numbers, 360 random numbers and 1,000 random numbers.</p>
-<p><img src="images/Screenshot%202023-06-15%20at%2011.57.37.png" class="img-fluid"></p>
+<p><img src="images/Screenshot%202023-06-16%20at%2016.17.40.png" class="img-fluid"></p>
 <ol type="a">
 <li><p>Explain the differences among these figures. Do they all indicate that the data are white noise?</p></li>
 <li><p>Why are the critical values at different distances from the mean of zero? Why are the autocorrelations different in each figure when they each refer to white noise?</p></li>
 </ol>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<p>Since all three datasets are generated from random (white noise) distributions, we would expect there to be no autocorrelation detected, and thus an ACF value of zero throughout.</p>
+<p>In actual practice, random variation does occur in these randomly-generated samples and so the datasets with a low <span class="math inline">\(n\)</span> display some ‘false positives’ of autocorrelation detected at random intervals.</p>
+<p>However as number of samples grows larger, these false signals tend to cancel each other out and our ACF values begin to converge to zero.</p>
 </section>
 <section id="ha-exercise-8.2" class="level1">
 <h1>HA Exercise 8.2</h1>
 <p>A classic example of a non-stationary series is the daily closing IBM stock price series (data set&nbsp;<code>ibmclose</code>). Use R to plot the daily closing prices for IBM stock and the ACF and PACF. Explain how each plot shows that the series is non-stationary and should be differenced.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(ibmclose)</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(ibmclose)</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggAcf</span>(ibmclose)</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggPacf</span>(ibmclose)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid" width="672"></p>
 </div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-24-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-24-3.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+<p>While there is not a great deal of seasonality apparent in this dataset, the time series plot of daily closing prices demonstrates a strong cyclic trend and changes in levels. In order to make this non-stationary dataset stationary, we might consider plotting the daily differences in prices instead:</p>
+<div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(ibmclose) <span class="sc">+</span> </span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autolayer</span>(<span class="fu">diff</span>(ibmclose))</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggAcf</span>(<span class="fu">diff</span>(ibmclose))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-25-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+<p>We’ve converted this time series to a more stationary dataset using differencing, which can also be demonstrated with the ACF graph - the result looks like a white noise series with only two autocorrelations exceeding the 95% limits</p>
 </section>
 <section id="ha-exercise-8.6" class="level1">
 <h1>HA Exercise 8.6</h1>
@@ -557,34 +700,228 @@ diaporthe-pod-&amp;-stem-blight                2-4-d-injury
 <ol type="a">
 <li>Use the following R code to generate data from an AR(1) model with&nbsp;ϕ1=0.6&nbsp;and&nbsp;σ2=1. The process starts with&nbsp;y1=0.</li>
 </ol>
-<pre><code>y &lt;- ts(numeric(100))
-e &lt;- rnorm(100)
-for(i in 2:100)
-  y[i] &lt;- 0.6*y[i-1] + e[i]</code></pre>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">ts</span>(<span class="fu">numeric</span>(<span class="dv">100</span>))</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>e <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">100</span>)</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">100</span>)</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>  y[i] <span class="ot">&lt;-</span> <span class="fl">0.6</span><span class="sc">*</span>y[i<span class="dv">-1</span>] <span class="sc">+</span> e[i]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <ol start="2" type="a">
-<li><p>Produce a time plot for the series. How does the plot change as you change&nbsp;ϕ1?</p></li>
-<li><p>Write your own code to generate data from an MA(1) model with&nbsp;θ1=0.6&nbsp;and&nbsp;σ2=1.</p></li>
-<li><p>Produce a time plot for the series. How does the plot change as you change&nbsp;θ1?</p></li>
-<li><p>Generate data from an ARMA(1,1) model with&nbsp;ϕ1=0.6,&nbsp;θ1=0.6&nbsp;and&nbsp;σ2=1.</p></li>
-<li><p>Generate data from an AR(2) model with&nbsp;ϕ1=−0.8,&nbsp;ϕ2=0.3&nbsp;and&nbsp;σ2=1. (Note that these parameters will give a non-stationary series.)</p></li>
-<li><p>Graph the latter two series and compare them.</p></li>
+<li>Produce a time plot for the series. How does the plot change as you change&nbsp;ϕ1?</li>
+</ol>
+<div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>ar1 <span class="ot">&lt;-</span> <span class="cf">function</span>(y,e,phi){</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">100</span>){</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>    y[i] <span class="ot">&lt;-</span> phi <span class="sc">*</span> y[i<span class="dv">-1</span>] <span class="sc">+</span> e[i]</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(y, <span class="at">ylim=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">5</span>,<span class="dv">5</span>))</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">ts</span>(<span class="fu">numeric</span>(<span class="dv">100</span>))</span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a>e <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">100</span>)</span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ar1</span>(y,e,<span class="fl">0.2</span>)</span>
+<span id="cb49-12"><a href="#cb49-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ar1</span>(y,e,<span class="fl">0.5</span>)</span>
+<span id="cb49-13"><a href="#cb49-13" aria-hidden="true" tabindex="-1"></a><span class="fu">ar1</span>(y,e,<span class="fl">0.9</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-27-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-27-3.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+<p>As the value of phi increases, the variance in the time plot increases.</p>
+<ol start="3" type="a">
+<li>Write your own code to generate data from an MA(1) model with&nbsp;θ1=0.6&nbsp;and&nbsp;σ2=1.</li>
 </ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">ts</span>(<span class="fu">numeric</span>(<span class="dv">100</span>))</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>e <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">100</span>)</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">100</span>)</span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>  y[i] <span class="ot">&lt;-</span> y[i<span class="dv">-1</span>] <span class="sc">+</span> <span class="fl">0.6</span><span class="sc">*</span>e[i]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<ol start="4" type="a">
+<li>Produce a time plot for the series. How does the plot change as you change&nbsp;θ1?</li>
+</ol>
+<div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>ma1 <span class="ot">&lt;-</span> <span class="cf">function</span>(y,e,phi){</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">100</span>){</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>    y[i] <span class="ot">&lt;-</span> y[i<span class="dv">-1</span>] <span class="sc">+</span> phi <span class="sc">*</span> e[i]</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(y, <span class="at">ylim=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span>,<span class="dv">10</span>))</span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">ts</span>(<span class="fu">numeric</span>(<span class="dv">100</span>))</span>
+<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>e <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">100</span>)</span>
+<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-11"><a href="#cb51-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ma1</span>(y,e,<span class="fl">0.2</span>)</span>
+<span id="cb51-12"><a href="#cb51-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ma1</span>(y,e,<span class="fl">0.5</span>)</span>
+<span id="cb51-13"><a href="#cb51-13" aria-hidden="true" tabindex="-1"></a><span class="fu">ma1</span>(y,e,<span class="fl">0.9</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-29-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-29-3.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+<ol start="5" type="a">
+<li>Generate data from an ARMA(1,1) model with&nbsp;ϕ1=0.6,&nbsp;θ1=0.6&nbsp;and&nbsp;σ2=1.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>arma <span class="ot">&lt;-</span> <span class="fu">ts</span>(<span class="fu">numeric</span>(<span class="dv">100</span>))</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>e <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">100</span>)</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">100</span>){</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>  arma[i] <span class="ot">&lt;-</span> <span class="fl">0.6</span><span class="sc">*</span>arma[i<span class="dv">-1</span>] <span class="sc">+</span> <span class="fl">0.6</span><span class="sc">*</span>e[i]</span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ol start="6" type="a">
+<li>Generate data from an AR(2) model with&nbsp;ϕ1=−0.8,&nbsp;ϕ2=0.3&nbsp;and&nbsp;σ2=1. (Note that these parameters will give a non-stationary series.)</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>ar2 <span class="ot">&lt;-</span> <span class="fu">ts</span>(<span class="fu">numeric</span>(<span class="dv">100</span>))</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>e <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">100</span>)</span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">3</span><span class="sc">:</span><span class="dv">100</span>){</span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>  ar2[i] <span class="ot">&lt;-</span> <span class="fl">0.3</span><span class="sc">*</span>ar2[i<span class="dv">-2</span>] <span class="sc">+</span> <span class="fl">0.8</span><span class="sc">*</span>ar2[i<span class="dv">-1</span>] <span class="sc">+</span> e[i]</span>
+<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ol start="7" type="a">
+<li>Graph the latter two series and compare them.</li>
+</ol>
+<div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(arma)</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(ar2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-32-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-32-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+<p>The ARMA(1,1) plot is relatively stationary with no obvious or predicatble trends, while the AR(2) model is non-stationary with what appears to be an exponential curve which can either increase or decrease infinitely, depending upon the opening conditions of the random sample.</p>
 </section>
 <section id="ha-exercise-8.8" class="level1">
 <h1>HA Exercise 8.8</h1>
 <p>Consider&nbsp;<code>austa</code>, the total international visitors to Australia (in millions) for the period 1980-2015.</p>
 <ol type="a">
-<li><p>Use&nbsp;<code>auto.arima()</code>&nbsp;to find an appropriate ARIMA model. What model was selected. Check that the residuals look like white noise. Plot forecasts for the next 10 periods.</p></li>
-<li><p>Plot forecasts from an ARIMA(0,1,1) model with no drift and compare these to part a. Remove the MA term and plot again.</p></li>
-<li><p>Plot forecasts from an ARIMA(2,1,3) model with drift. Remove the constant and see what happens.</p></li>
-<li><p>Plot forecasts from an ARIMA(0,0,1) model with a constant. Remove the MA term and plot again.</p></li>
-<li><p>Plot forecasts from an ARIMA(0,2,1) model with no constant.</p></li>
+<li>Use&nbsp;<code>auto.arima()</code>&nbsp;to find an appropriate ARIMA model. What model was selected. Check that the residuals look like white noise. Plot forecasts for the next 10 periods.</li>
+</ol>
+<div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>austa_fit <span class="ot">&lt;-</span> <span class="fu">auto.arima</span>(austa)</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ARIMA(0,1,1) with drift </span></span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a><span class="co"># sigma^2 = 0.03376:  log likelihood = 10.62</span></span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a><span class="co"># AIC=-15.24   AICc=-14.46   BIC=-10.57</span></span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(<span class="fu">forecast</span>(austa_fit, <span class="at">h=</span><span class="dv">10</span>), <span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">10</span>))</span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggAcf</span>(austa_fit<span class="sc">$</span>residuals)</span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a><span class="fu">Box.test</span>(austa_fit<span class="sc">$</span>residuals, <span class="at">lag=</span><span class="dv">10</span>, <span class="at">type=</span><span class="st">"Ljung-Box"</span>) <span class="co"># p-value = 0.9748</span></span>
+<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a><span class="co"># small X2 and large p-value: no correlations in the residuals</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-33-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-33-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output cell-output-stdout quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<pre><code>
+    Box-Ljung test
+
+data:  austa_fit$residuals
+X-squared = 3.2552, df = 10, p-value = 0.9748</code></pre>
+</div>
+</div>
+</div>
+</div>
+<ol start="2" type="a">
+<li>Plot forecasts from an ARIMA(0,1,1) model with no drift and compare these to part a. Remove the MA term and plot again.</li>
+</ol>
+<div>
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>austa_011_fit <span class="ot">&lt;-</span> <span class="fu">Arima</span>(austa, <span class="at">order=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>), <span class="at">include.drift=</span><span class="cn">FALSE</span>)</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(<span class="fu">forecast</span>(austa_011_fit), <span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">10</span>))</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>austa_010_fit <span class="ot">&lt;-</span> <span class="fu">Arima</span>(austa, <span class="at">order=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>), <span class="at">include.drift=</span><span class="cn">FALSE</span>)</span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(<span class="fu">forecast</span>(austa_010_fit), <span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-34-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-34-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+<ol start="3" type="a">
+<li>Plot forecasts from an ARIMA(2,1,3) model with drift. Remove the constant and see what happens.</li>
+</ol>
+<div>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>austa_213_fit <span class="ot">&lt;-</span> <span class="fu">Arima</span>(austa, <span class="at">order=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">3</span>), <span class="at">include.drift=</span><span class="cn">TRUE</span>)</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(<span class="fu">forecast</span>(austa_213_fit), <span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">10</span>))</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a><span class="co"># austa_213_noc_fit &lt;- Arima(austa, order=c(2,1,3), include.drift=TRUE, include.constant=FALSE)</span></span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a><span class="co"># autoplot(forecast(austa_213_noc_fit), ylim=c(0,10))</span></span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a><span class="co"># error: non-stationary AR part from CSS</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-35-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+<p>Removing the constant from the ARIMA(2,1,3) model results in an error pointing to a non-stationary condition in the dataset.</p>
+<ol start="4" type="a">
+<li>Plot forecasts from an ARIMA(0,0,1) model with a constant. Remove the MA term and plot again.</li>
+</ol>
+<div>
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>austa_001_fit <span class="ot">&lt;-</span> <span class="fu">Arima</span>(austa, <span class="at">order=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">include.constant=</span><span class="cn">TRUE</span>)</span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(<span class="fu">forecast</span>(austa_001_fit), <span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">10</span>))</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>austa_000_fit <span class="ot">&lt;-</span> <span class="fu">Arima</span>(austa, <span class="at">order=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>), <span class="at">include.constant=</span><span class="cn">TRUE</span>)</span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(<span class="fu">forecast</span>(austa_000_fit), <span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-36-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-36-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+<ol start="5" type="a">
+<li>Plot forecasts from an ARIMA(0,2,1) model with no constant.</li>
 </ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>austa_021_noc_fit <span class="ot">&lt;-</span> <span class="fu">Arima</span>(austa, <span class="at">order=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">1</span>), <span class="at">include.constant=</span><span class="cn">FALSE</span>)</span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(<span class="fu">forecast</span>(austa_021_noc_fit), <span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="DATA-624-Homework1-jeff_files/figure-html/unnamed-chunk-37-1.png" class="img-fluid" width="672"></p>
+</div>
 </div>
 </section>
 

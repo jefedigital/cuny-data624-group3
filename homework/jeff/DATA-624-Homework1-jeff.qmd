@@ -273,6 +273,7 @@ df_glass_num %>%
   skewness() %>%
   round(2) %>% sort()
 ```
+
 The classification model might be improved by making the distributions more normal via centering, scaling or using power transformations such as Box-Cox.
 
 ```{r}
@@ -287,12 +288,14 @@ df_glass_norm %>%
   geom_histogram(aes(x=values, y = ..density..), alpha=0.5, colour='black', size=0.2) +
   facet_wrap(vars(variables), scales="free")
 ```
+
 ```{r}
 df_glass_norm %>%
   skewness() %>%
   round(2) %>% sort()
 ```
-As we can see, some of the predictors are still pretty resistant to the BoxCox transform, where we have high levels of skewness.  We can use another transformation method, SpatialSign, to bring outliers closer to the central range (rather than removing them entirely from the model.)
+
+As we can see, some of the predictors are still pretty resistant to the BoxCox transform, where we have high levels of skewness. We can use another transformation method, SpatialSign, to bring outliers closer to the central range (rather than removing them entirely from the model.)
 
 ```{r}
 # SpatialSign Transform
@@ -307,13 +310,14 @@ df_glass_ss %>%
   geom_histogram(aes(x=values, y = ..density..), alpha=0.5, colour='black', size=0.2) +
   facet_wrap(vars(variables), scales="free")
 ```
+
 ```{r}
 df_glass_ss %>%
   skewness() %>%
   round(2) %>% sort()
 ```
-This appears to be successful - we can see that `Mg` is indeed bimodal, but overall we can use SpatialSign to reduce skewness while keeping all available information in the model.
 
+This appears to be successful - we can see that `Mg` is indeed bimodal, but overall we can use SpatialSign to reduce skewness while keeping all available information in the model.
 
 # KJ Exercise 3.2
 
@@ -325,11 +329,9 @@ b.  Roughly 18 % of the data are missing. Are there particular predictors that a
 
 c.  Develop a strategy for handling missing data, either by eliminating predictors or imputation.
 
-By examining bar plots of the frequencies, we can see that all variables have more than one possible outcome, so they are not 'degenerate distributions' in the strictest sense.  However, several only have two possible outcomes with a huge imbalance (such as `shriveling` and `leaf.maif`), so these might be considered to fall into this category.
+By examining bar plots of the frequencies, we can see that all variables have more than one possible outcome, so they are not 'degenerate distributions' in the strictest sense. However, several only have two possible outcomes with a huge imbalance (such as `shriveling` and `leaf.maif`), so these might be considered to fall into this category.
 
-Using the `naniar` package to visualize missing data, we can see that certain predictors (e.g. `sever`, `seed.tmt`, `lodging` and `hail`) are missing data for over 15% of the observations.  However can also see this missingness is restricted to just five soybean Classes.
-
-
+Using the `naniar` package to visualize missing data, we can see that certain predictors (e.g. `sever`, `seed.tmt`, `lodging` and `hail`) are missing data for over 15% of the observations. However can also see this missingness is restricted to just five soybean Classes.
 
 ```{r}
 library(naniar)
@@ -350,7 +352,7 @@ df_soybean_freq %>%
   facet_wrap(vars(variables), scales="free")
 ```
 
-On closer examination, we can see that several classes (`2-4-d-injury`, `cyst-nematode`, `herbicide-injury`) are missing 100% of data for most of the predictor variables.  Altogether these only represent 38 observations or about 6% of the total. Unless there is a compelling reason to keep these three classes, we might consider dropping them from the model, and using a robust imputation method (such as MICE) on the two other classes for which we have partial data.
+On closer examination, we can see that several classes (`2-4-d-injury`, `cyst-nematode`, `herbicide-injury`) are missing 100% of data for most of the predictor variables. Altogether these only represent 38 observations or about 6% of the total. Unless there is a compelling reason to keep these three classes, we might consider dropping them from the model, and using a robust imputation method (such as MICE) on the two other classes for which we have partial data.
 
 ```{r}
 # missing data by predictor
@@ -359,6 +361,7 @@ gg_miss_var(df_soybean, show_pct=TRUE)
 # missing data by predictor and class
 gg_miss_var(df_soybean, facet = Class, show_pct=TRUE)
 ```
+
 ```{r}
 df_soybean_missing <- df_soybean %>% 
   filter(Class %in% c('2-4-d-injury','cyst-nematode','diaporthe-pod-&-stem-blight',
@@ -374,53 +377,123 @@ df_soybean_missing <- df_soybean %>%
 
 Consider the `pigs` series --- the number of pigs slaughtered in Victoria each month.
 
-a.  Use the `ses()` function in R to find the optimal values of α and ℓ0, and generate forecasts for the next four months.
+a.  Use the `ses()` function in R to find the optimal values of $\alpha$ and $\ell_0$, and generate forecasts for the next four months.
 
-b.  Compute a 95% prediction interval for the first forecast using \^y±1.96s where s is the standard deviation of the residuals. Compare your interval with the interval produced by R.
+b.  Compute a 95% prediction interval for the first forecast using $\hat{y} \pm 1.96s$ where s is the standard deviation of the residuals. Compare your interval with the interval produced by R.
 
 ```{r}
 # library(fpp2)
 data(pigs)
-df_pigs<- pigs
+pigs_ses <- ses(pigs, h=4)
+summary(pigs_ses)
+
+pigs_ses %>% autoplot()
+forecast(pigs_ses)
 ```
+
+The optimal parameter values determined by the ets model are `r round(pigs_ses$model$par['alpha'],2)` for $\alpha$, and `r round(pigs_ses$model$par['l'],2)` for $\ell$.
+
+```{r}
+pigs_ses$mean[1] # point forecast
+
+# PI from model
+pigs_ses$lower[,'95%'][1] # 78611.97
+pigs_ses$upper[,'95%'][1] # 119020.8
+
+# PI calculated
+# these are estimates .. more accurate PIs provided in the model
+pigs_ses_sd <- sd(pigs_ses$residuals)
+
+pigs_ses$mean[1] - pigs_ses_sd # 88542.71
+pigs_ses$mean[1] + pigs_ses_sd # 109090.1
+```
+
+Our point forecast for the first period is `r round(pigs_ses$mean[1],2)` with an estimated standard deviation of `r round(sd(pigs_ses$residuals),2)`, producing a 95% confidence interval from `r round(pigs_ses$mean[1] - pigs_ses_sd,2)` to `r round(pigs_ses$mean[1] + pigs_ses_sd,2)`.
 
 # HA Exercise 7.2
 
 Write your own function to implement simple exponential smoothing. The function should take arguments `y` (the time series), `alpha` (the smoothing parameter α) and `level`(the initial level ℓ0). It should return the forecast of the next observation in the series. Does it give the same forecast as `ses()`?
 
 ```{r}
-# code here
+exp_smooth <- function(ts,alpha,lambda){
+  levels = as.vector(lambda)
+  
+  for (y in ts){
+    l <- (alpha * y) + ((1-alpha) * last(levels))
+    levels <- append(levels,l)
+  }
+  
+  forecast = last(levels)
+  return(forecast)
+}
+
+exp_smooth(pigs, 0.2971, 77260.0561)
 ```
+
+Using the `pigs` time series and parameters from the last exercise ($\alpha = 0.2971$, $\ell = 77260.0561$), we get the same result for a one-step forecast of `r round(exp_smooth(pigs, 0.2971, 77260.0561),2)`.
 
 # HA Exercise 7.3
 
 Modify your function from the previous exercise to return the sum of squared errors rather than the forecast of the next observation. Then use the `optim()` function to find the optimal values of α and ℓ0. Do you get the same values as the `ses()` function?
 
 ```{r}
-# code here
+exp_smooth_sse <- function(ts,alpha,lambda){
+  levels = as.vector(lambda)
+  
+  for (y in ts){
+    l <- (alpha * y) + ((1-alpha) * last(levels))
+    levels <- append(levels,l)
+  }
+  
+  residuals <- ts[1:length(ts)] - levels[1:length(ts)]
+  return(sum(residuals^2))
+}
+
+exp_smooth_sse(pigs, 0.2971, 77260.0561)
+
+# come back for the optim() portion
 ```
 
 # HA Exercise 8.1
 
 Figure [8.31](https://otexts.com/fpp2/arima-exercises.html#fig:wnacfplus) shows the ACFs for 36 random numbers, 360 random numbers and 1,000 random numbers.
 
-![](images/Screenshot%202023-06-15%20at%2011.57.37.png)
+![](images/Screenshot 2023-06-16 at 16.17.40.png)
 
 a.  Explain the differences among these figures. Do they all indicate that the data are white noise?
 
 b.  Why are the critical values at different distances from the mean of zero? Why are the autocorrelations different in each figure when they each refer to white noise?
 
-```{r}
-# code here
-```
+Since all three datasets are generated from random (white noise) distributions, we would expect there to be no autocorrelation detected, and thus an ACF value of zero throughout.
+
+In actual practice, random variation does occur in these randomly-generated samples and so the datasets with a low $n$ display some 'false positives' of autocorrelation detected at random intervals.
+
+However as number of samples grows larger, these false signals tend to cancel each other out and our ACF values begin to converge to zero.
 
 # HA Exercise 8.2
 
 A classic example of a non-stationary series is the daily closing IBM stock price series (data set `ibmclose`). Use R to plot the daily closing prices for IBM stock and the ACF and PACF. Explain how each plot shows that the series is non-stationary and should be differenced.
 
 ```{r}
-# code here
+#| layout-ncol: 2
+data(ibmclose)
+autoplot(ibmclose)
+ggAcf(ibmclose)
+ggPacf(ibmclose)
 ```
+
+While there is not a great deal of seasonality apparent in this dataset, the time series plot of daily closing prices demonstrates a strong cyclic trend and changes in levels. In order to make this non-stationary dataset stationary, we might consider plotting the daily differences in prices instead:
+
+```{r}
+#| layout-ncol: 2
+autoplot(ibmclose) + 
+  autolayer(diff(ibmclose))
+
+ggAcf(diff(ibmclose))
+```
+
+We've converted this time series to a more stationary dataset using differencing, which can also be demonstrated with the ACF graph - the result looks like a white noise series with only two autocorrelations exceeding the 95% limits
+
 
 # HA Exercise 8.6
 
@@ -428,28 +501,98 @@ Use R to simulate and plot some data from simple ARIMA models.
 
 a.  Use the following R code to generate data from an AR(1) model with ϕ1=0.6 and σ2=1. The process starts with y1=0.
 
-```         
+```{r}         
 y <- ts(numeric(100))
 e <- rnorm(100)
+
 for(i in 2:100)
   y[i] <- 0.6*y[i-1] + e[i]
 ```
 
 b.  Produce a time plot for the series. How does the plot change as you change ϕ1?
 
+```{r}
+#| layout-ncol: 3
+ar1 <- function(y,e,phi){
+  for(i in 2:100){
+    y[i] <- phi * y[i-1] + e[i]
+  }
+  autoplot(y, ylim=c(-5,5))
+}
+
+y <- ts(numeric(100))
+e <- rnorm(100)
+
+ar1(y,e,0.2)
+ar1(y,e,0.5)
+ar1(y,e,0.9)
+```
+
+As the value of phi increases, the variance in the time plot increases.
+
+
 c.  Write your own code to generate data from an MA(1) model with θ1=0.6 and σ2=1.
+
+```{r}         
+y <- ts(numeric(100))
+e <- rnorm(100)
+
+for(i in 2:100)
+  y[i] <- y[i-1] + 0.6*e[i]
+```
 
 d.  Produce a time plot for the series. How does the plot change as you change θ1?
 
+```{r}
+#| layout-ncol: 3
+ma1 <- function(y,e,phi){
+  for(i in 2:100){
+    y[i] <- y[i-1] + phi * e[i]
+  }
+  autoplot(y, ylim=c(-10,10))
+}
+
+y <- ts(numeric(100))
+e <- rnorm(100)
+
+ma1(y,e,0.2)
+ma1(y,e,0.5)
+ma1(y,e,0.9)
+```
+
 e.  Generate data from an ARMA(1,1) model with ϕ1=0.6, θ1=0.6 and σ2=1.
 
+```{r}         
+arma <- ts(numeric(100))
+e <- rnorm(100)
+
+for(i in 2:100){
+  arma[i] <- 0.6*arma[i-1] + 0.6*e[i]
+}
+
+```
+
 f.  Generate data from an AR(2) model with ϕ1=−0.8, ϕ2=0.3 and σ2=1. (Note that these parameters will give a non-stationary series.)
+
+```{r}         
+ar2 <- ts(numeric(100))
+e <- rnorm(100)
+
+for(i in 3:100){
+  ar2[i] <- 0.3*ar2[i-2] + 0.8*ar2[i-1] + e[i]
+}
+```
 
 g.  Graph the latter two series and compare them.
 
 ```{r}
-# code here
+#| layout-ncol: 2
+
+autoplot(arma)
+autoplot(ar2)
 ```
+
+The ARMA(1,1) plot is relatively stationary with no obvious or predicatble trends, while the AR(2) model is non-stationary with what appears to be an exponential curve which can either increase or decrease infinitely, depending upon the opening conditions of the random sample.
 
 # HA Exercise 8.8
 
@@ -457,14 +600,62 @@ Consider `austa`, the total international visitors to Australia (in millions) f
 
 a.  Use `auto.arima()` to find an appropriate ARIMA model. What model was selected. Check that the residuals look like white noise. Plot forecasts for the next 10 periods.
 
+```{r}
+#| layout-ncol: 2
+austa_fit <- auto.arima(austa)
+# ARIMA(0,1,1) with drift 
+# sigma^2 = 0.03376:  log likelihood = 10.62
+# AIC=-15.24   AICc=-14.46   BIC=-10.57
+
+autoplot(forecast(austa_fit, h=10), ylim=c(0,10))
+ggAcf(austa_fit$residuals)
+
+Box.test(austa_fit$residuals, lag=10, type="Ljung-Box") # p-value = 0.9748
+# small X2 and large p-value: no correlations in the residuals
+```
+
 b.  Plot forecasts from an ARIMA(0,1,1) model with no drift and compare these to part a. Remove the MA term and plot again.
+
+```{r}
+#| layout-ncol: 2
+austa_011_fit <- Arima(austa, order=c(0,1,1), include.drift=FALSE)
+autoplot(forecast(austa_011_fit), ylim=c(0,10))
+
+austa_010_fit <- Arima(austa, order=c(0,1,0), include.drift=FALSE)
+autoplot(forecast(austa_010_fit), ylim=c(0,10))
+```
 
 c.  Plot forecasts from an ARIMA(2,1,3) model with drift. Remove the constant and see what happens.
 
+```{r}
+#| layout-ncol: 2
+austa_213_fit <- Arima(austa, order=c(2,1,3), include.drift=TRUE)
+autoplot(forecast(austa_213_fit), ylim=c(0,10))
+
+# austa_213_noc_fit <- Arima(austa, order=c(2,1,3), include.drift=TRUE, include.constant=FALSE)
+# autoplot(forecast(austa_213_noc_fit), ylim=c(0,10))
+# error: non-stationary AR part from CSS
+```
+
+Removing the constant from the ARIMA(2,1,3) model results in an error pointing to a non-stationary condition in the dataset.  
+
 d.  Plot forecasts from an ARIMA(0,0,1) model with a constant. Remove the MA term and plot again.
+
+```{r}
+#| layout-ncol: 2
+austa_001_fit <- Arima(austa, order=c(0,0,1), include.constant=TRUE)
+autoplot(forecast(austa_001_fit), ylim=c(0,10))
+
+austa_000_fit <- Arima(austa, order=c(0,0,0), include.constant=TRUE)
+autoplot(forecast(austa_000_fit), ylim=c(0,10))
+```
 
 e.  Plot forecasts from an ARIMA(0,2,1) model with no constant.
 
 ```{r}
-# code here
+#| layout-ncol: 2
+austa_021_noc_fit <- Arima(austa, order=c(0,2,1), include.constant=FALSE)
+autoplot(forecast(austa_021_noc_fit), ylim=c(0,10))
 ```
+
+
