@@ -1,0 +1,231 @@
+---
+title: "Project1_S03"
+author: "Lwin_Shwe"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+  word_document: default
+---
+
+```{r load-packages, message=FALSE}
+library(fpp2)
+library(dplyr)
+library(imputeTS)
+library(readxl)
+library(tsoutliers)
+library(forecast)
+```
+
+
+
+```{r reading-dataset}
+library(readxl)
+DATA624_Project1_Data_S03 <- read_excel("~/DATA624_Project1_Data_S03.xlsx")
+View(DATA624_Project1_Data_S03)
+```
+
+
+
+```{r subsetan-filter-dataset}
+
+data_S03 <- subset(DATA624_Project1_Data_S03, category == 'S03', select = c(SeriesInd, Var05, Var07)) %>%
+  mutate(date = as.Date(SeriesInd, origin = "1900-01-01"))
+summary(data_S03)
+str(data_S03)
+data_S03 <- filter(data_S03, SeriesInd <= 43221)
+summary(data_S03)
+str(data_S03)
+```
+
+```{r subsetsV05V07}
+data_S03_v5 <- data_S03 %>% select(Var05)
+data_S03_v5 <- data_S03_v5[1:1622,]
+summary(data_S03_v5)
+str(data_S03_v5)
+data_S03_v7 <- data_S03 %>% select(Var07)
+data_S03_v7 <- data_S03_v7[1:1622,]
+summary(data_S03_v7)
+str(data_S03_v7)
+
+```
+
+
+```{r impute-missing-data}
+data_S03_v5 <- na_interpolation(data_S03_v5)
+summary(data_S03_v5)
+str(data_S03_v5)
+data_S03_v7 <- na_interpolation(data_S03_v7)
+summary(data_S03_v7)
+str(data_S03_v7)
+```
+
+
+```{r timeseries-data}
+data_S03_v5 <- ts(data_S03_v5)
+str(data_S03_v5)
+data_S03_v7 <- ts(data_S03_v7)
+str(data_S03_v7)
+autoplot(data_S03_v5) + ggtitle("Time Series Data S03_Var05")
+autoplot(data_S03_v7) + ggtitle("Time Series Data S03_Var07")
+```
+
+```{r Cyclic-timeseries-data}
+par(mfrow= c(1,2))
+hist(data_S03_v5)
+boxplot(data_S03_v5)
+hist(data_S03_v7)
+boxplot(data_S03_v7)
+```
+
+```{r remove-outliers}
+data_S03_v5_out <- tsoutliers(data_S03_v5)
+data_S03_v7_out <- tsoutliers(data_S03_v7)
+data_S03_v5 <- tsclean(data_S03_v5)
+data_S03_v7 <-tsclean(data_S03_v7)
+autoplot(data_S03_v5) + ggtitle("Cleaned Data_S03_Var05")
+autoplot(data_S03_v7) + ggtitle("Cleaned Data_S03_Var07")
+
+# correlation test & Extract correlation coefficient and p-value
+correlation_test <- cor.test(data_S03_v5, data_S03_v7)
+cor_coefficient <- correlation_test$estimate
+p_value <- correlation_test$p.value
+print(correlation_test)
+
+```
+
+```{r linear_regression_model}
+lmodel <- lm(data_S03_v5 ~ data_S03_v7)
+plot(data_S03_v5, data_S03_v7) 
+abline(lmodel)
+title(main = "Scatter plot of S03_Var05 Vs S03_Var07")
+```
+```{r squared-correlation}
+correlation <- cor(data_S03_v5, data_S03_v7)
+squared_correlation <- correlation^2
+print(squared_correlation)
+
+# Plot the ACF of the differences of S03_Var05
+ggAcf(data_S03_v5)
+autoplot(diff(data_S03_v5))
+acf(diff(data_S03_v5), main = "ACF of S03_Var05 Difference")
+# There is no seasonality due to the presence of one order autocorrelation.
+```
+
+```{r auto_correlation}
+# Plot the ACF of the differences of S03_Var07
+ggAcf(data_S03_v7)
+autoplot(diff(data_S03_v7))
+acf(diff(data_S03_v7), main = "ACF of S03_Var07 Difference")
+# There is no seasonality due to the presence of one order autocorrelation.
+```
+```{r Training_set}
+data_S03_v5_train <- window(data_S03_v5, end = as.integer(length(data_S03_v5) * 0.80))
+data_S03_v7_train <- window(data_S03_v7, end = as.integer(length(data_S03_v7) * 0.85))
+
+# Find lambda value
+lambda5 <- BoxCox.lambda(data_S03_v5)
+lambda7 <- BoxCox.lambda(data_S03_v7)
+# Apply the selected model to training Set
+f_horizon <- length(data_S03_v5) - as.integer(length(data_S03_v5) * 0.914)
+f_horizon
+# There are 140 periods in forecasting horizon.
+```
+
+
+```{r arima-model}
+
+# Fit the ARIMA model
+data_S03_v5_farima_fit <- auto.arima(data_S03_v5_train, lambda = lambda5, stepwise = FALSE)
+# Forecast time series
+fresult_arima_V05 <- forecast(data_S03_v5_farima_fit, h = f_horizon)
+# visualize ARIMA model of foresting 
+autoplot(fresult_arima_V05)+autolayer(fresult_arima_V05, alpha = 0.65)
+#Check Var05 residuals if the model is valid
+checkresiduals(fresult_arima_V05)
+#with p-value greater than 0.05, there is convincing evidence that residuals for Var05 are white noise. On ACF, the residuals are uncorrelated. The histogram shows that the residuals are normal distributed.
+
+data_S03_v7_farima_fit <- auto.arima(data_S03_v7_train, lambda = lambda7, stepwise = FALSE)
+fresult_arima_V07 <- forecast(data_S03_v7_farima_fit, h = f_horizon)
+autoplot(fresult_arima_V07)+autolayer(fresult_arima_V07, alpha = 0.65)
+checkresiduals(fresult_arima_V07)
+```
+
+
+```{r ETS_Model}
+
+# Fit the ETS model
+data_S03_v5_fets_fit <- ets(data_S03_v5_train, lambda = lambda5)
+# Forecast the result
+fresult_fets_V05<- forecast(data_S03_v5_fets_fit, h = f_horizon)
+# visualize ETS model of foresting 
+autoplot(fresult_fets_V05)+autolayer(fresult_fets_V05, alpha = 0.65)
+#Check Var05 residuals if the model is valid
+checkresiduals(fresult_fets_V05)
+#The p values for the ETS models residuals are less than 0.05.The residuals are not white noise. They ETS models have prediction interval to wide. The ETS models have the best accuracy with the test set
+
+# Fit the ETS model for S03_Var07
+data_S03_v7_fets_fit <- ets(data_S03_v7_train, lambda = lambda7)
+# Forecast the result of S03_Var07
+fresult_fets_V07<- forecast(data_S03_v7_fets_fit, h = f_horizon)
+# visualize ETS model of foresting for variables S03_Var07
+autoplot(fresult_fets_V07)+autolayer(fresult_fets_V07, alpha = 0.65)
+#Check Var07 residuals if the model is valid
+checkresiduals(fresult_fets_V07)
+```
+
+
+```{r Naive-Model}
+# Forecast the result 
+data_S03_v5_naive_fit <- naive(data_S03_v5_train, h = f_horizon)
+# visualize Naive model of foresting 
+autoplot(data_S03_v5_naive_fit)+autolayer(data_S03_v5_naive_fit, alpha = 0.65)
+#Check Var05 residuals if the model is valid
+checkresiduals(data_S03_v5_naive_fit)
+
+data_S03_v7_naive_fit <- naive(data_S03_v7_train, h = f_horizon)
+autoplot(data_S03_v7_naive_fit)+autolayer(data_S03_v7_naive_fit, alpha = 0.65)
+checkresiduals(data_S03_v7_naive_fit)
+```
+
+
+```{r MAPE_accuracy_Var05}
+
+# ARIMA model
+DS03_Var05_farima_ac <- accuracy(fresult_arima_V05, data_S03_v5)["Test set", "MAPE"]
+
+# ETS model
+DS03_Var05_fets_ac <- accuracy(fresult_fets_V05, data_S03_v5)["Test set", "MAPE"]
+
+# Naive model
+DS03_Var05_fnaive_ac <- accuracy(data_S03_v5_naive_fit, data_S03_v5)["Test set", "MAPE"]
+```
+
+
+
+```{r Accuary_MAPE_Var07}
+# ARIMA model
+DS03_Var07_farima_ac <- accuracy(fresult_arima_V07, data_S03_v7)["Test set", "MAPE"]
+
+# ETS model
+DS03_Var07_fets_ac <- accuracy(fresult_fets_V07, data_S03_v7)["Test set", "MAPE"]
+
+# Naive model
+DS03_Var07_fnaive_ac <- accuracy(data_S03_v7_naive_fit, data_S03_v7)["Test set", "MAPE"]
+```
+
+
+
+```{r Compare_accuary_models}
+DS03_Var05_MAPE <- c(DS03_Var05_fnaive_ac, DS03_Var05_farima_ac, DS03_Var05_fets_ac)
+DS03_Var07_MAPE <- c(DS03_Var07_fnaive_ac, DS03_Var07_farima_ac, DS03_Var07_fets_ac)
+
+S03_MAPE <- matrix(rbind(DS03_Var05_MAPE, DS03_Var07_MAPE), nrow = 2, ncol = 3)
+rownames(S03_MAPE) <- c("S03_Var05", "S03_Var07")
+colnames(S03_MAPE) <- c("Naive", "ARIMA", "ETS")
+data.frame(S03_MAPE)
+
+```
+### According to the results of MAPE (Mean Absolute Percentage Error), the Naive model has the best accuracy with the least error compared to ETS and ARIMA methods for the variables S03_Var05 and S03_Var07.
+
