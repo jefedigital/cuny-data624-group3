@@ -20,7 +20,7 @@ library(dplyr)
 
 ```{r}
 getwd
-df <- read_xls('Desktop/CunySPS/Data Set for Class.xls')
+df <- read_xls('../data/Data Set for Class.xls', sheet='Set for Class')
 ```
 
 ```{r}
@@ -107,7 +107,6 @@ accuracy(naive_1, s04_1)["Test set", "MAPE"]
 ```{r}
 accuracy(naive_2, s04_2)["Test set", "MAPE"]
 ```
-
 
 ```{r}
 
