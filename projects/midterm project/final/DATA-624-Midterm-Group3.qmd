@@ -8,13 +8,13 @@ format:
     highlight-style: arrow
     number-sections: false
     number-depth: 2
-    reference-doc: ../../templates/quarto-word-template.docx
+    reference-doc: ../../../templates/quarto-word-template.docx
     toc: true
     toc-depth: 1
     toc-title: Contents
 editor: visual
 execute:
-  echo: true
+  echo: false
   eval: true
   include: true
   message: false
@@ -27,7 +27,7 @@ execute:
 page-layout: article
 ---
 
-```{r setup, include=FALSE}
+```{r setup}
 # libraries
 library(tidyverse)
 library(fpp2)
@@ -352,3 +352,12 @@ df_s06 <- df %>%
 # Appendix
 
 ## R Code
+
+```{r}
+#| echo: true
+#| eval: false
+
+# code here
+```
+
+
