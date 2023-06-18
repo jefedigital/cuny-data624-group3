@@ -1,0 +1,613 @@
+---
+title: "Data624HW1"
+author: "Mathew Katz"
+date: "2023-06-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(fpp2)
+library(glue)
+library(corrplot)
+library(randomForest)
+library(caret)
+library(gridExtra)
+library(vip)
+library(party)
+library(Cubist)
+library(gbm)
+```
+
+HA 2.1
+Use the help function to explore what the series gold, woolyrnq and gas represent.
+
+Use autoplot() to plot each of these in separate plots.
+What is the frequency of each series? Hint: apply the frequency() function.
+Use which.max() to spot the outlier in the gold series. Which observation was it?
+
+```{r}
+help(gold)
+```
+
+The help functions tells us that gold is a time series dataframe of the daily morning gold prices in US dollars from 1 January 1985 – 31 March 1989.
+
+```{r}
+autoplot(gold) + ggtitle("Plot for Gold Time Series") + xlab("Day") + ylab("Price $")
+```
+
+```{r}
+fg <- frequency(gold)
+glue('The frequency for the gold time series data is {fg}.')
+```
+
+```{r}
+wmg <- which.max(gold)
+glue('The outlier for the gold time series data is {wmg}.')
+```
+
+```{r}
+help(woolyrnq)
+```
+The help functions tells us that woolyrnq is a time series dataframe of the quarterly production of woollen yarn in Australia from Mar 1965 – Sep 1994.
+
+```{r}
+autoplot(woolyrnq) + ggtitle("Plot for Wool Time Series") + xlab("Year") + ylab("Weight in tonnes")
+```
+```{r}
+fw <- frequency(woolyrnq)
+glue('The frequency for the wool time series data is {fw} (quarterly).')
+```
+
+```{r}
+wmw <- which.max(woolyrnq)
+glue('The outlier for the wool time series data is {wmw}.')
+```
+```{r}
+help(gas)
+```
+
+The help functions tells us that gas is a time series dataframe of the Australian monthly gas production from 1956–1995.
+
+```{r}
+autoplot(gas) + ggtitle("Plot for Gas Time Series") + xlab("Year") + ylab("Amount Produced")
+```
+
+```{r}
+fgas <- frequency(gas)
+glue('The frequency for the gas time series data is {fgas} (yearly).')
+```
+
+```{r}
+wmgas <- which.max(gas)
+glue('The outlier for the gas time series data is {wmgas}.')
+```
+HA 2.3
+Download some monthly Australian retail data from the book website. These represent retail sales in various categories for different Australian states, and are stored in a MS-Excel file.
+
+You can read the data into R with the following script:
+
+retaildata <- readxl::read_excel("retail.xlsx", skip=1)
+The second argument (skip=1) is required because the Excel sheet has two header rows.
+
+Select one of the time series as follows (but replace the column name with your own chosen column):
+
+myts <- ts(retaildata[,"A3349873A"],
+  frequency=12, start=c(1982,4))
+Explore your chosen retail time series using the following functions:
+
+autoplot(), ggseasonplot(), ggsubseriesplot(), gglagplot(), ggAcf()
+
+Can you spot any seasonality, cyclicity and trend? What do you learn about the series?
+
+```{r}
+retaildata <- readxl::read_excel("retail.xlsx", skip=1)
+```
+
+```{r}
+myts <- ts(retaildata[,"A3349399C"],
+  frequency=12, start=c(1982,4))
+```
+
+```{r}
+autoplot(myts) + ggtitle("A3349399C") +
+  xlab("Year") + ylab("Sales")
+```
+
+```{r}
+ggseasonplot(myts, year.labels = TRUE, year.labels.left = TRUE) +
+  ylab("Sales") + ggtitle("Seasonal Plot of A3349399C")
+```
+```{r}
+ggsubseriesplot(myts) + ylab("Sales") +
+  ggtitle("Seasonal Subseries Plot of A3349399C")
+```
+
+```{r}
+gglagplot(myts)
+```
+
+```{r}
+ggAcf(myts)
+```
+HA 6.2 The plastics data set consists of the monthly sales (in thousands) of product A for a plastics manufacturer for five years.
+
+Plot the time series of sales of product A. Can you identify seasonal fluctuations and/or a trend-cycle?
+Use a classical multiplicative decomposition to calculate the trend-cycle and seasonal indices.
+Do the results support the graphical interpretation from part a?
+Compute and plot the seasonally adjusted data.
+Change one observation to be an outlier (e.g., add 500 to one observation), and recompute the seasonally adjusted data. What is the effect of the outlier?
+Does it make any difference if the outlier is near the end rather than in the middle of the time series?
+
+```{r}
+autoplot(plastics) +
+  xlab("Year") + ylab("Sales") +
+  ggtitle("Monthly Sales of Product A for a plastics manufacturer")
+```
+
+```{r}
+ggseasonplot(plastics) +
+  xlab("Year") + ylab("Sales") +
+  ggtitle("Monthly Sales of Product A for a plastics manufacturer")
+```
+
+```{r}
+ggsubseriesplot(plastics) +
+  xlab("Year") + ylab("Sales") +
+  ggtitle("Monthly Sales of Product A for a plastics manufacturer")
+```
+The plots above shows high seasonality effects in the time series of sales of product A. Most of the sales peaks are around summer. There is also an increasing trend over the years in this time series.
+
+```{r}
+plastics %>% decompose(type="multiplicative") %>% 
+  autoplot() + xlab("Year") +
+  ggtitle("Classical Multiplicative Decomposition of Monthly Sales of Product A")
+```
+Yes, forsure. The results in part b support the graphical interpretation from part a.
+
+```{r}
+fit <- plastics %>% decompose(type="multiplicative")
+autoplot(plastics, series="Data") +
+  autolayer(trendcycle(fit), series="Trend") +
+  autolayer(seasadj(fit), series="Seasonally Adjusted") +
+  xlab("Year") + ylab("Sales") +
+  ggtitle("Monthly Sales of Product A for a plastics manufacturer") +
+  scale_color_manual(values=c("gray", "blue", "red"), 
+                     breaks=c("Data", "Seasonally Adjusted", "Trend"))
+```
+
+```{r}
+plastics %>% decompose(type="multiplicative") %>% 
+  autoplot() + xlab("Year") +
+  ggtitle("Classical Multiplicative Decomposition of Monthly Sales of Product A")
+```
+
+```{r}
+plastics_copy <- plastics
+plastics_copy[32] <- plastics_copy[32] + 500
+
+fit <- plastics_copy %>% decompose(type="multiplicative")
+autoplot(plastics_copy, series="Data") +
+  autolayer(trendcycle(fit), series="Trend") +
+  autolayer(seasadj(fit), series="Seasonally Adjusted") +
+  xlab("Year") + ylab("Sales") +
+  ggtitle("Monthly Sales of Product A for a plastics manufacturer") +
+  scale_color_manual(values=c("gray", "blue", "red"), 
+                     breaks=c("Data", "Seasonally Adjusted", "Trend"))
+```
+
+```{r}
+plastics_copy %>% decompose(type="multiplicative") %>% 
+  autoplot() + xlab("Year") +
+  ggtitle("Classical Multiplicative Decomposition with Outlier at Middle of the TS")
+```
+It shouldn't make a difference where the outlier is placed. 
+
+HA 7.1
+Consider the pigs series — the number of pigs slaughtered in Victoria each month.
+
+Use the ses() function in R to find the optimal values of  
+α
+  and  
+ℓ
+0
+ , and generate forecasts for the next four months.
+Compute a 95% prediction interval for the first forecast using  
+^
+y
+±
+1.96
+s
+  where  
+s
+  is the standard deviation of the residuals. Compare your interval with the interval produced by R.
+  
+```{r}
+summary(ses(pigs,h=4))
+```
+alpha = 0.2971  // sigma:  10308.58
+
+```{r}
+s<-sd((ses(pigs, h=4))$residuals)
+ses(pigs,h=4)$mean[1]-1.96*s
+```
+
+```{r}
+ses(pigs,h=4)$mean[1]+1.96*s
+```
+My interval is slightly tighter than the interval produced by R due to the s for the residuals is smaller than that found in the model produced by R.
+
+HA 7.2
+Write your own function to implement simple exponential smoothing. The function should take arguments y (the time series), alpha (the smoothing parameter  
+α
+ ) and level (the initial level  
+ℓ
+0
+ ). It should return the forecast of the next observation in the series. Does it give the same forecast as ses()?
+ 
+```{r}
+simexsmo <- function(y, h) {forecast(ets(y), h = h)}
+```
+
+```{r}
+summary(simexsmo(qcement,h=4))
+```
+
+```{r}
+summary(snaive(qcement, h=4))
+```
+```{r}
+SES <- function(y, alpha, l0){
+  y_hat <- l0
+  for(index in 1:length(y)){
+   y_hat <- alpha*y[index] + (1 - alpha)*y_hat 
+  }
+  cat("Forecast of next observation by SES function: ",
+      as.character(y_hat),
+      sep = "\n")
+}
+ses_pigs <- ses(pigs, h = 4)
+alpha <- ses_pigs$model$par[1]
+l0 <- ses_pigs$model$par[2]
+SES(pigs, alpha = alpha, l0 = l0)
+writeLines(paste(
+  "Forecast of next observation by ses function: ",       as.character(ses_pigs$mean[1])
+  ))
+
+```
+Same forecast.
+
+HA 7.3
+Modify your function from the previous exercise to return the sum of squared errors rather than the forecast of the next observation. Then use the optim() function to find the optimal values of  
+α
+  and  
+ℓ
+0
+ . Do you get the same values as the ses() function?
+ 
+```{r}
+SES <- function(pars = c(alpha, l0), y){
+  error <- 0
+  SSE <- 0
+  alpha <- pars[1]
+  l0 <- pars[2]
+  y_hat <- l0
+  
+  for(index in 1:length(y)){
+    error <- y[index] - y_hat
+    SSE <- SSE + error^2
+    
+    y_hat <- alpha*y[index] + (1 - alpha)*y_hat 
+  }
+  
+  return(SSE)
+}
+```
+
+```{r}
+opt_SES_pigs <- optim(par = c(0.5, pigs[1]), y = pigs, fn = SES)
+
+writeLines(paste(
+  "Optimal parameters for the result of SES function: ",
+  "\n",
+  as.character(opt_SES_pigs$par[1]),
+  ", ",
+  as.character(opt_SES_pigs$par[2]),
+  sep = ""
+  ))
+writeLines(paste(
+  "Parameters got from the result of ses function: ",
+  "\n",
+  as.character(ses_pigs$model$par[1]),
+  ", ",
+  as.character(ses_pigs$model$par[2]),
+  sep = ""
+))
+```
+Close but not exact.
+
+KJ 3.1. The UC Irvine Machine Learning Repository6 contains a data set related
+to glass identification. The data consist of 214 glass samples labeled as one
+of seven class categories. There are nine predictors, including the refractive
+index and percentages of eight elements: Na, Mg, Al, Si, K, Ca, Ba, and Fe.
+(a) Using visualizations, explore the predictor variables to understand their
+distributions as well as the relationships between predictors.
+(b) Do there appear to be any outliers in the data? Are any predictors skewed?
+(c) Are there any relevant transformations of one or more predictors that
+might improve the classification model?
+
+```{r}
+library(mlbench)
+data(Glass)
+str(Glass)
+```
+
+```{r}
+Glass %>%
+  keep(is.numeric) %>%
+  gather() %>%
+  ggplot(aes(value)) + 
+  geom_histogram(bins = 15) + 
+  facet_wrap(~key, scales = 'free') +
+  ggtitle("Histograms of Numerical Predictors")
+
+Glass %>%
+  keep(is.numeric) %>%
+  gather() %>%
+  ggplot(aes(value)) + 
+  geom_boxplot() + 
+  facet_wrap(~key, scales = 'free') +
+  ggtitle("Boxplots of Numerical Predictors")
+
+Glass %>%
+  keep(is.numeric) %>%
+  cor() %>%
+  corrplot() 
+
+Glass %>%
+  ggplot() +
+  geom_bar(aes(x = Type)) +
+  ggtitle("Distribution of Types of Glass")
+```
+It can be seen that: * Al is slightly right skewed * Ba is right skewed and mostly centered around 0 * Ca is right skewed * Fe is right skewed and mostly centered around 0 * K is right skewed * Mg is left skewed and bimodal * Na is almost normal with a slight right tail * RI is right skewed * Si is left skewed * Type is mostly centered around Types 1,2, and 7
+
+There also seems to be a strong positive correlation between RI and Ca. There are also notable negative correlations between RI and Si, Al and Mg, Ca and Mg, Ba and Mg. There is also notable positive correlations between Ba and Al.
+
+There seems to be outliers in Ba, K, RI, Ca, Fe, and possibly Na. There are some predictors that are skewed as mentioned below:
+
+Since Be, Fe, and Khave a strong right skewness with a concentrations of points with low values, they may benefit from a log transformation. Mg may also be log transformed since it is left skewed. The table below shows the optimal lambdas. RI can be inverse squared while Si can be squared. Al can be square rooted. It would also be interesting to see how the model performs without Ca as it has correlations with other variables.
+
+KJ 3.2
+The soybean data can also be found at the UC Irvine Machine Learning
+Repository. Data were collected to predict disease in 683 soybeans. The 35
+predictors are mostly categorical and include information on the environmental conditions (e.g., temperature, precipitation) and plant conditions (e.g., left
+spots, mold growth). The outcome labels consist of 19 distinct classes.
+(a) Investigate the frequency distributions for the categorical predictors. Are
+any of the distributions degenerate in the ways discussed earlier in this
+chapter?
+(b) Roughly 18 % of the data are missing. Are there particular predictors that
+are more likely to be missing? Is the pattern of missing data related to
+the classes?
+(c) Develop a strategy for handling missing data, either by eliminating
+predictors or imputation.
+
+```{r}
+data("Soybean")
+columns <- colnames(Soybean)
+
+lapply(columns,
+  function(col) {
+    ggplot(Soybean, 
+           aes_string(col)) + geom_bar() + coord_flip() + ggtitle(col)})
+```
+Degenerate distributions are ones that take on one possible value. mycelium and sclerotia seem to be degenerate. leaf.mild and leaf.malf seem to also almost one-sided when you discount the missing values.
+
+```{r}
+Soybean %>%
+  summarise_all(list(~is.na(.)))%>%
+  pivot_longer(everything(), names_to = "variables", values_to="missing") %>%
+  count(variables, missing) %>%
+  ggplot(aes(y = variables, x=n, fill = missing))+
+  geom_col(position = "fill") +
+  labs(title = "Proportion of Missing Values",
+       x = "Proportion") +
+  scale_fill_manual(values=c("grey","red"))
+```
+There does seem to be a pattern in that some of the cases that are missing data are affiliated with certain cases. 
+
+```{r}
+Soybean %>%
+  group_by(Class) %>%
+  mutate(class_Total = n()) %>%
+  ungroup() %>%
+  filter(!complete.cases(.)) %>%
+  group_by(Class) %>%
+  mutate(Missing = n(),
+         Proportion =  Missing / class_Total) %>% 
+  ungroup()%>%
+  select(Class, Proportion) %>%
+  distinct() 
+```
+One strategy would be to remove those 5 classes completely from the data. You can also subset the data by their class, with those 5 classes separately. You can then impute the variables that have missing values using KNN. If there are certain variables that are affiliated with those classes that have no data at all, then they can be removed in the subsetted dataset.
+
+HA 8.1
+8.1. Recreate the simulated data from Exercise 7.2:
+Did the random forest model significantly use the uninformative predictors (V6 – V10)?
+(b) Now add an additional predictor that is highly correlated with one of the
+informative predictors. 
+Fit another random forest model to these data. Did the importance score
+for V1 change? What happens when you add another predictor that is
+also highly correlated with V1?
+(c) Use the cforest function in the party package to fit a random forest model
+using conditional inference trees. The party package function varimp can
+calculate predictor importance. The conditional argument of that function toggles between the traditional importance measure and the modified
+version described in Strobl et al. (2007). Do these importances show the
+same pattern as the traditional random forest model?
+(d) Repeat this process with different tree models, such as boosted trees and
+Cubist. Does the same pattern occur?
+```{r}
+set.seed(200)
+simulated <- mlbench.friedman1(200, sd = 1)
+simulated <- cbind(simulated$x, simulated$y)
+simulated <- as.data.frame(simulated)
+colnames(simulated)[ncol(simulated)] <- "y"
+```
+
+```{r}
+model1 <- randomForest(y ~ ., data = simulated,
+  importance = TRUE,
+  ntree = 1000)
+
+rfImp1 <- varImp(model1, scale = FALSE)
+rfImp1
+```
+The random forest model did not significantly use these variables (V6- V10).
+```{r}
+simulated$duplicate1 <- simulated$V1 + rnorm(200) * .1
+cor(simulated$duplicate1, simulated$V1)
+```
+
+```{r}
+model2 <- randomForest(y ~ ., data = simulated, 
+                       importance = TRUE, 
+                       ntree = 1000)
+rfImp2 <- varImp(model2, scale = FALSE)
+grid.arrange(vip(model1, color = 'red', fill='green') + 
+  ggtitle('Model1 Var Imp'), vip(model2, color = 'green', fill='red') + 
+  ggtitle('Model2 Var Imp'), ncol = 2)
+```
+We can see the addition of highly correlated valriable changes the overall variable importanc of the model. Importance score of V1 changed. We can see the original importance score of variable V1 is decreased by half due to addition of highly correlated variable. If we have highly correlated variables in the model input, variable importance score will be misleading.
+
+```{r}
+model3 <- cforest(y ~ ., data = simulated)
+
+cfImp3 <- varimp(model3, conditional = TRUE)
+cfImp4 <- varimp(model3, conditional = FALSE)
+old.par <- par(mfrow=c(1, 2))
+barplot(sort(cfImp3),horiz = TRUE, main = 'Conditional', col = rainbow(3))
+barplot(sort(cfImp4),horiz = TRUE, main = 'Un-Conditional', col = rainbow(5))
+```
+
+We can see that when variable importance is calculated conditionally, it takes into account correlation between variable V1 and duplicate1. It adjust importance score of these two variables accordingly. When variable importance is calculated un-conditionally then it treats both highly correlated variables (V1 and duplicate1) with equal importance which can be misleading.
+```{r}
+model4 <- cubist(x = simulated[, names(simulated)[names(simulated) != 'y']], 
+                 y = simulated[,c('y')])
+
+
+# Conditional variable importance
+cfImp4 <- varImp(model4, conditional = TRUE)
+# Un-conditional variable importance
+cfImp5 <- varImp(model4, conditional = FALSE)
+old.par <- par(mfrow=c(1, 2))
+barplot((t(cfImp4)),horiz = TRUE, main = 'Conditional', col = rainbow(3))
+barplot((t(cfImp5)),horiz = TRUE, main = 'Un-Conditional', col = rainbow(5))
+```
+
+```{r}
+gbmGrid = expand.grid(interaction.depth = seq(1,5, by=2), n.trees = seq(100, 1000, by = 100), shrinkage = 0.1, n.minobsinnode = 5)
+model4 <- train(y ~ ., data = simulated, tuneGrid = gbmGrid, verbose = FALSE, method = 'gbm' )
+
+
+# Conditional variable importance
+cfImp4 <- varImp(model4, conditional = TRUE)
+# Un-conditional variable importance
+cfImp5 <- varImp(model4, conditional = FALSE)
+old.par <- par(mfrow=c(1, 2))
+barplot((t(cfImp4$importance)),horiz = TRUE, main = 'Conditional', col = rainbow(3))
+barplot((t(cfImp5$importance)),horiz = TRUE, main = 'Un-Conditional', col = rainbow(5))
+```
+We can see that conditional and un-conditional variable importance is same for Cubist and Boosted Trees algorithms.
+
+HA 8.2 Use a simulation to show tree bias with different granularities.
+```{r}
+V1 <- runif(1000, 2,1000)
+V2 <- runif(1000, 50,500)
+V3 <- rnorm(1000, 500,10)
+y <- V2 + V1 
+
+df <- data.frame(V1, V2, V3, y)
+model5 <- cforest(y ~ ., data = df)
+
+#unconditional
+cfImp_cond <- varimp(model5, conditional = FALSE)
+```
+With V1 having more distinct values, the random forest gives this variable the highest score. V2 has a higher score compared to V3 since V2 has more distinct values than V3.
+
+
+```{r}
+barplot(sort(cfImp_cond),horiz = TRUE, main = 'Unconditional')
+```
+HA 8.6 Return to the permeability problem described in Exercises 6.2 and 7.4.
+Train several tree-based models and evaluate the resampling and test set
+performance:
+(a) Which tree-based model gives the optimal resampling and test set performance?
+(b) Do any of these models outperform the covariance or non-covariance
+based regression models you have previously developed for these data?
+What criteria did you use to compare models’ performance?
+(c) Of all the models you have developed thus far, which, if any, would you
+recommend to replace the permeability laboratory experiment?
+```{r}
+library(AppliedPredictiveModeling)
+data(permeability)
+fingerprints1 <- as.data.frame(fingerprints)
+permeability1 <- as.data.frame(permeability)
+
+fingerprints1 <- fingerprints1[, -nearZeroVar(fingerprints1)]
+
+trainingRows <- createDataPartition(permeability1$permeability, p = 0.8, list= FALSE)
+fingerprints_train <- fingerprints1[trainingRows,]
+fingerprints_test <- fingerprints1[-trainingRows,]
+
+permeability_train <- permeability1[trainingRows, ]
+permeability_test <- permeability1[-trainingRows, ]
+```
+
+
+```{r}
+ctrl <- trainControl(method = "cv", preProc = c("center", "scale"))
+
+plsTune3  <- train(x = fingerprints_train, y = permeability_train, method = "pls", trControl = ctrl)
+rpartTune3  <- train(x = fingerprints_train, y = permeability_train, method = "rpart2", trControl = ctrl)
+rfTune3  <- train(x = fingerprints_train, y = permeability_train, method = "rf", trControl = ctrl)
+
+gbmGrid <- expand.grid(interaction.depth = seq(1, 7, by = 2), n.trees = seq(100, 1000, by = 50), shrinkage = c(0.01, 0.1), n.minobsinnode = 10)
+gbmTune3 <- train(x = fingerprints_train, y = permeability_train, method = "gbm", tuneGrid = gbmGrid, verbose = FALSE)
+
+cubistTune3 <- train(x = fingerprints_train, y = permeability_train, method = "cubist")
+```
+
+```{r}
+pls_RMSE3 <- min(plsTune3$results$RMSE)
+rpart_RMSE3 <- min(rpartTune3$results$RMSE)
+rf_RMSE3 <- min(rfTune3$results$RMSE)
+gbm_RMSE3 <- min(gbmTune3$results$RMSE)
+cubist_RMSE3 <- min(cubistTune3$results$RMSE)
+
+result3 <- data.frame(Model = c("pls", "rpart", "rf", "gbm", "cubist"), RMSE = c(pls_RMSE3, rpart_RMSE3, rf_RMSE3, gbm_RMSE3, cubist_RMSE3))
+
+result3
+```
+None of these models outperform the covariance or non-covariance based regression models than SVM radial model. I am using RMSE to compare model's performance.
+
+```{r}
+ctrl <- trainControl(method = "cv", preProc = c("center", "scale", "knnImpute"))
+
+knnTune3 <- train(x = fingerprints_train, y = permeability_train, method = "knn", tuneLength = 10)
+
+marsGrid <- expand.grid(degree = 1:2, nprune = 1:20)
+marsTune3 <- train(x = fingerprints_train, y = permeability_train, method = "earth", tuneGrid = marsGrid, trControl = ctrl)
+
+svmRTune3 <- train(x = fingerprints_train, y = permeability_train, method = "svmRadial", tuneLength = 20, trControl = ctrl)
+```
+
+```{r}
+knn_RMSE3 <- min(knnTune3$results$RMSE)
+mars_RMSE3 <- min(marsTune3$results$RMSE)
+svmR_RMSE3 <- min(svmRTune3$results$RMSE)
+
+result4 <- data.frame(Model = c("knn", "mars", "svmR"), RMSE = c(knn_RMSE3, mars_RMSE3, svmR_RMSE3))
+
+result4
+```
+I would recommend SVM model with svmRadial method, because it generate lowest RMSEvalue.
+
