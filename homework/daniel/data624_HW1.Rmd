@@ -2,7 +2,11 @@
 title: "Homework 1 Data624"
 author: "Daniel Sullivan"
 date: "2023-06-09"
-output: pdf_document
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+    theme: united
 ---
 
 ```{r setup, include=FALSE}
@@ -18,7 +22,9 @@ library(ggcorrplot)
 library(tidyverse)
 ```
 
-# 2.10.1. use the help function to explore what the series gold, woolyrnq and gas represent.
+# 2.10.1. 
+
+use the help function to explore what the series gold, woolyrnq and gas represent.
 
 The gold data set shows the daily gold production in dollars per troy ounce for the trading days of 2005. woolyrnq shows the quarterly production in Australia of woolen yarn. and gas shows the monthly gas production in Australia. all of these are time series data sets.
 
@@ -48,7 +54,7 @@ frequency(gold)
 frequency(woolyrnq)
 frequency(gas)
 ```
-###c. Use which.max() to spot the outlier in the gold series. Whichobservation was it?
+### c. Use which.max() to spot the outlier in the gold series. Whichobservation was it?
 
 The outlier or maximum of the gold series is the 770 entry which is equal to 593.7 which is confirmed after consulting a graph. 
 
@@ -56,12 +62,14 @@ The outlier or maximum of the gold series is the 770 entry which is equal to 593
 which.max(gold)
 gold[770]
 ```
-# 2.10.3 Download some monthly Australian retail data from the book website. Theserepresent retail sales in various categories for dierent Australian states,and are stored in a MS-Excel le.
+# 2.10.3 
+
+Download some monthly Australian retail data from the book website. Theserepresent retail sales in various categories for dierent Australian states,and are stored in a MS-Excel le.
 
 ### a. You can read the data into R with the following script:The second argument (skip=1) is required because the Excel sheet hastwo header rows.
 
 ```{r}
-retaildata <- readxl::read_excel("retail.xlsx", skip=1)
+retaildata <- readxl::read_excel("data/retail.xlsx", skip=1)
 
 ```
 
@@ -92,7 +100,9 @@ ggAcf(dans_ts)
 ```
 
 
-# 6.9.2 the plastics data set consists of the monthly sales (in thousands) ofproduct A for a plastics manufacturer for five years.
+# 6.9.2 
+
+the plastics data set consists of the monthly sales (in thousands) ofproduct A for a plastics manufacturer for five years.
 
 ```{r}
 help(plastics)
@@ -214,7 +224,9 @@ plastics[55]<-plastics[55]-500
 ```
 
 
-# 3.1 The UC Irvine Machine Learning Repository contains a data set related to glass identification. The data consist of 214 glass samples labeled as one of seven class categories. There are nine predictors, including the refractive index and percentages of eight elements: Na, Mg, Al, Si, K, Ca, Ba, and Fe
+# 3.1 
+
+The UC Irvine Machine Learning Repository contains a data set related to glass identification. The data consist of 214 glass samples labeled as one of seven class categories. There are nine predictors, including the refractive index and percentages of eight elements: Na, Mg, Al, Si, K, Ca, Ba, and Fe
 
 ```{r}
 
@@ -240,15 +252,17 @@ corrplot(cor(GlassM),na.rm=TRUE)
 cor(Glass)
 Glass
 
-ggplot(data=Glass, aes(y=Glass[,1], x=v))+geom_point()
-ggplot(data=Glass, aes(y=Glass[,2], x=v))+geom_point()
-ggplot(data=Glass, aes(y=Glass[,3], x=v))+geom_point()
-ggplot(data=Glass, aes(y=Glass[,4], x=v))+geom_point()
-ggplot(data=Glass, aes(y=Glass[,5], x=v))+geom_point()
-ggplot(data=Glass, aes(y=Glass[,6], x=v))+geom_point()
-ggplot(data=Glass, aes(y=Glass[,7], x=v))+geom_point()
-ggplot(data=Glass, aes(y=Glass[,8], x=v))+geom_point()
-ggplot(data=Glass, aes(y=Glass[,9], x=v))+geom_point()
+# ? what is v
+
+# ggplot(data=Glass, aes(y=Glass[,1], x=v))+geom_point()
+# ggplot(data=Glass, aes(y=Glass[,2], x=v))+geom_point()
+# ggplot(data=Glass, aes(y=Glass[,3], x=v))+geom_point()
+# ggplot(data=Glass, aes(y=Glass[,4], x=v))+geom_point()
+# ggplot(data=Glass, aes(y=Glass[,5], x=v))+geom_point()
+# ggplot(data=Glass, aes(y=Glass[,6], x=v))+geom_point()
+# ggplot(data=Glass, aes(y=Glass[,7], x=v))+geom_point()
+# ggplot(data=Glass, aes(y=Glass[,8], x=v))+geom_point()
+# ggplot(data=Glass, aes(y=Glass[,9], x=v))+geom_point()
 ```
 There is a high amount of positive correlation between ca and Ri with Ba and Al showing the second most. One interesting thing is that most of the minerals are negativly correlated with Si and Ri with the strongest negative correlation and Ba/Mg and Al/Mg close behind.
 
@@ -262,7 +276,9 @@ AS far as skew is concerned most f the graphs are mostly normal. However  K Ba a
 Both NA and Al seem like they would model beeter with a log transformation. 
 
 
-# 3.2 The soybean data can also be found at the UC Irvine Machine Learning Repository. Data were collected to predict disease in 683 soybeans. The 35 predictors are mostly categorical and include information on the environmental conditions (e.g., temperature, precipitation) and plant conditions (e.g., left spots, mold growth). The outcome labels consist of 19 distinct classes.
+# 3.2 
+
+The soybean data can also be found at the UC Irvine Machine Learning Repository. Data were collected to predict disease in 683 soybeans. The 35 predictors are mostly categorical and include information on the environmental conditions (e.g., temperature, precipitation) and plant conditions (e.g., left spots, mold growth). The outcome labels consist of 19 distinct classes.
 
 The data can be loaded via:
 ```{r}
@@ -279,10 +295,13 @@ Yes there are a few that are lopsided for example lodging, leaf.mild, leaf.malf,
 #str(Soybean)
 summary(Soybean)
 matrix(Soybean)
-corrplot(cor(soyB),na.rm=TRUE)
 
-ggplot(Soybean, aes()) +
-  geom_histogram()
+# ? what is soyB
+# corrplot(cor(soyB),na.rm=TRUE)
+
+# ? no aes set up
+# ggplot(Soybean, aes()) +
+#   geom_histogram()
 #> `stat_bin()` using `bins = 30`. Pick better value with `binwidth`
 ```
 
@@ -293,7 +312,8 @@ ggplot(Soybean, aes()) +
 yeas there are a number of predictors that tend to have more Na values typically charecteristics that involve damage or issues with the plant are the least empty then the more empty ones typically involve anatomy of the plant in question. The most compleate data are of course the more metadata such as date and class. the Class does play a role in most represented data points. a vast majority of empty datapoints were part of the 2-4-d injury, diaporthe-pod-&-stem-blight, cyst-nematode, herbicide-injury and phytophthora-rot Classes with most of the other classes unchanged. 
 
 ```{r}
-count(soybean)
+# ? what is soybean
+# count(soybean)
 count(Soybean)
 bean<-drop_na(Soybean)
 summary(Soybean$Class)
@@ -308,13 +328,17 @@ Personally with this data set i think there are two directions to go for filling
 
 
 
-# 7.8.1 Consider the pigs series — the number of pigs slaughtered in Victoria each month
+# 7.8.1 
+
+Consider the pigs series — the number of pigs slaughtered in Victoria each month
 
 ### a. use the ses function in r to find the optimal values of  
 α and ℓ 0, and generate forecasts for the next four months.
 
 ```{r}
-  data(pigs)
+library(MLmetrics) # MAPE
+
+data(pigs)
 autoplot(pigs)
 
 pigs
@@ -353,7 +377,9 @@ final_fit$lower[1]
 ```
 
 
-# 7.8.2 Write your own function to implement simple exponential smoothing. The function should take arguments y (the time series), alpha (the smoothing parameter α) and level (the initial level ℓ0). It should return the forecast of the next observation in the series. Does it give the same forecast as ses()
+# 7.8.2 
+
+Write your own function to implement simple exponential smoothing. The function should take arguments y (the time series), alpha (the smoothing parameter α) and level (the initial level ℓ0). It should return the forecast of the next observation in the series. Does it give the same forecast as ses()
 
 Yes this gives the same value as the predicted value of ses
 
@@ -388,7 +414,9 @@ pigs[188]
 
 #final_fit$model$par[1]
 ```
-# 7.8.3 Modify your function from the previous exercise to return the sum of squared errors rather than the forecast of the next observation. Then use the optim() function to find the optimal values of α and  ℓ0. Do you get the same values as the ses() function?
+# 7.8.3 
+
+Modify your function from the previous exercise to return the sum of squared errors rather than the forecast of the next observation. Then use the optim() function to find the optimal values of α and  ℓ0. Do you get the same values as the ses() function?
 
 **wasnt able to wrap this one up **
 
@@ -416,7 +444,9 @@ sse_pigs
 #sse=0
 ```
 
-# 8.11.1  Figure 8.31 shows the ACFs for 36 random numbers, 360 random numbers and 1,000 random numbers.
+# 8.11.1  
+
+Figure 8.31 shows the ACFs for 36 random numbers, 360 random numbers and 1,000 random numbers.
 
 ### a. Explain the differences among these figures. Do they all indicate that the data are white noise? 
 
@@ -426,7 +456,9 @@ the primary difference between these datasets is that the confidence interval wi
 
 This is determined by the dataset. Essentially the critical values are based off of a confidence interval therefore different datasets will have variying critical values. 
 
-# 8.11.2 A classic example of a non-stationary series is the daily closing IBM stock price series (data set ibmclose). Use R to plot the daily closing prices for IBM stock and the ACF and PACF. Explain how each plot shows that the series is non-stationary and should be differenced.
+# 8.11.2 
+
+A classic example of a non-stationary series is the daily closing IBM stock price series (data set ibmclose). Use R to plot the daily closing prices for IBM stock and the ACF and PACF. Explain how each plot shows that the series is non-stationary and should be differenced.
 
 For starters in our first graph we can see that the as the data goes through the time series the data appears to have plateaus or tiers. It is clear that the time points go through periods of rapid increase and stall and then dip again. Just the fact that the data is tiered like this with non white noise like rising and falling shows non-stationarity. in the second plot(ACF) we see an extraordinarily high level of correlation with previous points. with significance into lag 25. this contributes to the rise and run aspect of non-stationarity.
 
@@ -436,7 +468,9 @@ autoplot(ibmclose)
 Acf(ibmclose)
 Pacf(ibmclose)
 ```
-# 8.11.6 Use R to simulate and plot some data from simple ARIMA models.
+# 8.11.6 
+
+Use R to simulate and plot some data from simple ARIMA models.
 
 ### a. Use the following R code to generate data from an AR(1) model with  ϕ1=0.6  and σ2=1 . The process starts with y1=0.
 ```{r}

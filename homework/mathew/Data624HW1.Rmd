@@ -2,7 +2,11 @@
 title: "Data624HW1"
 author: "Mathew Katz"
 date: "2023-06-05"
-output: html_document
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+    theme: united
 ---
 
 ```{r setup, include=FALSE}
@@ -17,9 +21,11 @@ library(vip)
 library(party)
 library(Cubist)
 library(gbm)
+library(tidyverse)
 ```
 
-HA 2.1
+# HA 2.1
+
 Use the help function to explore what the series gold, woolyrnq and gas represent.
 
 Use autoplot() to plot each of these in separate plots.
@@ -82,7 +88,9 @@ glue('The frequency for the gas time series data is {fgas} (yearly).')
 wmgas <- which.max(gas)
 glue('The outlier for the gas time series data is {wmgas}.')
 ```
-HA 2.3
+
+# HA 2.3
+
 Download some monthly Australian retail data from the book website. These represent retail sales in various categories for different Australian states, and are stored in a MS-Excel file.
 
 You can read the data into R with the following script:
@@ -101,7 +109,7 @@ autoplot(), ggseasonplot(), ggsubseriesplot(), gglagplot(), ggAcf()
 Can you spot any seasonality, cyclicity and trend? What do you learn about the series?
 
 ```{r}
-retaildata <- readxl::read_excel("retail.xlsx", skip=1)
+retaildata <- readxl::read_excel("data/retail.xlsx", skip=1)
 ```
 
 ```{r}
@@ -130,7 +138,9 @@ gglagplot(myts)
 ```{r}
 ggAcf(myts)
 ```
-HA 6.2 The plastics data set consists of the monthly sales (in thousands) of product A for a plastics manufacturer for five years.
+# HA 6.2 
+
+The plastics data set consists of the monthly sales (in thousands) of product A for a plastics manufacturer for five years.
 
 Plot the time series of sales of product A. Can you identify seasonal fluctuations and/or a trend-cycle?
 Use a classical multiplicative decomposition to calculate the trend-cycle and seasonal indices.
@@ -203,7 +213,8 @@ plastics_copy %>% decompose(type="multiplicative") %>%
 ```
 It shouldn't make a difference where the outlier is placed. 
 
-HA 7.1
+# HA 7.1
+
 Consider the pigs series — the number of pigs slaughtered in Victoria each month.
 
 Use the ses() function in R to find the optimal values of  
@@ -237,7 +248,8 @@ ses(pigs,h=4)$mean[1]+1.96*s
 ```
 My interval is slightly tighter than the interval produced by R due to the s for the residuals is smaller than that found in the model produced by R.
 
-HA 7.2
+# HA 7.2
+
 Write your own function to implement simple exponential smoothing. The function should take arguments y (the time series), alpha (the smoothing parameter  
 α
  ) and level (the initial level  
@@ -277,7 +289,8 @@ writeLines(paste(
 ```
 Same forecast.
 
-HA 7.3
+# HA 7.3
+
 Modify your function from the previous exercise to return the sum of squared errors rather than the forecast of the next observation. Then use the optim() function to find the optimal values of  
 α
   and  
@@ -326,7 +339,9 @@ writeLines(paste(
 ```
 Close but not exact.
 
-KJ 3.1. The UC Irvine Machine Learning Repository6 contains a data set related
+# KJ 3.1. 
+
+The UC Irvine Machine Learning Repository6 contains a data set related
 to glass identification. The data consist of 214 glass samples labeled as one
 of seven class categories. There are nine predictors, including the refractive
 index and percentages of eight elements: Na, Mg, Al, Si, K, Ca, Ba, and Fe.
@@ -377,7 +392,8 @@ There seems to be outliers in Ba, K, RI, Ca, Fe, and possibly Na. There are some
 
 Since Be, Fe, and Khave a strong right skewness with a concentrations of points with low values, they may benefit from a log transformation. Mg may also be log transformed since it is left skewed. The table below shows the optimal lambdas. RI can be inverse squared while Si can be squared. Al can be square rooted. It would also be interesting to see how the model performs without Ca as it has correlations with other variables.
 
-KJ 3.2
+# KJ 3.2
+
 The soybean data can also be found at the UC Irvine Machine Learning
 Repository. Data were collected to predict disease in 683 soybeans. The 35
 predictors are mostly categorical and include information on the environmental conditions (e.g., temperature, precipitation) and plant conditions (e.g., left
@@ -430,7 +446,8 @@ Soybean %>%
 ```
 One strategy would be to remove those 5 classes completely from the data. You can also subset the data by their class, with those 5 classes separately. You can then impute the variables that have missing values using KNN. If there are certain variables that are affiliated with those classes that have no data at all, then they can be removed in the subsetted dataset.
 
-HA 8.1
+# HA 8.1
+
 8.1. Recreate the simulated data from Exercise 7.2:
 Did the random forest model significantly use the uninformative predictors (V6 – V10)?
 (b) Now add an additional predictor that is highly correlated with one of the
@@ -518,7 +535,9 @@ barplot((t(cfImp5$importance)),horiz = TRUE, main = 'Un-Conditional', col = rain
 ```
 We can see that conditional and un-conditional variable importance is same for Cubist and Boosted Trees algorithms.
 
-HA 8.2 Use a simulation to show tree bias with different granularities.
+# HA 8.2 
+
+Use a simulation to show tree bias with different granularities.
 ```{r}
 
 ```
