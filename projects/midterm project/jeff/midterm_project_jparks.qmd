@@ -6,15 +6,16 @@ output:
     toc_float: yes
     theme: united
 editor: visual
+execute:
+  echo: false
+  eval: true
+  include: true
+  message: false
+  warning: false
+page-layout: article
 ---
 
-## Category S02
-
 ```{r setup, include=FALSE}
-# chunks
-knitr::opts_chunk$set(echo=TRUE, eval=TRUE, include=TRUE, message=FALSE, 
-warning=FALSE, fig.show="hold", fig.height=4)
-
 # libraries
 library(tidyverse)
 library(fpp2)
@@ -22,33 +23,10 @@ library(readxl)
 library(zoo)
 library(seasonal)
 library(kableExtra)
+library(imputeTS)
 
 # ggplot
 theme_set(theme_light())
-```
-
-```{r}
-expand_dates <- function(my_data){
-  
-  # create full date sequence
-  date_seq <- seq(min(my_data$dates), max(my_data$dates), by = "day")
-
-  # convert original data frame to a zoo object
-  zoo_obj <- zooreg(my_data$values, order.by = my_data$dates, frequency=365)
-
-  # merge with a zoo object containing consecutive dates
-  merged_obj <- merge(zoo_obj, zooreg(, order.by = date_seq, frequency=365))
-
-  # replace NA with 0
-  merged_obj_na <- merged_obj %>% replace(is.na(.), 0)
-
-  # convert to a ts object
-  my_ts <- ts(coredata(merged_obj_na)[,1], 
-              start = c(year(min(my_data$dates)),
-                        yday(min(my_data$dates))), frequency=365) 
-  
-  return(my_ts)
-}
 ```
 
 ```{r include=FALSE}
@@ -66,166 +44,241 @@ nice_table <- function(df, cap=NULL, cols=NULL, dig=3, fw=F){
 
 ```{r}
 # load data
-df <- read_xls('data/Data Set for Class.xls', sheet='Set for Class') %>%
+df <- read_xls('../data/Data Set for Class.xls', sheet='Set for Class') %>%
   mutate(Date = as.Date(SeriesInd-2, origin = '1900-01-01'))
 ```
 
 ```{r}
+# set up timeseries
+
+df_s01 <- df %>%
+  filter(category == 'S01') %>%
+  mutate(Date_index = row_number()) %>%
+  select(c(Date_index,Date,Var01,Var02)) %>%
+  head(1622)
+
 df_s02 <- df %>%
   filter(category == 'S02') %>%
   mutate(Date_index = row_number()) %>%
   select(c(Date_index,Date,Var02,Var03)) %>%
   head(1622)
+
+df_s03 <- df %>%
+  filter(category == 'S03') %>%
+  mutate(Date_index = row_number()) %>%
+  select(c(Date_index,Date,Var05,Var07)) %>%
+  head(1622)
+
+df_s04 <- df %>%
+  filter(category == 'S04') %>%
+  mutate(Date_index = row_number()) %>%
+  select(c(Date_index,Date,Var01,Var02)) %>%
+  head(1622)
+
+df_s05 <- df %>%
+  filter(category == 'S05') %>%
+  mutate(Date_index = row_number()) %>%
+  select(c(Date_index,Date,Var02,Var03)) %>%
+  head(1622)
+
+df_s06 <- df %>%
+  filter(category == 'S06') %>%
+  mutate(Date_index = row_number()) %>%
+  select(c(Date_index,Date,Var05,Var07)) %>%
+  head(1622)
 ```
 
-```{r}
-data_s02_v02 <- df_s02 %>%
-  select(dates=Date,values=Var02) %>%
-  drop_na() 
+## Category 02
 
-data_s02_v03 <- df_s02 %>%
-  select(dates=Date,values=Var03) %>%
-  drop_na() 
-```
+For the second category we examined time series data for Variables 2 and 3.
 
 ### Variable 02
 
 ```{r}
-## expand to include missing dates, impute 0 for NA
-ts_s02_v02 <- expand_dates(data_s02_v02)
+my_data <- df_s02 %>%
+  select(values=Var02)
+my_ts <- ts(my_data)
+```
+
+This time series represents a product or activity with a high volume - approximately 40 million units per day!  Overall there seems to be a gradually decreasing trend for this item, with neither seasonality nor long-term cyclic patterns detected.  
+
+This dataset is fairly complete with no missing values, but the presence of many extreme values could possibly interfere with the accuracy of our forecasts. In order to correct for these conditions while preserving as much information as possible, we chose to identify and smooth those 66 outlier values with a linear interpolation.
+
+```{r}
+#| layout-ncol: 2
+
+# summary(my_data)
+autoplot(my_ts)
+# hist(my_ts)
+#boxplot(my_ts)
+# autoplot(decompose(my_ts))
+# ggAcf(my_ts, lag=30)
+# ggPacf(my_ts, lag=30)
+
+# missing data
+# my_ts <- na_interpolation(my_ts)
+
+# outliers
+my_ts_out <- tsoutliers(my_ts)
+my_ts_clean <- tsclean(my_ts)
+
+autoplot(my_ts, series = 'Orig') +
+  autolayer(my_ts_clean, series = 'Clean')
+
+# length(my_ts_out$index)
+```
+
+#### Model Selection
+
+To evaluate and select models, we created 80/20 train/test split and score performance using the Mean Absolute Percentage Error (MAPE) statistic. The three models evaluated were:
+
+* ARIMA(2,1,3) with drift 
+* Holt (Damped)
+* Simple Exponential Smoothing (SES)
+
+We selected the SES method for this forecast since it produced the smallest MAPE score (30.22). 
+
+Our resulting forecast for the next 140 days has a stable mean of approximately 20.7M units daily, but with a fairly large predictive interval.
+
+```{r}
+# split
+split_idx <- floor(length(my_ts_clean)*.8)
+split_h <- (length(my_ts_clean) - split_idx)
+            
+my_ts_train <- window(my_ts_clean, end = split_idx)
+
+# auto.arima
+my_ts_arima_fit <- auto.arima(my_ts_train, stepwise = FALSE)
+my_ts_arima <- forecast(my_ts_arima_fit, h = split_h)
+# my_ts_arima_fit
+
+# holt (damped)
+my_ts_holtd <- holt(my_ts_train, damped=TRUE, h = split_h)
+# my_ts_holtd
+
+# ses
+my_ts_ses <- ses(my_ts_train, h = split_h)
+# my_ts_ses
 ```
 
 ```{r}
-# check stats
-start(ts_s02_v02)
-end(ts_s02_v02)
-frequency(ts_s02_v02)
-```
+#| layout-ncol: 1
 
-```{r}
-# simple graphs
-autoplot(ts_s02_v02)
-```
+# plot training/test data
+# autoplot(my_ts_arima)
+# autoplot(my_ts_holtd)
+# autoplot(my_ts_ses)
 
-```{r}
-# 7-MA moving averages
-ts_s02_v02_ma7 <- ma(ts_s02_v02, order=7, centre=TRUE)
-autoplot(ts_s02_v02_ma7)
-```
+# check residuals
+# checkresiduals(my_ts_arima)
+# checkresiduals(my_ts_holtd)
+# checkresiduals(my_ts_ses)
 
-```{r}
-#! layout-ncol: 2
+# accuracy
+my_ts_arima_acc <- accuracy(my_ts_arima, my_ts_clean)["Test set", "MAPE"] # 45.82757
+my_ts_holtd_acc <- accuracy(my_ts_holtd, my_ts_clean)["Test set", "MAPE"] # 30.29515
+my_ts_ses_acc <- accuracy(my_ts_ses, my_ts_clean)["Test set", "MAPE"] # 30.22492
 
-# seasonality
-ggAcf(ts_s02_v02_ma7, lag=30)
-ggseasonplot(ts_s02_v02_ma7)
-ggsubseriesplot(ts_s02_v02_ma7)
-gglagplot(ts_s02_v02_ma7)
-```
+# forecast
+my_forecast <- forecast(my_ts_ses, my_ts, h=140)
+autoplot(my_forecast)
 
-#### Classical Decomposition
-
-```{r}
-# classical decomp
-decompose(ts_s02_v02_ma7) %>%
-  autoplot()
-```
-
-### STL Decomposition
-
-```{r}
-# stl decomp
-mstl(ts_s02_v02_ma7) %>%
-  autoplot()
-```
-
-#### Forecast
-
-```{r}
-# ets forecast with 7-MA moving average
-f_s02_v02_ma7 <- forecast(ts_s02_v02_ma7, h=140) 
-
-f_s02_v02_ma7 %>%
-  autoplot()
-```
-
-#### Diagnostics
-
-```{r}
-accuracy(f_s02_v02_ma7)
-```
-
-```{r}
-# forecast_s02_v02 <- forecast(ts_s02_v02_ma7, h=140)
-# forecast_s02_v02$mean %>% nice_table()
+# export
+forecast_s02_v02 <- my_forecast$mean
 ```
 
 ### Variable 03
 
 ```{r}
-## expand to include missing dates, impute 0 for NA
-ts_s02_v03 <- expand_dates(data_s02_v03)
+my_data <- df_s02 %>%
+  select(values=Var03)
+my_ts <- ts(my_data)
+```
+
+This time series represents a product or activity with low volume - approximately 14 units per day.  Overall there seems to be a steady trend for this item, with no seasonality detected.  
+
+This dataset is fairly complete with only two missing values, and one notable extreme value toward the end of the dataset, smoothed here with a linear interpolation.
+
+```{r}
+#| layout-ncol: 2
+
+# summary(my_data)
+autoplot(my_ts)
+# hist(my_ts)
+# boxplot(my_ts)
+#autoplot(decompose(my_ts))
+# ggAcf(my_ts, lag=30)
+# ggPacf(my_ts, lag=30)
+
+# missing data
+my_ts <- na_interpolation(my_ts)
+
+# outliers
+my_ts_out <- tsoutliers(my_ts)
+my_ts_clean <- tsclean(my_ts)
+
+autoplot(my_ts, series = 'Orig') +
+  autolayer(my_ts_clean, series = 'Clean')
+
+# length(my_ts_out$index)
+```
+
+#### Model Selection
+
+To evaluate and select models, we created 80/20 train/test split and score performance using the Mean Absolute Percentage Error (MAPE) statistic. The three models evaluated were:
+
+* ARIMA(2,1,0)
+* Holt (Damped)
+* Simple Exponential Smoothing
+
+We selected the ARIMA(2,1,0)method for this forecast since it produced the smallest MAPE score (16.19). 
+
+Our resulting forecast for the next 140 days has a stable mean of approximately 16.2 units daily, but with a fairly large predictive interval.
+
+```{r}
+# split
+split_idx <- floor(length(my_ts_clean)*.8)
+split_h <- (length(my_ts_clean) - split_idx)
+            
+my_ts_train <- window(my_ts_clean, end = split_idx)
+
+# auto.arima
+my_ts_arima_fit <- auto.arima(my_ts_train, stepwise = FALSE)
+my_ts_arima <- forecast(my_ts_arima_fit, h = split_h)
+# my_ts_arima_fit
+
+# holt (damped)
+my_ts_holtd <- holt(my_ts_train, damped=TRUE, h = split_h)
+# my_ts_holtd
+
+# ses
+my_ts_ses <- ses(my_ts_train, h = split_h)
+# my_ts_ses
 ```
 
 ```{r}
-# check stats
-start(ts_s02_v03)
-end(ts_s02_v03)
-frequency(ts_s02_v03)
+#| layout-ncol: 1
+
+# plot training/test data
+# autoplot(my_ts_arima)
+# autoplot(my_ts_holtd)
+# autoplot(my_ts_ses)
+
+# check residuals
+# checkresiduals(my_ts_arima)
+# checkresiduals(my_ts_holtd)
+# checkresiduals(my_ts_ses)
+
+# accuracy
+my_ts_arima_acc <- accuracy(my_ts_arima, my_ts_clean)["Test set", "MAPE"] # 16.19648 **
+my_ts_holtd_acc <- accuracy(my_ts_holtd, my_ts_clean)["Test set", "MAPE"] # 16.29988
+my_ts_ses_acc <- accuracy(my_ts_ses, my_ts_clean)["Test set", "MAPE"] # 16.28299
+
+# forecast
+my_forecast <- forecast(my_ts_arima, my_ts, h=140)
+autoplot(my_forecast)
+
+# export
+forecast_s02_v03 <- my_forecast$mean
 ```
 
-```{r}
-# simple graphs
-autoplot(ts_s02_v03)
-```
-
-```{r}
-# 7-MA moving averages
-ts_s02_v03_ma7 <- ma(ts_s02_v03, order=7, centre=TRUE)
-autoplot(ts_s02_v03_ma7)
-```
-
-```{r}
-# seasonality
-ggAcf(ts_s02_v03_ma7, lag=30)
-ggseasonplot(ts_s02_v03_ma7)
-ggsubseriesplot(ts_s02_v03_ma7)
-gglagplot(ts_s02_v03_ma7)
-```
-
-#### Classical Decomposition
-
-```{r}
-# classical decomp
-decompose(ts_s02_v03_ma7) %>%
-  autoplot()
-```
-
-### STL Decomposition
-
-```{r}
-# stl decomp
-mstl(ts_s02_v03_ma7) %>%
-  autoplot()
-```
-
-```{r}
-# exponential smoothing
-
-```
-
-#### Forecast Var03
-
-```{r}
-# ets forecast with 7-MA moving average
-f_s02_v03_ma7 <- forecast(ts_s02_v03_ma7, h=140) 
-
-f_s02_v03_ma7 %>%
-  autoplot()
-```
-
-#### Diagnostics
-
-```{r}
-accuracy(f_s02_v03_ma7)
-```

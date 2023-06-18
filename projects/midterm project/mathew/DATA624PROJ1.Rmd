@@ -133,4 +133,6 @@ This code evaluates the MAPE metric for the "naive_1" forecast model by comparin
 ```{r}
 accuracy(naive_2, s04_2)["Test set", "MAPE"]
 ```
+
 This code evaluates the MAPE metric for the "naive_2" forecast model by comparing its predictions to the actual values in the "s04_2" time series.
+
