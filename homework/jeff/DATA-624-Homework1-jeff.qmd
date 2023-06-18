@@ -458,7 +458,7 @@ exp_smooth_sse(pigs, 0.2971, 77260.0561)
 
 Figure [8.31](https://otexts.com/fpp2/arima-exercises.html#fig:wnacfplus) shows the ACFs for 36 random numbers, 360 random numbers and 1,000 random numbers.
 
-![](images/Screenshot 2023-06-16 at 16.17.40.png)
+![](images/Screenshot%202023-06-16%20at%2016.17.40.png)
 
 a.  Explain the differences among these figures. Do they all indicate that the data are white noise?
 
@@ -494,14 +494,13 @@ ggAcf(diff(ibmclose))
 
 We've converted this time series to a more stationary dataset using differencing, which can also be demonstrated with the ACF graph - the result looks like a white noise series with only two autocorrelations exceeding the 95% limits
 
-
 # HA Exercise 8.6
 
 Use R to simulate and plot some data from simple ARIMA models.
 
 a.  Use the following R code to generate data from an AR(1) model with ϕ1=0.6 and σ2=1. The process starts with y1=0.
 
-```{r}         
+```{r}
 y <- ts(numeric(100))
 e <- rnorm(100)
 
@@ -530,10 +529,9 @@ ar1(y,e,0.9)
 
 As the value of phi increases, the variance in the time plot increases.
 
-
 c.  Write your own code to generate data from an MA(1) model with θ1=0.6 and σ2=1.
 
-```{r}         
+```{r}
 y <- ts(numeric(100))
 e <- rnorm(100)
 
@@ -562,7 +560,7 @@ ma1(y,e,0.9)
 
 e.  Generate data from an ARMA(1,1) model with ϕ1=0.6, θ1=0.6 and σ2=1.
 
-```{r}         
+```{r}
 arma <- ts(numeric(100))
 e <- rnorm(100)
 
@@ -574,7 +572,7 @@ for(i in 2:100){
 
 f.  Generate data from an AR(2) model with ϕ1=−0.8, ϕ2=0.3 and σ2=1. (Note that these parameters will give a non-stationary series.)
 
-```{r}         
+```{r}
 ar2 <- ts(numeric(100))
 e <- rnorm(100)
 
@@ -637,7 +635,7 @@ autoplot(forecast(austa_213_fit), ylim=c(0,10))
 # error: non-stationary AR part from CSS
 ```
 
-Removing the constant from the ARIMA(2,1,3) model results in an error pointing to a non-stationary condition in the dataset.  
+Removing the constant from the ARIMA(2,1,3) model results in an error pointing to a non-stationary condition in the dataset.
 
 d.  Plot forecasts from an ARIMA(0,0,1) model with a constant. Remove the MA term and plot again.
 
@@ -657,5 +655,3 @@ e.  Plot forecasts from an ARIMA(0,2,1) model with no constant.
 austa_021_noc_fit <- Arima(austa, order=c(0,2,1), include.constant=FALSE)
 autoplot(forecast(austa_021_noc_fit), ylim=c(0,10))
 ```
-
-
