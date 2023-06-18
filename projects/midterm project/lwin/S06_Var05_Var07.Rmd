@@ -1,0 +1,170 @@
+---
+title: "S06_Var05_Var07"
+author: "Lwin Shwe"
+date: "2023-06-18"
+output:
+  word_document: default
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+ You can embed an R code chunk like this:
+
+```{r load-packages, message=FALSE}
+library(fpp2)
+library(dplyr)
+library(imputeTS)
+library(readxl)
+library(forecast)
+library(ggplot2)
+library(ggfortify)
+library(caret)
+```
+
+```{r reading-dataset}
+Project1_DataS06 <- read_excel("Project1_DataS06.xlsx", skip = 1)
+View(Project1_DataS06)
+```
+
+```{r subset_and_filter-dataset}
+
+data_S06 <- subset(Project1_DataS06, category == 'S06', select = c(SeriesInd, Var05, Var07)) %>%
+  mutate(date = as.Date(SeriesInd, origin = "1900-01-01"))
+data_S06 <- filter(data_S06, SeriesInd <= 43221)
+summary(data_S06)
+str(data_S06)
+```
+```{r S06-V05-V07}
+data_S06_v5 <- data_S06 %>% select(Var05)
+data_S06_v5 <- data_S06_v5[1:1622,]
+summary(data_S06_v5)
+str(data_S06_v5)
+data_S06_v7 <- data_S06 %>% select(Var07)
+data_S06_v7 <- data_S06_v7[1:1622,]
+summary(data_S06_v7)
+str(data_S06_v7)
+```
+
+```{r times-eries-data}
+data_S06_Var05 <- ts(data_S06_v5)
+ggtsdisplay(data_S06_Var05)
+data_S06_Var07 <- ts(data_S06_v7)
+ggtsdisplay(data_S06_Var07)
+```
+
+
+```{r clean-missing-data}
+data_S06_Var05 <- data_S06_Var05 |>
+  tsclean() 
+ggtsdisplay(data_S06_Var05)
+data_S06_Var07 <- data_S06_Var07 |>
+  tsclean() 
+ggtsdisplay(data_S06_Var07)
+```
+### The data look getting better, appears to be some seaonality, upward trends via time. No significant variabilities but lags are so obvious over time in the ACF and cutoff after lag2 in PACE.
+
+```{r explore-lagging}
+gglagplot(data_S06_Var05)
+gglagplot(data_S06_Var07)
+```
+
+```{r data-preparation}
+train_index <- createDataPartition(data_S06_Var05, times = 1, p = 0.912, list = FALSE)
+train <- data_S06_Var05[train_index]
+test <- data_S06_Var05[-train_index]
+horizon <- length(test)
+print(dim(train))
+print(dim(test))
+print(horizon)
+
+train_index <- createDataPartition(data_S06_Var07, times = 1, p = 0.912, list = FALSE)
+train <- data_S06_Var07[train_index]
+test <- data_S06_Var07[-train_index]
+horizon <- length(test)
+print(dim(train))
+print(dim(test))
+print(horizon)
+```
+
+```{r build-data-models}
+# Simple Exponential Smoothing Method and # Holt's Method
+set.seed(123)
+ses.fit <- ses(train, h = horizon)
+ses_accuracy_Var05 <- c(data_S06_Var05 = accuracy(ses.fit, test)['Test set', 'MAPE'])
+holt.fit <- holt(train, damped=TRUE, h = horizon)
+holt_accuracy_Var05 <- c(data_S06_Var05 = accuracy(holt.fit, test)['Test set', 'MAPE'])
+
+autoplot(ses.fit) + ggtitle("ses.fit")
+autoplot(holt.fit) + ggtitle("holt.fit")
+
+
+ses.fit <- ses(train, h = horizon)
+ses_accuracy_Var07<- c(data_S06_Var07 = accuracy(ses.fit, test)['Test set', 'MAPE'])
+holt.fit <- holt(train, damped=TRUE, h = horizon)
+holt_accuracy_Var07 <- c(data_S06_Var07 = accuracy(holt.fit, test)['Test set', 'MAPE'])
+
+autoplot(ses.fit) + ggtitle("ses.fit")
+autoplot(holt.fit) + ggtitle("holt.fit")
+
+rbind(holt_pval = Box.test(residuals(holt.fit))$p.value,
+      ses_pval = Box.test(residuals(ses.fit))$p.value)
+```
+
+
+
+```{r build-ets-model}
+set.seed(123)
+ets.fit <- ets(train)
+ets.fit
+
+ets.fc <- forecast(ets.fit, h = horizon)
+ets_accuray_Var05 <- c(data_S06_Var05 = accuracy(ets.fc, test)['Test set', 'MAPE'])
+ets_accuray_Var05
+checkresiduals(ets.fc)
+autoplot(ets.fit) + ggtitle("ets.fit")
+autoplot(ets.fc) + ggtitle("ets.fc")
+
+ets.fc <- forecast(ets.fit, h = horizon)
+ets_accuray_Var07 <- c(data_S06_Var07 = accuracy(ets.fc, test)['Test set', 'MAPE'])
+ets_accuray_Var07
+checkresiduals(ets.fc)
+autoplot(ets.fit) + ggtitle("ets.fit")
+autoplot(ets.fc) + ggtitle("ets.fc")
+```
+
+
+
+```{r build-arima-model}
+set.seed(123)
+train |>
+  auto.arima() |>
+  forecast(h = horizon) |>
+  checkresiduals()
+arima.fc <- train |>
+  auto.arima() |>
+  forecast(h=horizon)
+arima_accuray_Var05 <- c(data_S06_Var05= accuracy(arima.fc, test)['Test set', 'MAPE'])
+
+autoplot(arima.fc) + ggtitle("data_S06_Var05")
+
+arima_accuray_Var07 <- c(data_S06_Var07= accuracy(arima.fc, test)['Test set', 'MAPE'])
+
+autoplot(arima.fc) + ggtitle("data_S06_Var07")
+```
+```{r MAPE_accuracy_Var05}
+
+S06_Var05.result <- cbind(ses = ses_accuracy_Var05, holt = holt_accuracy_Var05, ets = ets_accuray_Var05, arima = arima_accuray_Var05)
+cat("\tMAPE results by model - S06_Var05\n\n")
+S06_Var05.result
+
+S06_Var07.result <- cbind(ses = ses_accuracy_Var07, holt = holt_accuracy_Var07, ets = ets_accuray_Var07, arima = arima_accuray_Var07)
+cat("\tMAPE results by model - S06_Var07\n\n")
+S06_Var07.result
+```
+### Conclusions
+It is found that MAPE accuracy measures of the forecasting models are the same. So, it might be similar patterns, have less significant variability over time and finally limitation of forecasting models.
