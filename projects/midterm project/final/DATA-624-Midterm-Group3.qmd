@@ -1,25 +1,33 @@
 ---
 title: 'Midterm Project'
-subtitle: 'CUNY DATA 624 - 2023 Summer I'
+subtitle: 'CUNY DATA 624|2023 Summer I'
 author: 'Group 3: Daniel Sullivan, Jeff Parks, Lwin Shwe, Matthew Katz'
 # abstract: 'abstract text'
 format:
   docx:
     highlight-style: arrow
     number-sections: false
-    number-depth: 3
-    reference-doc: quarto-word-template.docx
+    number-depth: 2
+    reference-doc: ../../templates/quarto-word-template.docx
     toc: true
     toc-depth: 1
     toc-title: Contents
-page-layout: article
 editor: visual
+execute:
+  echo: true
+  eval: true
+  include: true
+  message: false
+  warning: false
+# output:
+#   html_document:
+#     toc: yes
+#     toc_float: yes
+#     theme: united
+page-layout: article
 ---
 
 ```{r setup, include=FALSE}
-# chunks
-knitr::opts_chunk$set(echo=FALSE, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE)
-
 # libraries
 library(tidyverse)
 library(fpp2)
@@ -77,7 +85,7 @@ df <- read_xls('../data/Data Set for Class.xls', sheet='Set for Class') %>%
 
 # Overview
 
-Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec. Aenean non diam interdum, tincidunt dui in, maximus orci. 
+Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec. Aenean non diam interdum, tincidunt dui in, maximus orci.
 
 Praesent eget enim id erat volutpat euismod. Vivamus euismod turpis nec sollicitudin accumsan. Duis maximus finibus auctor. Phasellus quis ornare nunc, id porttitor elit. Donec sit amet vulputate arcu. Nulla sodales lacinia nisl, sed hendrerit ex consectetur eget.
 
@@ -120,7 +128,7 @@ Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpa
 
 # Series Two
 
-Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec. Aenean non diam interdum, tincidunt dui in, maximus orci. 
+Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec. Aenean non diam interdum, tincidunt dui in, maximus orci.
 
 ```{r data_s02}
 df_s02 <- df %>%
@@ -163,7 +171,7 @@ xlab('Year') + ylab('')
 
 ## Analysis
 
-Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec. Aenean non diam interdum, tincidunt dui in, maximus orci. 
+Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec. Aenean non diam interdum, tincidunt dui in, maximus orci.
 
 ```{r}
 #| layout-ncol: 2
@@ -181,7 +189,7 @@ mstl(ts_s02_v02_ma7) %>%
 
 ```
 
-Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. 
+Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa.
 
 ```{r}
 #| layout-ncol: 2
@@ -199,7 +207,7 @@ mstl(ts_s02_v03_ma7) %>%
 
 ## Forecast
 
-Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec. Aenean non diam interdum, tincidunt dui in, maximus orci. 
+Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec. Aenean non diam interdum, tincidunt dui in, maximus orci.
 
 ```{r}
 #| layout-ncol: 2
@@ -247,7 +255,6 @@ df_s03 <- df %>%
 ```{r}
 
 ```
-
 
 {{< pagebreak >}}
 
