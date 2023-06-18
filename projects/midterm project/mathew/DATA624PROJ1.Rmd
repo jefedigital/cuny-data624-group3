@@ -4,11 +4,11 @@ author: "Mathew Katz"
 date: "2023-06-12"
 output: html_document
 ---
-
+Set up the options for a package called "knitr" in R. Specifically, it enables the printing of code output by setting echo to TRUE. This means that when the code is executed, the results will be displayed along with the code. The include=FALSE part indicates that this setup code should not be included when the final output, such as a report or document, is generated.
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
+Load several R packages that contain useful functions and tools for data analysis and manipulation
 ```{r}
 library(MLmetrics)
 library(fpp2)
@@ -17,105 +17,122 @@ library(tidyverse)
 library(imputeTS)
 library(dplyr)
 ```
-
+Read an Excel file named "Data Set for Class.xls" located on my desktop and assign the contents of that file to a variable called "df" in R
 ```{r}
-getwd
-df <- read_xls('../data/Data Set for Class.xls', sheet='Set for Class')
+df <- read_xls('Data Set for Class.xls')
 ```
-
+Take a look at the dataframe:
 ```{r}
 df
 ```
-
 ```{r}
 s04 <- subset(df, category == 'S04', select = c(SeriesInd, Var01, Var02)) %>%
   mutate(date = as.Date(SeriesInd, origin = "1900-01-01"))
 summary(s04)
 ```
+Subset the data frame by selecting rows where the "category" column is equal to 'S04'. It also specifies that it should only select the columns named "SeriesInd," "Var01," and "Var02". The result of this operation is assigned to a new data frame called "s04".
+
+Next, it adds a new column called "date" to the "s04" data frame. The values in the "date" column are created by converting the values in the "SeriesInd" column to dates using the "as.Date" function. The "origin" parameter is set to "1900-01-01", indicating that the dates should be interpreted relative to that origin.
+
+Finally, it provides a summary of the "s04" data frame, which gives you an overview of its statistical properties such as minimum, maximum, mean, and quartile values for each column.
 
 ```{r}
 str(s04)
 ```
+It provides a concise summary of the data frame's internal structure, including the number of observations (rows) and variables (columns), as well as the data type and a few sample values for each variable.
 
 ```{r}
 s04_1 <- s04 %>% select(Var01)
 s04_1 <- s04_1[1:1622,]
 ```
+The first line creates a new data frame called "s04_1" by selecting only the column named "Var01" from the "s04" data frame using the %>% operator, which is used for piping operations in the tidyverse. This means that "s04_1" will contain only the data from the "Var01" column.
+
+The second line modifies the "s04_1" data frame by selecting rows 1 to 1622, effectively keeping only the first 1622 rows of data. This subset of data is assigned back to the "s04_1" data frame.
 
 ```{r}
 s04_2 <- s04 %>% select(Var02)
 s04_2 <- s04_2[1:1622,]
 ```
+The first line creates a new data frame called "s04_2" by selecting only the column named "Var02" from the "s04" data frame using the %>% operator, which is used for piping operations in the tidyverse. This means that "s04_2" will contain only the data from the "Var02" column.
+
+The second line modifies the "s04_2" data frame by selecting rows 1 to 1622, effectively keeping only the first 1622 rows of data. This subset of data is assigned back to the "s04_2" data frame.
 
 ```{r}
 ggplot(s04, aes(x=date, y=Var01))+geom_line()+ xlab("Time") + ylab("S04_V01")
-
 ```
+This code creates a line plot that visualizes the relationship between the "date" variable on the x-axis and the "Var01" variable on the y-axis, with labeled axes indicating "Time" and "S04_V01", respectively.
 
 ```{r}
 ggplot(s04, aes(x=date, y=Var02))+geom_line()+ xlab("Time") + ylab("S05_V02")
 ```
+This code creates a line plot that visualizes the relationship between the "date" variable on the x-axis and the "Var01" variable on the y-axis, with labeled axes indicating "Time" and "S04_V01", respectively.
 
 ```{r}
 s04_1 <- na_interpolation(s04_1)
 ```
+After executing this code, the "s04_1" data frame will have missing values replaced with interpolated values, resulting in a complete dataset without missing values.
 
 ```{r}
 s04_2 <- na_interpolation(s04_2)
 ```
+After executing this code, the "s04_2" data frame will have missing values replaced with interpolated values, resulting in a complete dataset without missing values.
 
 ```{r}
 s04_1 <- ts(s04_1)
 ```
+By converting the data frame into a time series object, you gain access to various time series analysis and modeling functions in R that are specifically designed to work with time series data.
 
 ```{r}
 s04_2 <- ts(s04_2)
 ```
+Converting the second one as well into a time series.
 
 ```{r}
 s04_1 <- tsclean(s04_1)
 s04_2 <- tsclean(s04_2)
 ```
+By applying tsclean() to the "s04_1" and "s04_2" time series objects, the function identifies and removes any outliers or extreme values that might exist in the data. This helps to improve the quality and accuracy of the time series by mitigating the impact of unusual or erroneous observations.
 
 ```{r}
 V1train <- window(s04_1, end = as.integer(length(s04_1)*0.8))
 V2train <- window(s04_2, end = as.integer(length(s04_2)*0.8))
 ```
+The code separates the first 80% of the data from the original time series and assigns it to the "V1train" and "V2train" time series objects, respectively.
 
+These training subsets will be  used for model training and parameter estimation in time series analysis.
 ```{r}
 farimafit_1 <- V1train %>% auto.arima(lambda = (BoxCox.lambda(s04_1)), stepwise = FALSE) %>% forecast(h = 325)
 farimafit_2 <- V2train %>% auto.arima(lambda = (BoxCox.lambda(s04_2)), stepwise = FALSE) %>% forecast(h = 325)
 ```
+By fitting ARIMA models to the training data and generating forecasts, these code lines aim to model the underlying patterns and dynamics of the time series data and provide predictions for the future values. The resulting forecasts are stored in the "farimafit_1" and "farimafit_2" objects for further analysis
 
 ```{r}
 naive_1 <- naive(V1train, h=325)
 naive_2 <- naive(V2train, h=325)
 ```
+These code lines provide simple and straightforward forecasts that assume future values will be the same as the last observed value in the training data. The resulting forecasts are stored in the "naive_1" and "naive_2" objects for further analysis.
 
 ```{r}
 accuracy(farimafit_1, s04_1)["Test set", "MAPE"]
 ```
+The code retrieves the MAPE value for the test set, which provides an indication of the average percentage error of the forecast compared to the actual values.
+
+This code evaluates the MAPE metric for the "farimafit_1" forecast model by comparing its predictions to the actual values in the "s04_1" time series.
 
 ```{r}
 accuracy(farimafit_2, s04_2)["Test set", "MAPE"]
 ```
+This code evaluates the MAPE metric for the "farimafit_2" forecast model by comparing its predictions to the actual values in the "s04_1" time series.
 
 ```{r}
 accuracy(naive_1, s04_1)["Test set", "MAPE"]
 ```
+The code retrieves the MAPE value for the test set, which provides an indication of the average percentage error of the forecast generated by the "naive_1" model compared to the actual values.
 
+This code evaluates the MAPE metric for the "naive_1" forecast model by comparing its predictions to the actual values in the "s04_1" time series.
 ```{r}
 accuracy(naive_2, s04_2)["Test set", "MAPE"]
 ```
 
-```{r}
+This code evaluates the MAPE metric for the "naive_2" forecast model by comparing its predictions to the actual values in the "s04_2" time series.
 
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
