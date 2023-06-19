@@ -3,15 +3,15 @@ title: 'Midterm Project'
 subtitle: 'CUNY DATA 624|2023 Summer I'
 author: 'Group 3: Daniel Sullivan, Jeff Parks, Lwin Shwe, Matthew Katz'
 # abstract: 'abstract text'
-format:
-  docx:
-    highlight-style: arrow
-    number-sections: false
-    number-depth: 2
-    reference-doc: ../../../templates/quarto-word-template.docx
-    toc: true
-    toc-depth: 1
-    toc-title: Contents
+# format:
+#   docx:
+#     highlight-style: arrow
+#     number-sections: false
+#     number-depth: 2
+#     reference-doc: ../../../templates/quarto-word-template.docx
+#     toc: true
+#     toc-depth: 1
+#     toc-title: Contents
 editor: visual
 execute:
   echo: false
@@ -19,11 +19,11 @@ execute:
   include: true
   message: false
   warning: false
-# output:
-#   html_document:
-#     toc: yes
-#     toc_float: yes
-#     theme: united
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+    theme: united
 page-layout: article
 ---
 
@@ -35,34 +35,14 @@ library(readxl)
 library(zoo)
 library(seasonal)
 library(kableExtra)
+library(MLmetrics)
+library(imputeTS)
 
 # ggplot
 theme_set(theme_light())
 ```
 
 ```{r functions}
-expand_dates <- function(my_data){
-  
-  # create full date sequence
-  date_seq <- seq(min(my_data$dates), max(my_data$dates), by = "day")
-
-  # convert original data frame to a zoo object
-  zoo_obj <- zooreg(my_data$values, order.by = my_data$dates, frequency=365)
-
-  # merge with a zoo object containing consecutive dates
-  merged_obj <- merge(zoo_obj, zooreg(, order.by = date_seq, frequency=365))
-
-  # replace NA with 0
-  merged_obj_na <- merged_obj %>% replace(is.na(.), 0)
-
-  # convert to a ts object
-  my_ts <- ts(coredata(merged_obj_na)[,1], 
-              start = c(year(min(my_data$dates)),
-                        yday(min(my_data$dates))), frequency=365) 
-  
-  return(my_ts)
-}
-
 nice_table <- function(df, cap=NULL, cols=NULL, dig=3, fw=F){
   if (is.null(cols)) {c <- colnames(df)} else {c <- cols}
   table <- df %>% 
@@ -79,6 +59,46 @@ nice_table <- function(df, cap=NULL, cols=NULL, dig=3, fw=F){
 # load data
 df <- read_xls('../data/Data Set for Class.xls', sheet='Set for Class') %>%
   mutate(Date = as.Date(SeriesInd-2, origin = '1900-01-01'))
+```
+
+```{r}
+# set up timeseries
+
+df_s01 <- df %>%
+  filter(category == 'S01') %>%
+  mutate(Date_index = row_number()) %>%
+  select(c(Date_index,Date,Var01,Var02)) %>%
+  head(1622)
+
+df_s02 <- df %>%
+  filter(category == 'S02') %>%
+  mutate(Date_index = row_number()) %>%
+  select(c(Date_index,Date,Var02,Var03)) %>%
+  head(1622)
+
+df_s03 <- df %>%
+  filter(category == 'S03') %>%
+  mutate(Date_index = row_number()) %>%
+  select(c(Date_index,Date,Var05,Var07)) %>%
+  head(1622)
+
+df_s04 <- df %>%
+  filter(category == 'S04') %>%
+  mutate(Date_index = row_number()) %>%
+  select(c(Date_index,Date,Var01,Var02)) %>%
+  head(1622)
+
+df_s05 <- df %>%
+  filter(category == 'S05') %>%
+  mutate(Date_index = row_number()) %>%
+  select(c(Date_index,Date,Var02,Var03)) %>%
+  head(1622)
+
+df_s06 <- df %>%
+  filter(category == 'S06') %>%
+  mutate(Date_index = row_number()) %>%
+  select(c(Date_index,Date,Var05,Var07)) %>%
+  head(1622)
 ```
 
 {{< pagebreak >}}
@@ -121,7 +141,8 @@ Var01- This variable shows an upward trend through the time series with what see
 
 Var02- This time series shows a very slight downward trend but generally appears to be near white noise.
 
-```{r, include=TRUE}
+```{r}
+#| layout-ncol: 2
 var01ts <- ts(s01$Var01, start = c(1,1), frequency=260)%>% na.locf()
 autoplot(var01ts)
 
@@ -133,7 +154,6 @@ autoplot(var02ts)
 
 decompose(var02ts) %>%
   autoplot()
-
 ```
 
 ## Analysis
@@ -141,6 +161,7 @@ decompose(var02ts) %>%
 Both Var01 and Var02 showed a very high amount of correlation as seen with the lag plots with Var01 having near 1.0 correlation almost 40 points out and Var02 with many values hovering around 0.5.
 
 ```{r}
+#| layout-ncol: 2
 ggAcf(var01ts,40)
 ggAcf(var02ts,40)
 
@@ -233,105 +254,157 @@ ses(var02ts, alpha = 0.03, h = 325)%>% autoplot()+autolayer(var02ts)
 
 # Series Two
 
-Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec. Aenean non diam interdum, tincidunt dui in, maximus orci.
-
-```{r data_s02}
-df
-df_s02 <- df %>%
-  filter(category == 'S02') %>%
-  select(c(Date,Var02,Var03)) %>%
-  head(1622)
-
-ts_s02_v02 <- df_s02 %>%
-  select(dates=Date,values=Var02) %>%
-  drop_na() %>%
-  expand_dates()
-
-ts_s02_v03 <- df_s02 %>%
-  select(dates=Date,values=Var03) %>%
-  drop_na() %>%
-  expand_dates()
-```
+For the second category we examined time series data for Variables 2 and 3.
 
 ## Variables
 
-Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa.
+**Variable 02** seems to represent a product or activity with a high volume, approximately 40 million units per day! Overall there seems to be a gradually decreasing trend for this item, with neither seasonality nor long-term cyclic patterns detected. The presence of many extreme values for this variable could possibly interfere with the accuracy of our forecasts. In order to correct for these conditions while preserving as much information as possible, we chose to identify and smooth those 66 outliers with a linear interpolation.
 
-```{r, include=TRUE}
-#| layout-ncol: 2
-
-# 7-MA moving average
-ts_s02_v02_ma7 <- ma(ts_s02_v02, order=7, centre=TRUE)
-
-autoplot(ts_s02_v02_ma7) + 
-ggtitle('7-MA - Variable 2') +
-xlab('Year') + ylab('')
-
-# 7-MA moving average
-ts_s02_v03_ma7 <- ma(ts_s02_v03, order=7, centre=TRUE)
-
-autoplot(ts_s02_v03_ma7) + 
-ggtitle('7-MA - Variable 3') +
-xlab('Year') + ylab('')
-```
-
-## Analysis
-
-Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec. Aenean non diam interdum, tincidunt dui in, maximus orci.
 
 ```{r}
 #| layout-ncol: 2
 
-# seasonality
-ggAcf(ts_s02_v02_ma7, lag=90)  + 
-  ggtitle('ACF - Variable 2') +
-  xlab('Year')
+# v02
+data_s02_v02 <- df_s02 %>%
+  select(values=Var02)
 
-# stl decomp
-mstl(ts_s02_v02_ma7) %>% 
-  autoplot() + 
-  ggtitle('STL Decomp - Variable 2') +
-  xlab('Year')
+ts_s02_v02 <- ts(data_s02_v02)
 
+autoplot(ts_s02_v02)
+
+# outliers
+ts_s02_v02_out <- tsoutliers(ts_s02_v02)
+ts_s02_v02_clean <- tsclean(ts_s02_v02)
+
+autoplot(ts_s02_v02, series = 'Orig') +
+  autolayer(ts_s02_v02_clean, series = 'Clean')
 ```
 
-Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa.
+**Variable 03** seems to represent a product or activity with low volume, approximately 14 units per day. Overall there seems to be a steady trend for this item, with no seasonality detected. This dataset has only two missing values, and one notable extreme value toward the end of the series, smoothed here with a linear interpolation.
 
 ```{r}
 #| layout-ncol: 2
-# seasonality
-ggAcf(ts_s02_v03_ma7, lag=90) + 
-  ggtitle('ACF - Variable 3') +
-  xlab('Year')
+#| 
+# v03
+data_s02_v03 <- df_s02 %>%
+  select(values=Var03)
 
-# stl decomp
-mstl(ts_s02_v03_ma7) %>% 
-  autoplot() + 
-  ggtitle('STL Decomp - Variable 3') +
-  xlab('Year')
+ts_s02_v03 <- ts(data_s02_v03)
+
+autoplot(ts_s02_v03)
+
+# missing data
+ts_s02_v03 <- na_interpolation(ts_s02_v03)
+
+# outliers
+ts_s02_v03_out <- tsoutliers(ts_s02_v03)
+ts_s02_v03_clean <- tsclean(ts_s02_v03)
+
+autoplot(ts_s02_v03, series = 'Orig') +
+  autolayer(ts_s02_v03_clean, series = 'Clean')
 ```
 
-## Forecast
+#### Model Selection & Forecasts
 
-Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec. Aenean non diam interdum, tincidunt dui in, maximus orci.
+To evaluate and select models, we created 80/20 train/test split and score performance using the Mean Absolute Percentage Error (MAPE) statistic. 
+
+The three models evaluated for Variable 02 were:
+
+-   ARIMA(2,1,3) with drift
+-   Holt (Damped)
+-   Simple Exponential Smoothing (SES)
+
+We selected the SES method for this forecast since it produced the smallest MAPE score (30.22).
+
+Our resulting forecast for the next 140 days has a stable mean of approximately 20.7M units daily, but with a fairly large predictive interval.
 
 ```{r}
-#| layout-ncol: 2
 
-# ets forecast with 7-MA moving average
-f_s02_v02_ma7 <- forecast(ts_s02_v02_ma7, h=140) 
+## v02
+#
+# split
+split_idx <- floor(length(ts_s02_v02_clean)*.8)
+split_h <- (length(ts_s02_v02_clean) - split_idx)
+            
+ts_s02_v02_train <- window(ts_s02_v02_clean, end = split_idx)
 
-autoplot(f_s02_v02_ma7) + 
-  ggtitle('ETS Forecast - Variable 1') +
-  xlab('Year') + ylab('')
+# auto.arima
+ts_s02_v02_arima_fit <- auto.arima(ts_s02_v02_train, stepwise = FALSE)
+ts_s02_v02_arima <- forecast(ts_s02_v02_arima_fit, h = split_h)
 
-# ets forecast with 7-MA moving average
-f_s02_v03_ma7 <- forecast(ts_s02_v03_ma7, h=140) 
+# holt (damped)
+ts_s02_v02_holtd <- holt(ts_s02_v02_train, damped=TRUE, h = split_h)
 
-autoplot(f_s02_v03_ma7) + 
-  ggtitle('ETS Forecast - Variable 2') +
-  xlab('Year') + ylab('')
+# ses
+ts_s02_v02_ses <- ses(ts_s02_v02_train, h = split_h)
+
+# check residuals
+# checkresiduals(ts_s02_v02_arima)
+# checkresiduals(ts_s02_v02_holtd)
+# checkresiduals(ts_s02_v02_ses)
+
+# accuracy
+ts_s02_v02_arima_acc <- accuracy(ts_s02_v02_arima, ts_s02_v02_clean)["Test set", "MAPE"] # 45.82757
+# ts_s02_v02_holtd_acc <- accuracy(ts_s02_v02_holtd, ts_s02_v02_clean)["Test set", "MAPE"] # 30.29515
+# ts_s02_v02_ses_acc <- accuracy(ts_s02_v02_ses, ts_s02_v02_clean)["Test set", "MAPE"] # 30.22492
+
+# forecast
+ts_s02_v02_forecast <- forecast(ts_s02_v02_ses, ts_s02_v02, h=140)
+autoplot(ts_s02_v02_forecast) + 
+  ggtitle('Series Two - Var 02: Forecast')
+
+# export
+forecast_s02_v02 <- ts_s02_v02_forecast$mean
 ```
+
+The three models evaluated for Variable 03 were:
+
+-   ARIMA(2,1,0)
+-   Holt (Damped)
+-   Simple Exponential Smoothing
+
+We selected the ARIMA(2,1,0) method for this forecast since it produced the smallest MAPE score (16.19).
+
+Our resulting forecast for the next 140 days has a stable mean of approximately 16.2 units daily, but with a fairly large predictive interval.
+
+```{r}
+## v03
+#
+# split
+split_idx <- floor(length(ts_s02_v03_clean)*.8)
+split_h <- (length(ts_s02_v03_clean) - split_idx)
+            
+ts_s02_v03_train <- window(ts_s02_v03_clean, end = split_idx)
+
+# auto.arima
+ts_s02_v03_arima_fit <- auto.arima(ts_s02_v03_train, stepwise = FALSE)
+ts_s02_v03_arima <- forecast(ts_s02_v03_arima_fit, h = split_h)
+
+# holt (damped)
+ts_s02_v03_holtd <- holt(ts_s02_v03_train, damped=TRUE, h = split_h)
+
+# ses
+ts_s02_v03_ses <- ses(ts_s02_v03_train, h = split_h)
+
+# check residuals
+# checkresiduals(ts_s02_v03_arima)
+# checkresiduals(ts_s02_v03_holtd)
+# checkresiduals(ts_s02_v03_ses)
+
+# accuracy
+ts_s02_v03_arima_acc <- accuracy(ts_s02_v03_arima, ts_s02_v03_clean)["Test set", "MAPE"] # 16.19648 **
+ts_s02_v03_holtd_acc <- accuracy(ts_s02_v03_holtd, ts_s02_v03_clean)["Test set", "MAPE"] # 16.29988
+ts_s02_v03_ses_acc <- accuracy(ts_s02_v03_ses, ts_s02_v03_clean)["Test set", "MAPE"] # 16.28299
+
+# forecast
+ts_s02_v03_forecast <- forecast(ts_s02_v03_arima, ts_s02_v03, h=140)
+autoplot(ts_s02_v03_forecast) + 
+  ggtitle('Series Two - Var 03: Forecast')
+
+# export
+forecast_s02_v03 <- ts_s02_v03_forecast$mean
+```
+
 
 {{< pagebreak >}}
 
