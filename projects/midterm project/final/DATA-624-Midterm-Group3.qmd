@@ -105,11 +105,9 @@ df_s06 <- df %>%
 
 # Overview
 
-Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec. Aenean non diam interdum, tincidunt dui in, maximus orci.
+For this project, we were presented with six batches of blinded time series data, containing historical performance on twelve separate variables. Our goal is to provide you with statistically rigorous, but actionable advice on expected performance for each of these twelve variables - whether they correspond to product sales, web traffic, or other important business metrics.
 
-Praesent eget enim id erat volutpat euismod. Vivamus euismod turpis nec sollicitudin accumsan. Duis maximus finibus auctor. Phasellus quis ornare nunc, id porttitor elit. Donec sit amet vulputate arcu. Nulla sodales lacinia nisl, sed hendrerit ex consectetur eget.
-
-Vivamus euismod turpis nec sollicitudin accumsan. Duis maximus finibus auctor. Phasellus quis ornare nunc, id porttitor elit. Donec sit amet vulputate arcu. Nulla sodales lacinia nisl, sed hendrerit ex consectetur eget.
+In this report we will illustrate for you the overall performance of each of the variables, as well as any relationships we suspect might exist between them. We will also briefly cover any adjustments that were made to the data in order to aid in clean and accurate forecast models. Finally, we will provide you our best estimates for future performance along with guidance on measures of uncertainty in the models.
 
 {{< pagebreak >}}
 
