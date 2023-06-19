@@ -44,6 +44,7 @@ data_S03_v5 <- data_S03 %>% select(Var05)
 data_S03_v5 <- data_S03_v5[1:1622,]
 summary(data_S03_v5)
 str(data_S03_v5)
+
 data_S03_v7 <- data_S03 %>% select(Var07)
 data_S03_v7 <- data_S03_v7[1:1622,]
 summary(data_S03_v7)
@@ -56,6 +57,7 @@ str(data_S03_v7)
 data_S03_v5 <- na_interpolation(data_S03_v5)
 summary(data_S03_v5)
 str(data_S03_v5)
+
 data_S03_v7 <- na_interpolation(data_S03_v7)
 summary(data_S03_v7)
 str(data_S03_v7)
@@ -65,8 +67,10 @@ str(data_S03_v7)
 ```{r timeseries-data}
 data_S03_v5 <- ts(data_S03_v5)
 str(data_S03_v5)
+
 data_S03_v7 <- ts(data_S03_v7)
 str(data_S03_v7)
+
 autoplot(data_S03_v5) + ggtitle("Time Series Data S03_Var05")
 autoplot(data_S03_v7) + ggtitle("Time Series Data S03_Var07")
 ```
@@ -75,6 +79,7 @@ autoplot(data_S03_v7) + ggtitle("Time Series Data S03_Var07")
 par(mfrow= c(1,2))
 hist(data_S03_v5)
 boxplot(data_S03_v5)
+
 hist(data_S03_v7)
 boxplot(data_S03_v7)
 ```
@@ -82,8 +87,10 @@ boxplot(data_S03_v7)
 ```{r remove-outliers}
 data_S03_v5_out <- tsoutliers(data_S03_v5)
 data_S03_v7_out <- tsoutliers(data_S03_v7)
+
 data_S03_v5 <- tsclean(data_S03_v5)
 data_S03_v7 <-tsclean(data_S03_v7)
+
 autoplot(data_S03_v5) + ggtitle("Cleaned Data_S03_Var05")
 autoplot(data_S03_v7) + ggtitle("Cleaned Data_S03_Var07")
 
