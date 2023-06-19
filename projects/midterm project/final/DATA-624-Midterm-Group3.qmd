@@ -3,15 +3,15 @@ title: 'Midterm Project'
 subtitle: 'CUNY DATA 624|2023 Summer I'
 author: 'Group 3: Daniel Sullivan, Jeff Parks, Lwin Shwe, Matthew Katz'
 # abstract: 'abstract text'
-format:
-  docx:
-    highlight-style: arrow
-    number-sections: false
-    number-depth: 2
-    reference-doc: ../../../templates/quarto-word-template.docx
-    toc: true
-    toc-depth: 1
-    toc-title: Contents
+# format:
+#   docx:
+#     highlight-style: arrow
+#     number-sections: false
+#     number-depth: 2
+#     reference-doc: ../../../templates/quarto-word-template.docx
+#     toc: true
+#     toc-depth: 1
+#     toc-title: Contents
 editor: visual
 execute:
   echo: false
@@ -19,11 +19,11 @@ execute:
   include: true
   message: false
   warning: false
-# output:
-#   html_document:
-#     toc: yes
-#     toc_float: yes
-#     theme: united
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+    theme: united
 page-layout: article
 ---
 
@@ -35,34 +35,14 @@ library(readxl)
 library(zoo)
 library(seasonal)
 library(kableExtra)
+library(MLmetrics)
+library(imputeTS)
 
 # ggplot
 theme_set(theme_light())
 ```
 
 ```{r functions}
-expand_dates <- function(my_data){
-  
-  # create full date sequence
-  date_seq <- seq(min(my_data$dates), max(my_data$dates), by = "day")
-
-  # convert original data frame to a zoo object
-  zoo_obj <- zooreg(my_data$values, order.by = my_data$dates, frequency=365)
-
-  # merge with a zoo object containing consecutive dates
-  merged_obj <- merge(zoo_obj, zooreg(, order.by = date_seq, frequency=365))
-
-  # replace NA with 0
-  merged_obj_na <- merged_obj %>% replace(is.na(.), 0)
-
-  # convert to a ts object
-  my_ts <- ts(coredata(merged_obj_na)[,1], 
-              start = c(year(min(my_data$dates)),
-                        yday(min(my_data$dates))), frequency=365) 
-  
-  return(my_ts)
-}
-
 nice_table <- function(df, cap=NULL, cols=NULL, dig=3, fw=F){
   if (is.null(cols)) {c <- colnames(df)} else {c <- cols}
   table <- df %>% 
@@ -79,6 +59,46 @@ nice_table <- function(df, cap=NULL, cols=NULL, dig=3, fw=F){
 # load data
 df <- read_xls('../data/Data Set for Class.xls', sheet='Set for Class') %>%
   mutate(Date = as.Date(SeriesInd-2, origin = '1900-01-01'))
+```
+
+```{r}
+# set up timeseries
+
+df_s01 <- df %>%
+  filter(category == 'S01') %>%
+  mutate(Date_index = row_number()) %>%
+  select(c(Date_index,Date,Var01,Var02)) %>%
+  head(1622)
+
+df_s02 <- df %>%
+  filter(category == 'S02') %>%
+  mutate(Date_index = row_number()) %>%
+  select(c(Date_index,Date,Var02,Var03)) %>%
+  head(1622)
+
+df_s03 <- df %>%
+  filter(category == 'S03') %>%
+  mutate(Date_index = row_number()) %>%
+  select(c(Date_index,Date,Var05,Var07)) %>%
+  head(1622)
+
+df_s04 <- df %>%
+  filter(category == 'S04') %>%
+  mutate(Date_index = row_number()) %>%
+  select(c(Date_index,Date,Var01,Var02)) %>%
+  head(1622)
+
+df_s05 <- df %>%
+  filter(category == 'S05') %>%
+  mutate(Date_index = row_number()) %>%
+  select(c(Date_index,Date,Var02,Var03)) %>%
+  head(1622)
+
+df_s06 <- df %>%
+  filter(category == 'S06') %>%
+  mutate(Date_index = row_number()) %>%
+  select(c(Date_index,Date,Var05,Var07)) %>%
+  head(1622)
 ```
 
 {{< pagebreak >}}
@@ -103,129 +123,148 @@ s01 <- df %>%
   select(c(SeriesInd,Var01,Var02)) %>%
   head(1622)
 
-var01 <- s01 %>%
+var01 <- df %>%
   select(c(SeriesInd,Var01)) %>%
   na.locf()
-var02 <- s01 %>%
+
+var02 <- df %>%
   select(c(SeriesInd,Var02)) %>%
   na.locf()
-
-#length(s05$Var02)
 ```
 
-## Variables
+## Variables & Analysis
 
 Series one used two variables, Var01 and Var02. It seems that for both there was little if any seasonality but where the data seemed to have 5 day intervals with scattered gaps. A work days per year pattern was used however I do not believe that there is a major correlation with these series since in most of decomposition at various frequencies showed large runs of wave motion remainders showing their may be some other pattern to the data. each variable had a few missing variables which were imputed where necessary being replaced with the most recent non-NA value before it.
 
-Var01- This variable shows an upward trend through the time series with what seems to be plateaus at either end with the mid section appearing linear and two almost camel humps at either end of the linear phase.
+**Variable 01** shows an upward trend through the time series with what seems to be plateaus at either end with the mid section appearing linear and two almost camel humps at either end of the linear phase.
 
-Var02- This time series shows a very slight downward trend but generally appears to be near white noise.
-
-```{r, include=TRUE}
+```{r}
+#| layout-ncol: 2
 var01ts <- ts(s01$Var01, start = c(1,1), frequency=260)%>% na.locf()
 autoplot(var01ts)
 
 decompose(var01ts) %>%
   autoplot()
+```
 
+**Variable 02** shows a very slight downward trend but generally appears to be near white noise.
+
+```{r}
+#| layout-ncol: 2
 var02ts <- ts(s01$Var02, start = c(1,1), frequency=260)%>%  na.locf()
 autoplot(var02ts)
 
 decompose(var02ts) %>%
   autoplot()
-
 ```
-
-## Analysis
 
 Both Var01 and Var02 showed a very high amount of correlation as seen with the lag plots with Var01 having near 1.0 correlation almost 40 points out and Var02 with many values hovering around 0.5.
 
 ```{r}
+#| layout-ncol: 2
 ggAcf(var01ts,40)
 ggAcf(var02ts,40)
-
 ```
 
 Because of the non seasonal pattern of the data we moved forward using the forecast function which implemented an STL+ETS method and SES with a tuned alpha variable. After comparing these forecasts with a 80/20 training/testing split with the last 20 on the last half we tested the forecast optimizing the MAPE. We found that in all cases the tuned alpha performed better so used this for the Forecast. we found the alpha values optimized at a=0.03 for Var01 and a=0.27.
 
 ```{r}
+#| layout-ncol: 2
+
 s01<-s01%>%na.locf()
 
 var01ts <- ts(s01$Var01, start = c(1,1), frequency=260)%>% na.locf()
+
 train1<-window(var01ts,end = 6)
-#train1
 test1 <- window(var01ts,start = 6.00001)
-#test1
-#ses(train, h=140, alpha = 0.7) %>%
-#  autoplot()
+
+# ses(train, h=140, alpha = 0.7) %>%
+#   autoplot()
+
 forc1<-forecast(train1, h=325)
-
-
 
 alpha <- seq(.01, .99, by = .01)
 error1 <- NA
 for(i in seq_along(alpha)) {
   fit1 <- ses(train1, alpha = alpha[i],h = 325)
-  
   error1[i] <- MAPE(y_pred=fit1$mean,y_true=test1)
   #print(c(fit1$mean[i],test1[i]))
  # print(error1[i])
 }
-print(error1)
-print("...forcast...")
-MAPE(y_pred=forc1$mean,y_true=test1)
 
-min(error1)
+# print(error1)
+# print("...forcast...")
+# MAPE(y_pred=forc1$mean,y_true=test1)
+# min(error1)
 
-ses(train1, alpha = 0.03, h = 325)%>% autoplot()+autolayer(var01ts)
-forecast(train1, h=325)%>%autoplot()+autolayer(var01ts)
-min(error1)
-MAPE(y_pred=forc1$mean,y_true=test1)
+ses(train1, alpha = 0.03, h = 325) %>% 
+  autoplot() +
+  autolayer(var01ts)
+
+forecast(train1, h=325) %>% 
+  autoplot() + 
+  autolayer(var01ts)
+
+# min(error1)
+# MAPE(y_pred=forc1$mean,y_true=test1)
 ```
 
 ```{r}
+#| layout-ncol: 2
 
 train2<-window(var02ts,end = 6)
 test2 <- window(var02ts,start = 6.000001)
 
-#ses(train, h=140, alpha = 0.7) %>%
-#  autoplot()
+# ses(train, h=140, alpha = 0.7) %>%
+#   autoplot()
+
 forc2<-forecast(train2, h=325)
-
-
 
 alpha <- seq(.01, .99, by = .01)
 error2 <- NA
+
 for(i in seq_along(alpha)) {
   fit2 <- ses(train2, alpha = alpha[i],
              h = 325)
-  
   error2[i] <- MAPE(y_pred=fit2$mean,y_true=test2)
 }
-print(error2)
-print("...forcast...")
-MAPE(y_pred=forc2$mean,y_true=test2)
 
-min(error2)
+# print(error2)
+# print("...forcast...")
+# MAPE(y_pred=forc2$mean,y_true=test2)
+# min(error2)
 
-ses(train2, alpha = 0.27, h = 325)%>% autoplot()+autolayer(var02ts)
-forecast(train2, h=325)%>%autoplot() +autolayer(var02ts)
-autoplot(var02ts)
-min(error2)
-MAPE(y_pred=forc2$mean,y_true=test2)
+ses(train2, alpha = 0.27, h = 325) %>% 
+  autoplot() +
+  autolayer(var02ts)
+
+forecast(train2, h=325) %>% 
+  autoplot() + 
+  autolayer(var02ts)
+
+# min(error2)
+# MAPE(y_pred=forc2$mean,y_true=test2)
 ```
 
-## Forecast
+## Model Selection & Forecasts
 
-Since the SES models performed slightly better these were chosen for the forecast.
+Since the SES models performed slightly better, these were chosen for the forecast.
 
-```{r, include=TRUE}
-forcast_s01_var01<-ses(var01ts, alpha = 0.03, h = 140)
-forcast_s01_var01$mean
-ses(var01ts, alpha = 0.03, h = 325)%>% autoplot()+autolayer(var01ts)
-forcast_s01_var02<-ses(var02ts, alpha = 0.27, h = 140)
-forcast_s01_var02$mean
-ses(var02ts, alpha = 0.03, h = 325)%>% autoplot()+autolayer(var02ts)
+```{r}
+#| layout-ncol: 2
+forcast_s01_var01 <- ses(var01ts, alpha = 0.03, h = 140)
+# forcast_s01_var01$mean
+
+ses(var01ts, alpha = 0.03, h = 325) %>% 
+  autoplot() + 
+  autolayer(var01ts)
+
+forcast_s01_var02 <- ses(var02ts, alpha = 0.27, h = 140)
+# forcast_s01_var02$mean
+
+ses(var02ts, alpha = 0.03, h = 325) %>% 
+  autoplot() +
+  autolayer(var02ts)
 
 ```
 
@@ -233,104 +272,151 @@ ses(var02ts, alpha = 0.03, h = 325)%>% autoplot()+autolayer(var02ts)
 
 # Series Two
 
-Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec. Aenean non diam interdum, tincidunt dui in, maximus orci.
-
-```{r data_s02}
-df
-df_s02 <- df %>%
-  filter(category == 'S02') %>%
-  select(c(Date,Var02,Var03)) %>%
-  head(1622)
-
-ts_s02_v02 <- df_s02 %>%
-  select(dates=Date,values=Var02) %>%
-  drop_na() %>%
-  expand_dates()
-
-ts_s02_v03 <- df_s02 %>%
-  select(dates=Date,values=Var03) %>%
-  drop_na() %>%
-  expand_dates()
-```
+For the second category we examined time series data for Variables 2 and 3.
 
 ## Variables
 
-Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa.
-
-```{r, include=TRUE}
-#| layout-ncol: 2
-
-# 7-MA moving average
-ts_s02_v02_ma7 <- ma(ts_s02_v02, order=7, centre=TRUE)
-
-autoplot(ts_s02_v02_ma7) + 
-ggtitle('7-MA - Variable 2') +
-xlab('Year') + ylab('')
-
-# 7-MA moving average
-ts_s02_v03_ma7 <- ma(ts_s02_v03, order=7, centre=TRUE)
-
-autoplot(ts_s02_v03_ma7) + 
-ggtitle('7-MA - Variable 3') +
-xlab('Year') + ylab('')
-```
-
-## Analysis
-
-Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec. Aenean non diam interdum, tincidunt dui in, maximus orci.
+**Variable 02** seems to represent a product or activity with a high volume, approximately 40 million units per day! Overall there seems to be a gradually decreasing trend for this item, with neither seasonality nor long-term cyclic patterns detected. The presence of many extreme values for this variable could possibly interfere with the accuracy of our forecasts. In order to correct for these conditions while preserving as much information as possible, we chose to identify and smooth those 66 outliers with a linear interpolation.
 
 ```{r}
 #| layout-ncol: 2
 
-# seasonality
-ggAcf(ts_s02_v02_ma7, lag=90)  + 
-  ggtitle('ACF - Variable 2') +
-  xlab('Year')
+# v02
+data_s02_v02 <- df_s02 %>%
+  select(values=Var02)
 
-# stl decomp
-mstl(ts_s02_v02_ma7) %>% 
-  autoplot() + 
-  ggtitle('STL Decomp - Variable 2') +
-  xlab('Year')
+ts_s02_v02 <- ts(data_s02_v02)
 
+autoplot(ts_s02_v02)
+
+# outliers
+ts_s02_v02_out <- tsoutliers(ts_s02_v02)
+ts_s02_v02_clean <- tsclean(ts_s02_v02)
+
+autoplot(ts_s02_v02, series = 'Orig') +
+  autolayer(ts_s02_v02_clean, series = 'Clean')
 ```
 
-Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa.
+**Variable 03** seems to represent a product or activity with low volume, approximately 14 units per day. Overall there seems to be a steady trend for this item, with no seasonality detected. This dataset has only two missing values, and one notable extreme value toward the end of the series, smoothed here with a linear interpolation.
 
 ```{r}
 #| layout-ncol: 2
-# seasonality
-ggAcf(ts_s02_v03_ma7, lag=90) + 
-  ggtitle('ACF - Variable 3') +
-  xlab('Year')
+#| 
+# v03
+data_s02_v03 <- df_s02 %>%
+  select(values=Var03)
 
-# stl decomp
-mstl(ts_s02_v03_ma7) %>% 
-  autoplot() + 
-  ggtitle('STL Decomp - Variable 3') +
-  xlab('Year')
+ts_s02_v03 <- ts(data_s02_v03)
+
+autoplot(ts_s02_v03)
+
+# missing data
+ts_s02_v03 <- na_interpolation(ts_s02_v03)
+
+# outliers
+ts_s02_v03_out <- tsoutliers(ts_s02_v03)
+ts_s02_v03_clean <- tsclean(ts_s02_v03)
+
+autoplot(ts_s02_v03, series = 'Orig') +
+  autolayer(ts_s02_v03_clean, series = 'Clean')
 ```
 
-## Forecast
+## Model Selection & Forecasts
 
-Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec. Aenean non diam interdum, tincidunt dui in, maximus orci.
+To evaluate and select models, we created 80/20 train/test split and score performance using the Mean Absolute Percentage Error (MAPE) statistic.
+
+The three models evaluated for Variable 02 were:
+
+-   ARIMA(2,1,3) with drift
+-   Holt (Damped)
+-   Simple Exponential Smoothing (SES)
+
+We selected the SES method for this forecast since it produced the smallest MAPE score (30.22).
+
+Our resulting forecast for the next 140 days has a stable mean of approximately 20.7M units daily, but with a fairly large predictive interval.
 
 ```{r}
-#| layout-ncol: 2
+## v02
+# split
+split_idx <- floor(length(ts_s02_v02_clean)*.8)
+split_h <- (length(ts_s02_v02_clean) - split_idx)
+            
+ts_s02_v02_train <- window(ts_s02_v02_clean, end = split_idx)
 
-# ets forecast with 7-MA moving average
-f_s02_v02_ma7 <- forecast(ts_s02_v02_ma7, h=140) 
+# auto.arima
+ts_s02_v02_arima_fit <- auto.arima(ts_s02_v02_train, stepwise = FALSE)
+ts_s02_v02_arima <- forecast(ts_s02_v02_arima_fit, h = split_h)
 
-autoplot(f_s02_v02_ma7) + 
-  ggtitle('ETS Forecast - Variable 1') +
-  xlab('Year') + ylab('')
+# holt (damped)
+ts_s02_v02_holtd <- holt(ts_s02_v02_train, damped=TRUE, h = split_h)
 
-# ets forecast with 7-MA moving average
-f_s02_v03_ma7 <- forecast(ts_s02_v03_ma7, h=140) 
+# ses
+ts_s02_v02_ses <- ses(ts_s02_v02_train, h = split_h)
 
-autoplot(f_s02_v03_ma7) + 
-  ggtitle('ETS Forecast - Variable 2') +
-  xlab('Year') + ylab('')
+# check residuals
+# checkresiduals(ts_s02_v02_arima)
+# checkresiduals(ts_s02_v02_holtd)
+# checkresiduals(ts_s02_v02_ses)
+
+# accuracy
+ts_s02_v02_arima_acc <- accuracy(ts_s02_v02_arima, ts_s02_v02_clean)["Test set", "MAPE"] # 45.82757
+# ts_s02_v02_holtd_acc <- accuracy(ts_s02_v02_holtd, ts_s02_v02_clean)["Test set", "MAPE"] # 30.29515
+# ts_s02_v02_ses_acc <- accuracy(ts_s02_v02_ses, ts_s02_v02_clean)["Test set", "MAPE"] # 30.22492
+
+# forecast
+ts_s02_v02_forecast <- forecast(ts_s02_v02_ses, ts_s02_v02, h=140)
+autoplot(ts_s02_v02_forecast) + 
+  ggtitle('Series Two - Var 02: Forecast')
+
+# export
+forecast_s02_v02 <- ts_s02_v02_forecast$mean
+```
+
+The three models evaluated for Variable 03 were:
+
+-   ARIMA(2,1,0)
+-   Holt (Damped)
+-   Simple Exponential Smoothing
+
+We selected the ARIMA(2,1,0) method for this forecast since it produced the smallest MAPE score (16.19).
+
+Our resulting forecast for the next 140 days has a stable mean of approximately 16.2 units daily, but with a fairly large predictive interval.
+
+```{r}
+## v03
+# split
+split_idx <- floor(length(ts_s02_v03_clean)*.8)
+split_h <- (length(ts_s02_v03_clean) - split_idx)
+            
+ts_s02_v03_train <- window(ts_s02_v03_clean, end = split_idx)
+
+# auto.arima
+ts_s02_v03_arima_fit <- auto.arima(ts_s02_v03_train, stepwise = FALSE)
+ts_s02_v03_arima <- forecast(ts_s02_v03_arima_fit, h = split_h)
+
+# holt (damped)
+ts_s02_v03_holtd <- holt(ts_s02_v03_train, damped=TRUE, h = split_h)
+
+# ses
+ts_s02_v03_ses <- ses(ts_s02_v03_train, h = split_h)
+
+# check residuals
+# checkresiduals(ts_s02_v03_arima)
+# checkresiduals(ts_s02_v03_holtd)
+# checkresiduals(ts_s02_v03_ses)
+
+# accuracy
+ts_s02_v03_arima_acc <- accuracy(ts_s02_v03_arima, ts_s02_v03_clean)["Test set", "MAPE"] # 16.19648 **
+ts_s02_v03_holtd_acc <- accuracy(ts_s02_v03_holtd, ts_s02_v03_clean)["Test set", "MAPE"] # 16.29988
+ts_s02_v03_ses_acc <- accuracy(ts_s02_v03_ses, ts_s02_v03_clean)["Test set", "MAPE"] # 16.28299
+
+# forecast
+ts_s02_v03_forecast <- forecast(ts_s02_v03_arima, ts_s02_v03, h=140)
+autoplot(ts_s02_v03_forecast) + 
+  ggtitle('Series Two - Var 03: Forecast')
+
+# export
+forecast_s02_v03 <- ts_s02_v03_forecast$mean
 ```
 
 {{< pagebreak >}}
@@ -348,19 +434,13 @@ df_s03 <- df %>%
 
 ```
 
-## Variables
+## Variables & Analysis
 
 ```{r}
 
 ```
 
-## Analysis
-
-```{r}
-
-```
-
-## Forecast
+## Model Selection & Forecasts
 
 ```{r}
 
@@ -377,19 +457,13 @@ df_s04 <- df %>%
   head(1622)
 ```
 
-## Variables
+## Variables & Analysis
 
 ```{r}
 
 ```
 
-## Analysis
-
-```{r}
-
-```
-
-## Forecast
+## Model Selection & Forecasts
 
 ```{r}
 
@@ -412,7 +486,7 @@ s05_var03 <- s05 %>%
   na.locf()
 ```
 
-## Variables
+## Variables & Analysis
 
 Series five consisted of two variables var02 and var03. both contained small amounts of missing values and where applicable were replaced based on the previous held value. Additionally since all of these data sets appear to be on a 5 day cycle the work year(260) days was used for establishing frequency.
 
@@ -421,6 +495,7 @@ Var02- In the variable 2 plots we see a gradual small decrease in value with an 
 Var03- variable 3 has what seems to be three patterns in the center of the plot there seems to be slow steady growth that is near linear with a fair amount of fluctuation. Additionally at the start of the data set there is a steep rise and at the end a steep fall. The seasonal patterns seem to make these more gradual however there is a good amount of wave motion in the remainders so there is an aspect of the data this is not accounted for despite the seasonal graph matching a few of the data motifs.
 
 ```{r}
+#| layout-ncol: 2
 s05_var02ts <- ts(s05_var02$Var02, start = c(1,1), frequency=260)%>% na.locf()
 autoplot(s05_var02ts)
 
@@ -435,11 +510,10 @@ decompose(s05_var03ts) %>%
 
 ```
 
-## Analysis
-
 Both variable three and variable five show high levels of corelation within the lag plot with var02 hovering near 0.5-0.4 and var03 hovering around 1-0.8 for over 40 values.
 
 ```{r}
+#| layout-ncol: 2
 ggAcf(s05_var02ts,40)
 ggAcf(s05_var03ts,40)
 ```
@@ -447,83 +521,95 @@ ggAcf(s05_var03ts,40)
 For this analysis we compared how the forcast() function performed using an STL+ETS model and how an SES(simply exponential smoothing) model with tuned alpha variable performed. We tuned the SES by using an algorithm to reduce MAPE to determine the alpha value. We found using the highest alpha=0.99 in both cases gave the most accurate forecast when testing on the last 20% of the data with an 80/20 training testing split and when we compared this to the forecast function performed slightly better.
 
 ```{r}
-s05_var02ts <- ts(s05_var02$Var02, start = c(1,1), frequency=260)%>% na.locf()
-#autoplot(s05_var02ts)
-train25<-window(s05_var02ts,end = 6)
+#| layout-ncol: 2
+
+s05_var02ts <- ts(s05_var02$Var02, start = c(1,1), frequency=260) %>% 
+  na.locf()
+
+train25 <- window(s05_var02ts,end = 6)
 test25 <- window(s05_var02ts,start = 6.000001)
 
-#ses(train, h=140, alpha = 0.7) %>%
-#  autoplot()
-forc25<-forecast(train25, h=325)
+# ses(train, h=140, alpha = 0.7) %>%
+#   autoplot()
 
-
+forc25 <- forecast(train25, h=325)
 
 alpha <- seq(.01, .99, by = .01)
 error25 <- NA
 for(i in seq_along(alpha)) {
   fit25 <- ses(train25, alpha = alpha[i],
              h = 325)
-  
   error25[i] <- MAPE(y_pred=fit25$mean,y_true=test25)
 }
-print(error25)
-print("...forcast...")
-MAPE(y_pred=forc25$mean,y_true=test25)
-min(error25)
-ses(train25, alpha = 0.99, h = 325)%>% autoplot()+autolayer(s05_var02ts)
-forecast(train25, h=325)%>%autoplot() +autolayer(s05_var02ts)
-autoplot(s05_var02ts)
+
+# print(error25)
+# print("...forcast...")
+# MAPE(y_pred=forc25$mean,y_true=test25)
+# min(error25)
+
+ses(train25, alpha = 0.99, h = 325) %>% 
+  autoplot() + 
+  autolayer(s05_var02ts)
+
+forecast(train25, h=325) %>% 
+  autoplot() +
+  autolayer(s05_var02ts)
+
+# autoplot(s05_var02ts)
 #min(error25)
 #MAPE(y_pred=forc25$mean,y_true=test25)
 
 ```
 
 ```{r}
-
-train0503<-window(s05_var03ts,end = 6)
+#| layout-ncol: 2
+train0503 <- window(s05_var03ts,end = 6)
 test0503 <- window(s05_var03ts,start = 6.000001)
 
-#ses(train, h=140, alpha = 0.7) %>%
-#  autoplot()
-forc0503<-forecast(train0503, h=325)
+# ses(train, h=140, alpha = 0.7) %>%
+#   autoplot()
 
-
+forc0503 <- forecast(train0503, h=325)
 
 alpha <- seq(.01, .99, by = .01)
 error0503 <- NA
 for(i in seq_along(alpha)) {
   fit0503 <- ses(train0503, alpha = alpha[i],
              h = 325)
-  
   error0503[i] <- MAPE(y_pred=fit0503$mean,y_true=test0503)
 }
-print(error0503)
-print("…forcast…")
-MAPE(y_pred=forc0503$mean,y_true=test0503)
 
-min(error0503)
+# print(error0503)
+# print("…forcast…")
+# MAPE(y_pred=forc0503$mean,y_true=test0503)
+# min(error0503)
 
-ses(train0503, alpha = 0.99, h = 325)%>% autoplot()+autolayer(s05_var03ts)
-forecast(train0503, h=325)%>%autoplot() +autolayer(s05_var03ts)
-autoplot(s05_var03ts)
-##min(error0503)
-#MAPE(y_pred=forc0503$mean,y_true=test0503)
+ses(train0503, alpha = 0.99, h = 325) %>% 
+  autoplot() +
+  autolayer(s05_var03ts)
+
+forecast(train0503, h=325) %>% 
+  autoplot() + 
+  autolayer(s05_var03ts)
+
+# autoplot(s05_var03ts)
+# min(error0503)
+# MAPE(y_pred=forc0503$mean,y_true=test0503)
 ```
 
-## Forecast
+## Model Selection & Forecasts
 
 Since the SES models performed slightly better these were chosen for the forecast.
 
 ```{r}
-
+#| layout-ncol: 2
 forcast_s05_var02<-ses(s05_var02ts, alpha = 0.99, h = 140)
-forcast_s05_var02$mean
+# forcast_s05_var02$mean
 autoplot(forcast_s05_var02)
 
 forcast_s05_var03<-ses(s05_var03ts, alpha = 0.99, h = 140)
-forcast_s05_var03$mean
+# forcast_s05_var03$mean
 autoplot(forcast_s05_var03)
-
 
 ```
 
@@ -544,7 +630,7 @@ data_S06 <- subset(df, category == 'S06', select = c(SeriesInd, Var05, Var07)) %
 #str(data_S06)
 ```
 
-## Variables
+## Variables & Analysis
 
 Data set S06 contains two strikingly similar data sets var06 and var07. Each shows a mostly linear patterns with a few humps with larger increases and dramatic dips with one point that is drastically larger then any other. the autocorrelation showed that between time points there is a very high level of correlation hovering around one for both of these time points as seen in the ACF plot. to help make clean prediction for these variables the single high value was omitted from the data set and all five empty values were imputed using linear imputation. While the graphs look extraordinarily similar these plots data sets ar not identicle
 
@@ -571,8 +657,6 @@ data_S06_Var07 <- data_S06_Var07 |>
 ggtsdisplay(data_S06_Var07)
 
 ```
-
-## Analysis
 
 ```{r}
 set.seed(123)
@@ -673,7 +757,7 @@ cat("\tMAPE results by model - S06_Var07\n\n")
 S06_Var07.result
 ```
 
-## Forecast
+## Model Selection & Forecasts
 
 ```{r,include=TRUE}
 autoplot(ses.fit5)

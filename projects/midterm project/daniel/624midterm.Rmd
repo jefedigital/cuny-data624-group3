@@ -1,0 +1,221 @@
+---
+title: "group rpoject 1"
+author: "Daniel Sullivan"
+date: "2023-06-10"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(TSA)
+library(forecast)
+library(tidyverse)
+library(zoo)
+library(fpp2)
+library(readxl)
+library(seasonal)
+library(MLmetrics)
+#library(MASS)
+#library(vars)
+
+```
+
+```{r}
+df <- read_xls('Data Set for Class.xls', sheet='Set for Class')
+df
+s01 <- df %>%
+  filter(category == 'S01') %>%
+  mutate(Date_index = row_number()) %>%
+  select(c(SeriesInd,Var01,Var02)) %>%
+  head(1622)
+
+var01 <- s01 %>%
+  select(c(SeriesInd,Var01)) %>%
+  na.locf()
+var02 <- s01 %>%
+  select(c(SeriesInd,Var02)) %>%
+  na.locf()
+s05 <- df %>%
+  filter(category == 'S05') %>%
+  select(c(SeriesInd,Var02,Var03))%>%
+  head(1622)
+s05_var02 <- s05 %>%
+  select(c(SeriesInd,Var02)) %>%
+  na.locf()
+length(s05$Var02)
+```
+```{r}
+var01ts <- ts(s01$Var01, start = c(1,1), frequency=5)%>%  na.locf()
+decompose(var01ts) %>%
+  autoplot()
+var01ts <- ts(s01$Var01, start = c(1,1), frequency=12) %>% na.locf()
+decompose(var01ts) %>%
+  autoplot()
+var01ts <- ts(s01$Var01, start = c(1,1), frequency=50)%>% na.locf()
+decompose(var01ts) %>%
+  autoplot()
+var01ts <- ts(s01$Var01, start = c(1,1), frequency=150)%>% na.locf()
+decompose(var01ts) %>%
+  autoplot()
+var01ts <- ts(s01$Var01, start = c(1,1), frequency=260)%>% na.locf()
+decompose(var01ts) %>%
+  autoplot()
+```
+
+```{r}
+var02ts <- ts(s01$Var02, start = c(1,1), frequency=5)%>%  na.locf()
+decompose(var02ts) %>%
+  autoplot()
+var02ts <- ts(s01$Var02, start = c(1,1), frequency=12) %>% na.locf()
+decompose(var02ts) %>%
+  autoplot()
+var02ts <- ts(s01$Var02, start = c(1,1), frequency=50)%>% na.locf()
+decompose(var02ts) %>%
+  autoplot()
+var02ts <- ts(s01$Var02, start = c(1,1), frequency=150)%>% na.locf()
+decompose(var02ts) %>%
+  autoplot()
+var02ts <- ts(s01$Var02, start = c(1,1), frequency=260)%>% na.locf()
+decompose(var02ts) %>%
+  autoplot()
+```
+```{r}
+s05_var02ts <- ts(s05_var02$Var02, start = c(1,1), frequency=5)%>%  na.locf()
+decompose(s05_var02ts) %>%
+  autoplot()
+s05_var02ts <- ts(s05_var02$Var02, start = c(1,1), frequency=12) %>% na.locf()
+decompose(s05_var02ts) %>%
+  autoplot()
+s05_var02ts <- ts(s05_var02$Var02, start = c(1,1), frequency=50)%>% na.locf()
+decompose(s05_var02ts) %>%
+  autoplot()
+s05_var02ts <- ts(s05_var02$Var02, start = c(1,1), frequency=150)%>% na.locf()
+decompose(s05_var02ts) %>%
+  autoplot()
+s05_var02ts <- ts(s05_var02$Var02, start = c(1,1), frequency=260)%>% na.locf()
+decompose(s05_var02ts) %>%
+  autoplot()
+s05_var02ts <- ts(s05_var02$Var02, start = c(1,1), frequency=1)%>%  na.locf()
+autoplot(s05_var02ts)
+
+```
+
+
+
+
+```{r}
+s01<-s01%>%na.locf()
+
+var01ts <- ts(s01$Var01, start = c(1,1), frequency=5)%>% na.locf()
+train1<-window(var01ts,end = 260)
+#train1
+test1 <- window(var01ts,start = 261)
+#test1
+#ses(train, h=140, alpha = 0.7) %>%
+#  autoplot()
+forc1<-forecast(train1, h=325)
+
+
+
+alpha <- seq(.01, .99, by = .01)
+error1 <- NA
+for(i in seq_along(alpha)) {
+  fit1 <- ses(train1, alpha = alpha[i],h = 325)
+  
+  error1[i] <- MAPE(y_pred=fit1$mean,y_true=test1)
+  #print(c(fit1$mean[i],test1[i]))
+ # print(error1[i])
+}
+print(error1)
+print("...forcast...")
+MAPE(y_pred=forc1$mean,y_true=test1)
+
+min(error1)
+```
+```{r}
+ses(train1, alpha = 0.04, h = 325)%>% autoplot()+autolayer(var01ts)
+forecast(train1, h=325)%>%autoplot()+autolayer(var01ts)
+min(error1)
+MAPE(y_pred=forc1$mean,y_true=test1)
+```
+
+```{r}
+var02ts <- ts(s01$Var02, start = c(1,1), frequency=5)%>% na.locf()
+train2<-window(var02ts,end = 260)
+test2 <- window(var02ts,start = 261)
+
+#ses(train, h=140, alpha = 0.7) %>%
+#  autoplot()
+forc2<-forecast(train2, h=325)
+
+
+
+alpha <- seq(.01, .99, by = .01)
+error2 <- NA
+for(i in seq_along(alpha)) {
+  fit2 <- ses(train2, alpha = alpha[i],
+             h = 325)
+  
+  error2[i] <- MAPE(y_pred=fit2$mean,y_true=test2)
+}
+print(error2)
+print("...forcast...")
+MAPE(y_pred=forc2$mean,y_true=test2)
+
+min(error2)
+
+```
+
+```{r}
+ses(train2, alpha = 0.86, h = 325)%>% autoplot()+autolayer(var02ts)
+forecast(train2, h=325)%>%autoplot() +autolayer(var02ts)
+autoplot(var02ts)
+min(error2)
+MAPE(y_pred=forc2$mean,y_true=test2)
+```
+
+
+```{r}
+s05_var02ts <- ts(s05_var02$Var02, start = c(1,1), frequency=5)%>% na.locf()
+#autoplot(s05_var02ts)
+train25<-window(s05_var02ts,end = 260)
+test25 <- window(s05_var02ts,start = 261)
+
+#ses(train, h=140, alpha = 0.7) %>%
+#  autoplot()
+forc25<-forecast(train25, h=325)
+
+
+
+alpha <- seq(.01, .99, by = .01)
+error25 <- NA
+for(i in seq_along(alpha)) {
+  fit25 <- ses(train25, alpha = alpha[i],
+             h = 325)
+  
+  error25[i] <- MAPE(y_pred=fit25$mean,y_true=test25)
+}
+print(error25)
+print("...forcast...")
+MAPE(y_pred=forc25$mean,y_true=test25)
+min(error25)
+```
+
+```{r}
+ses(train25, alpha = 0.5, h = 325)%>% autoplot()+autolayer(s05_var02ts)
+forecast(train25, h=325)%>%autoplot() +autolayer(s05_var02ts)
+autoplot(s05_var02ts)
+min(error25)
+MAPE(y_pred=forc25$mean,y_true=test25)
+```
+
+
+```{r}
+forcast_s01_var01<-ses(var01ts, alpha = 0.04, h = 140)
+forcast_s01_var01$mean
+forcast_s01_var02<-ses(var02ts, alpha = 0.86, h = 140)
+forcast_s01_var02$mean
+forcast_s05_var02<-ses(s05_var02ts, alpha = 0.5, h = 140)
+forcast_s05_var02$mean
+```
