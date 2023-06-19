@@ -1,6 +1,6 @@
 ---
 title: 'Midterm Project'
-subtitle: 'CUNY DATA 624|2023 Summer I'
+subtitle: 'CUNY DATA 624 | 2023 Summer I'
 author: 'Group 3: Daniel Sullivan, Jeff Parks, Lwin Shwe, Matthew Katz'
 # abstract: 'abstract text'
 # format:
@@ -105,11 +105,9 @@ df_s06 <- df %>%
 
 # Overview
 
-Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec. Aenean non diam interdum, tincidunt dui in, maximus orci.
+For this project, we were presented with six batches of blinded time series data, containing historical performance on twelve separate variables. Our goal is to provide you with statistically rigorous, but actionable advice on expected performance for each of these twelve variables - whether they correspond to product sales, web traffic, or other important business metrics.
 
-Praesent eget enim id erat volutpat euismod. Vivamus euismod turpis nec sollicitudin accumsan. Duis maximus finibus auctor. Phasellus quis ornare nunc, id porttitor elit. Donec sit amet vulputate arcu. Nulla sodales lacinia nisl, sed hendrerit ex consectetur eget.
-
-Vivamus euismod turpis nec sollicitudin accumsan. Duis maximus finibus auctor. Phasellus quis ornare nunc, id porttitor elit. Donec sit amet vulputate arcu. Nulla sodales lacinia nisl, sed hendrerit ex consectetur eget.
+In this report we will illustrate for you the overall performance of each of the variables, as well as any relationships we suspect might exist between them. We will also briefly cover any adjustments that were made to the data in order to aid in clean and accurate forecast models. Finally, we will provide you our best estimates for future performance along with guidance on measures of uncertainty in the models.
 
 {{< pagebreak >}}
 
@@ -325,13 +323,7 @@ autoplot(ts_s02_v03, series = 'Orig') +
 
 To evaluate and select models, we created 80/20 train/test split and score performance using the Mean Absolute Percentage Error (MAPE) statistic.
 
-The three models evaluated for Variable 02 were:
-
--   ARIMA(2,1,3) with drift
--   Holt (Damped)
--   Simple Exponential Smoothing (SES)
-
-We selected the SES method for this forecast since it produced the smallest MAPE score (30.22).
+The three models evaluated for Variable 02 were ARIMA(2,1,3) with drift, Holt (Damped), and Simple Exponential Smoothing (SES). We selected the SES method for this forecast since it produced the smallest MAPE score (30.22).
 
 Our resulting forecast for the next 140 days has a stable mean of approximately 20.7M units daily, but with a fairly large predictive interval.
 
@@ -372,13 +364,7 @@ autoplot(ts_s02_v02_forecast) +
 forecast_s02_v02 <- ts_s02_v02_forecast$mean
 ```
 
-The three models evaluated for Variable 03 were:
-
--   ARIMA(2,1,0)
--   Holt (Damped)
--   Simple Exponential Smoothing
-
-We selected the ARIMA(2,1,0) method for this forecast since it produced the smallest MAPE score (16.19).
+The three models evaluated for Variable 03 were ARIMA(2,1,0), Holt (Damped), and Simple Exponential Smoothing (SES). We selected the ARIMA(2,1,0) method for this forecast since it produced the smallest MAPE score (16.19).
 
 Our resulting forecast for the next 140 days has a stable mean of approximately 16.2 units daily, but with a fairly large predictive interval.
 
@@ -423,27 +409,157 @@ forecast_s02_v03 <- ts_s02_v03_forecast$mean
 
 # Series Three
 
-```{r data_s03}
-df_s03 <- df %>%
-  filter(category == 'S03') %>%
-  select(c(Date,Var05,Var07)) %>%
-  head(1622)
+For the third category we examined time series data for Variables 5 and 7.
 
+## Variables
 
-
-
-```
-
-## Variables & Analysis
+**Variable 05** seems to represent a product or activity with low volume, approximately 76 units per day. Overall there seems to be a gradually increasing trend, but thi does not appear to be a stationary dataset. By examining the differenced time series were able to confirm the lack of autocorrelations and seasonality. We also identified and smoothed several outliers and missing values with a linear interpolation before modeling.
 
 ```{r}
+#| layout-ncol: 2
 
+# v05
+data_s03_v05 <- df_s03 %>%
+  select(values=Var05)
+
+ts_s03_v05 <- ts(data_s03_v05)
+
+autoplot(ts_s03_v05)
+
+# missing data
+ts_s03_v05 <- na_interpolation(ts_s03_v05)
+
+# outliers
+ts_s03_v05_out <- tsoutliers(ts_s03_v05)
+ts_s03_v05_clean <- tsclean(ts_s03_v05)
+
+# autoplot(ts_s03_v05, series = 'Orig') +
+#   autolayer(ts_s03_v05_clean, series = 'Clean')
+
+# autocorrelations
+# ggAcf(ts_s03_v05_clean)
+# autoplot(diff(ts_s03_v05_clean))
+acf(diff(ts_s03_v05_clean), main = "ACF of S03_Var05 Difference")
+```
+
+**Variable 07** seems to represent an almost-identical time series to Variable 05 - in fact, the two datasets are 98% correlated.
+
+```{r}
+#| layout-ncol: 2
+#| 
+# v03
+data_s03_v07 <- df_s03 %>%
+  select(values=Var07)
+
+ts_s03_v07 <- ts(data_s03_v07)
+
+autoplot(ts_s03_v07)
+
+# missing data
+ts_s03_v07 <- na_interpolation(ts_s03_v07)
+
+# outliers
+ts_s03_v07_out <- tsoutliers(ts_s03_v07)
+ts_s03_v07_clean <- tsclean(ts_s03_v07)
+
+# autoplot(ts_s03_v07, series = 'Orig') +
+#   autolayer(ts_s03_v07_clean, series = 'Clean')
+
+# autocorrelations
+# ggAcf(ts_s03_v07_clean)
+# autoplot(diff(ts_s03_v07_clean))
+# acf(diff(ts_s03_v07_clean), main = "ACF of S03_Var05 Difference")
+
+correlation <- cor(ts_s03_v05, ts_s03_v07)
+squared_correlation <- correlation^2 # 0.9984582
 ```
 
 ## Model Selection & Forecasts
 
-```{r}
+To evaluate and select models, we created 80/20 train/test split and score performance using the Mean Absolute Percentage Error (MAPE) statistic.
 
+The three models evaluated for Variable 05 were: ARIMA(1,1,1) with drift, ETS, and Naive. We selected the Naive method for this forecast since it produced the smallest MAPE score (15.91).
+
+Our resulting forecast for the next 140 days has a stable mean of approximately 130 units daily, but with a fairly large predictive interval.
+
+```{r}
+## v05
+# split
+split_idx <- floor(length(ts_s03_v05_clean)*.8)
+split_h <- (length(ts_s03_v05_clean) - split_idx)
+            
+ts_s03_v05_train <- window(ts_s03_v05_clean, end = split_idx)
+
+# auto.arima
+ts_s03_v05_arima_fit <- auto.arima(ts_s03_v05_train, lambda='auto', stepwise = FALSE)
+ts_s03_v05_arima <- forecast(ts_s03_v05_arima_fit, h = split_h)
+
+# ets
+ts_s03_v05_ets_fit <- ets(ts_s03_v05_train, lambda='auto')
+ts_s03_v05_ets <- forecast(ts_s03_v05_ets_fit, h = split_h)
+
+# naive
+ts_s03_v05_naive <- naive(ts_s03_v05_train, h = split_h)
+
+# check residuals
+# checkresiduals(ts_s03_v05_arima)
+# checkresiduals(ts_s03_v05_ets)
+# checkresiduals(ts_s03_v05_naive)
+
+# accuracy
+ts_s03_v05_arima_acc <- accuracy(ts_s03_v05_arima, ts_s03_v05_clean)["Test set", "MAPE"] # 
+ts_s03_v05_ets_acc <- accuracy(ts_s03_v05_ets, ts_s03_v05_clean)["Test set", "MAPE"] # 
+ts_s03_v05_naive_acc <- accuracy(ts_s03_v05_naive, ts_s03_v05_clean)["Test set", "MAPE"] # 
+
+# forecast
+ts_s03_v05_forecast <- forecast(ts_s03_v05_naive, ts_s03_v05, h=140)
+autoplot(ts_s03_v05_forecast) +
+  ggtitle('Series Three - Var 05: Forecast')
+
+# export
+forecast_s03_v05 <- ts_s03_v05_forecast$mean
+```
+
+The three models evaluated for Variable 07 were ARIMA(3,1,2) with drift, ETS and Naive. We selected the Naive method for this forecast since it produced the smallest MAPE score (14.79).
+
+Our resulting forecast for the next 140 days has a stable mean of approximately 128.5 units daily, but with a fairly large predictive interval.
+
+```{r}
+## v07
+# split
+split_idx <- floor(length(ts_s03_v07_clean)*.8)
+split_h <- (length(ts_s03_v07_clean) - split_idx)
+            
+ts_s03_v07_train <- window(ts_s03_v07_clean, end = split_idx)
+
+# auto.arima
+ts_s03_v07_arima_fit <- auto.arima(ts_s03_v07_train, lambda='auto', stepwise = FALSE)
+ts_s03_v07_arima <- forecast(ts_s03_v07_arima_fit, h = split_h)
+
+# ets
+ts_s03_v07_ets_fit <- ets(ts_s03_v07_train, lambda='auto')
+ts_s03_v07_ets <- forecast(ts_s03_v07_ets_fit, h = split_h)
+
+# naive
+ts_s03_v07_naive <- naive(ts_s03_v07_train, h = split_h)
+
+# check residuals
+# checkresiduals(ts_s03_v07_arima)
+# checkresiduals(ts_s03_v07_ets)
+# checkresiduals(ts_s03_v07_naive)
+
+# accuracy
+ts_s03_v07_arima_acc <- accuracy(ts_s03_v07_arima, ts_s03_v07_clean)["Test set", "MAPE"] # 
+ts_s03_v07_ets_acc <- accuracy(ts_s03_v07_ets, ts_s03_v07_clean)["Test set", "MAPE"] # 
+ts_s03_v07_naive_acc <- accuracy(ts_s03_v07_naive, ts_s03_v07_clean)["Test set", "MAPE"] # 
+
+# forecast
+ts_s03_v07_forecast <- forecast(ts_s03_v07_naive, ts_s03_v07, h=140)
+autoplot(ts_s03_v07_forecast) +
+  ggtitle('Series Three - Var 07: Forecast')
+
+# export
+forecast_s03_v07 <- ts_s03_v07_forecast$mean
 ```
 
 {{< pagebreak >}}
