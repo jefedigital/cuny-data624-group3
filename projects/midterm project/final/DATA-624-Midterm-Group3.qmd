@@ -265,6 +265,9 @@ ses(var02ts, alpha = 0.03, h = 325) %>%
   autoplot() +
   autolayer(var02ts)
 
+# export
+forecast_s01_v01_export <- forcast_s01_var01$mean
+forecast_s01_v02_export <- forcast_s01_var02$mean
 ```
 
 {{< pagebreak >}}
@@ -404,7 +407,8 @@ autoplot(ts_s02_v03_forecast) +
   ggtitle('Series Two - Var 03: Forecast')
 
 # export
-forecast_s02_v03 <- ts_s02_v03_forecast$mean
+forecast_s02_v02_export <- ts_s02_v02_forecast$mean
+forecast_s02_v03_export <- ts_s02_v03_forecast$mean
 ```
 
 {{< pagebreak >}}
