@@ -88,19 +88,20 @@ df_s06 <- df %>%
   head(1622)
 ```
 
-## Category 02
+## Series 02
 
 For the second category we examined time series data for Variables 2 and 3.
 
 ### Variable 02
 
 ```{r}
-my_data <- df_s02 %>%
+data_s02_v02 <- df_s02 %>%
   select(values=Var02)
-my_ts <- ts(my_data)
+
+ts_s02_v02 <- ts(data_s02_v02)
 ```
 
-This time series represents a product or activity with a high volume - approximately 40 million units per day!  Overall there seems to be a gradually decreasing trend for this item, with neither seasonality nor long-term cyclic patterns detected.  
+This time series represents a product or activity with a high volume - approximately 40 million units per day! Overall there seems to be a gradually decreasing trend for this item, with neither seasonality nor long-term cyclic patterns detected.
 
 This dataset is fairly complete with no missing values, but the presence of many extreme values could possibly interfere with the accuracy of our forecasts. In order to correct for these conditions while preserving as much information as possible, we chose to identify and smooth those 66 outlier values with a linear interpolation.
 
@@ -132,11 +133,11 @@ autoplot(my_ts, series = 'Orig') +
 
 To evaluate and select models, we created 80/20 train/test split and score performance using the Mean Absolute Percentage Error (MAPE) statistic. The three models evaluated were:
 
-* ARIMA(2,1,3) with drift 
-* Holt (Damped)
-* Simple Exponential Smoothing (SES)
+-   ARIMA(2,1,3) with drift
+-   Holt (Damped)
+-   Simple Exponential Smoothing (SES)
 
-We selected the SES method for this forecast since it produced the smallest MAPE score (30.22). 
+We selected the SES method for this forecast since it produced the smallest MAPE score (30.22).
 
 Our resulting forecast for the next 140 days has a stable mean of approximately 20.7M units daily, but with a fairly large predictive interval.
 
@@ -195,7 +196,7 @@ my_data <- df_s02 %>%
 my_ts <- ts(my_data)
 ```
 
-This time series represents a product or activity with low volume - approximately 14 units per day.  Overall there seems to be a steady trend for this item, with no seasonality detected.  
+This time series represents a product or activity with low volume - approximately 14 units per day. Overall there seems to be a steady trend for this item, with no seasonality detected.
 
 This dataset is fairly complete with only two missing values, and one notable extreme value toward the end of the dataset, smoothed here with a linear interpolation.
 
@@ -227,11 +228,11 @@ autoplot(my_ts, series = 'Orig') +
 
 To evaluate and select models, we created 80/20 train/test split and score performance using the Mean Absolute Percentage Error (MAPE) statistic. The three models evaluated were:
 
-* ARIMA(2,1,0)
-* Holt (Damped)
-* Simple Exponential Smoothing
+-   ARIMA(2,1,0)
+-   Holt (Damped)
+-   Simple Exponential Smoothing
 
-We selected the ARIMA(2,1,0)method for this forecast since it produced the smallest MAPE score (16.19). 
+We selected the ARIMA(2,1,0)method for this forecast since it produced the smallest MAPE score (16.19).
 
 Our resulting forecast for the next 140 days has a stable mean of approximately 16.2 units daily, but with a fairly large predictive interval.
 
@@ -281,4 +282,3 @@ autoplot(my_forecast)
 # export
 forecast_s02_v03 <- my_forecast$mean
 ```
-
