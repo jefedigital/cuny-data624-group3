@@ -325,13 +325,7 @@ autoplot(ts_s02_v03, series = 'Orig') +
 
 To evaluate and select models, we created 80/20 train/test split and score performance using the Mean Absolute Percentage Error (MAPE) statistic.
 
-The three models evaluated for Variable 02 were:
-
--   ARIMA(2,1,3) with drift
--   Holt (Damped)
--   Simple Exponential Smoothing (SES)
-
-We selected the SES method for this forecast since it produced the smallest MAPE score (30.22).
+The three models evaluated for Variable 02 were ARIMA(2,1,3) with drift, Holt (Damped), and Simple Exponential Smoothing (SES). We selected the SES method for this forecast since it produced the smallest MAPE score (30.22).
 
 Our resulting forecast for the next 140 days has a stable mean of approximately 20.7M units daily, but with a fairly large predictive interval.
 
@@ -372,13 +366,7 @@ autoplot(ts_s02_v02_forecast) +
 forecast_s02_v02 <- ts_s02_v02_forecast$mean
 ```
 
-The three models evaluated for Variable 03 were:
-
--   ARIMA(2,1,0)
--   Holt (Damped)
--   Simple Exponential Smoothing
-
-We selected the ARIMA(2,1,0) method for this forecast since it produced the smallest MAPE score (16.19).
+The three models evaluated for Variable 03 were ARIMA(2,1,0), Holt (Damped), and Simple Exponential Smoothing (SES). We selected the ARIMA(2,1,0) method for this forecast since it produced the smallest MAPE score (16.19).
 
 Our resulting forecast for the next 140 days has a stable mean of approximately 16.2 units daily, but with a fairly large predictive interval.
 
@@ -427,7 +415,7 @@ For the third category we examined time series data for Variables 5 and 7.
 
 ## Variables
 
-**Variable 05** seems to represent a product or activity with low volume, approximately 76 units per day. Overall there seems to be a gradually increasing trend for this item with no seasonality detected. This does not appear to be a stationary dataset, but by examining the differenced time series were able to confirm the lack of autocorrelations and seasonality. We also identified and smoothed several outliers and missing values with a linear interpolation before modeling.
+**Variable 05** seems to represent a product or activity with low volume, approximately 76 units per day. Overall there seems to be a gradually increasing trend, but thi does not appear to be a stationary dataset. By examining the differenced time series were able to confirm the lack of autocorrelations and seasonality. We also identified and smoothed several outliers and missing values with a linear interpolation before modeling.
 
 ```{r}
 #| layout-ncol: 2
@@ -451,12 +439,12 @@ ts_s03_v05_clean <- tsclean(ts_s03_v05)
 #   autolayer(ts_s03_v05_clean, series = 'Clean')
 
 # autocorrelations
-#ggAcf(ts_s03_v05_clean)
-autoplot(diff(ts_s03_v05_clean))
+# ggAcf(ts_s03_v05_clean)
+# autoplot(diff(ts_s03_v05_clean))
 acf(diff(ts_s03_v05_clean), main = "ACF of S03_Var05 Difference")
 ```
 
-**Variable 07** seems to represent an almost-identical time series as Variable 05 - in fact, the two datasets are 98% corelated.  With some variation, the Variable 07 dataset is approximately 75 units higher than Variable 05 across the board, but appears to be similar in every other regard. 
+**Variable 07** seems to represent an almost-identical time series to Variable 05 - in fact, the two datasets are 98% correlated.
 
 ```{r}
 #| layout-ncol: 2
@@ -486,9 +474,6 @@ ts_s03_v07_clean <- tsclean(ts_s03_v07)
 
 correlation <- cor(ts_s03_v05, ts_s03_v07)
 squared_correlation <- correlation^2 # 0.9984582
-
-differences <- setdiff(ts_s03_v05, ts_s03_v07)
-summary(differences)
 ```
 
 ## Model Selection & Forecasts
@@ -537,7 +522,7 @@ autoplot(ts_s03_v05_forecast) +
 forecast_s03_v05 <- ts_s03_v05_forecast$mean
 ```
 
-The three models evaluated for Variable 03 were ARIMA(3,1,2) with drift, ETS and Naive. We selected the Naive method for this forecast since it produced the smallest MAPE score (14.79).
+The three models evaluated for Variable 07 were ARIMA(3,1,2) with drift, ETS and Naive. We selected the Naive method for this forecast since it produced the smallest MAPE score (14.79).
 
 Our resulting forecast for the next 140 days has a stable mean of approximately 128.5 units daily, but with a fairly large predictive interval.
 
