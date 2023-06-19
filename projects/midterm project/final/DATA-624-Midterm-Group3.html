@@ -218,26 +218,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="model-selection-forecasts-1" class="level2">
 <h2 class="anchored" data-anchor-id="model-selection-forecasts-1">Model Selection &amp; Forecasts</h2>
 <p>To evaluate and select models, we created 80/20 train/test split and score performance using the Mean Absolute Percentage Error (MAPE) statistic.</p>
-<p>The three models evaluated for Variable 02 were:</p>
-<ul>
-<li>ARIMA(2,1,3) with drift</li>
-<li>Holt (Damped)</li>
-<li>Simple Exponential Smoothing (SES)</li>
-</ul>
-<p>We selected the SES method for this forecast since it produced the smallest MAPE score (30.22).</p>
+<p>The three models evaluated for Variable 02 were ARIMA(2,1,3) with drift, Holt (Damped), and Simple Exponential Smoothing (SES). We selected the SES method for this forecast since it produced the smallest MAPE score (30.22).</p>
 <p>Our resulting forecast for the next 140 days has a stable mean of approximately 20.7M units daily, but with a fairly large predictive interval.</p>
 <div class="cell">
 <div class="cell-output-display">
 <p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>The three models evaluated for Variable 03 were:</p>
-<ul>
-<li>ARIMA(2,1,0)</li>
-<li>Holt (Damped)</li>
-<li>Simple Exponential Smoothing</li>
-</ul>
-<p>We selected the ARIMA(2,1,0) method for this forecast since it produced the smallest MAPE score (16.19).</p>
+<p>The three models evaluated for Variable 03 were ARIMA(2,1,0), Holt (Damped), and Simple Exponential Smoothing (SES). We selected the ARIMA(2,1,0) method for this forecast since it produced the smallest MAPE score (16.19).</p>
 <p>Our resulting forecast for the next 140 days has a stable mean of approximately 16.2 units daily, but with a fairly large predictive interval.</p>
 <div class="cell">
 <div class="cell-output-display">
@@ -252,7 +240,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>For the third category we examined time series data for Variables 5 and 7.</p>
 <section id="variables-1" class="level2">
 <h2 class="anchored" data-anchor-id="variables-1">Variables</h2>
-<p><strong>Variable 05</strong> seems to represent a product or activity with low volume, approximately 76 units per day. Overall there seems to be a gradually increasing trend for this item with no seasonality detected. This does not appear to be a stationary dataset, but by examining the differenced time series were able to confirm the lack of autocorrelations and seasonality. We also identified and smoothed several outliers and missing values with a linear interpolation before modeling.</p>
+<p><strong>Variable 05</strong> seems to represent a product or activity with low volume, approximately 76 units per day. Overall there seems to be a gradually increasing trend, but thi does not appear to be a stationary dataset. By examining the differenced time series were able to confirm the lack of autocorrelations and seasonality. We also identified and smoothed several outliers and missing values with a linear interpolation before modeling.</p>
 <div class="cell quarto-layout-panel">
 <div class="quarto-layout-row quarto-layout-valign-top">
 <div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
@@ -262,21 +250,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-12-2.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<div class="quarto-layout-row quarto-layout-valign-top">
-<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-12-3.png" class="img-fluid" width="672"></p>
 </div>
-</div>
-</div>
-<p><strong>Variable 07</strong> seems to represent an almost-identical time series as Variable 05 - in fact, the two datasets are 98% corelated. With some variation, the Variable 07 dataset is approximately 75 units higher than Variable 05 across the board, but appears to be similar in every other regard.</p>
+<p><strong>Variable 07</strong> seems to represent an almost-identical time series to Variable 05 - in fact, the two datasets are 98% correlated.</p>
 <div class="cell quarto-layout-panel">
 <div class="quarto-layout-row quarto-layout-valign-top">
 <div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output cell-output-stdout quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-  27.48   51.52   74.65   75.43   96.44  134.46 </code></pre>
 </div>
 </div>
 </div>
@@ -291,7 +270,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>The three models evaluated for Variable 03 were ARIMA(3,1,2) with drift, ETS and Naive. We selected the Naive method for this forecast since it produced the smallest MAPE score (14.79).</p>
+<p>The three models evaluated for Variable 07 were ARIMA(3,1,2) with drift, ETS and Naive. We selected the Naive method for this forecast since it produced the smallest MAPE score (14.79).</p>
 <p>Our resulting forecast for the next 140 days has a stable mean of approximately 128.5 units daily, but with a fairly large predictive interval.</p>
 <div class="cell">
 <div class="cell-output-display">
@@ -404,7 +383,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="r-code" class="level2">
 <h2 class="anchored" data-anchor-id="r-code">R Code</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
