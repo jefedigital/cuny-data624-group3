@@ -113,11 +113,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="series-one" class="level1">
 <h1>Series One</h1>
 <p>Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec.</p>
-<section id="variables" class="level2">
-<h2 class="anchored" data-anchor-id="variables">Variables</h2>
+<section id="variables-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="variables-analysis">Variables &amp; Analysis</h2>
 <p>Series one used two variables, Var01 and Var02. It seems that for both there was little if any seasonality but where the data seemed to have 5 day intervals with scattered gaps. A work days per year pattern was used however I do not believe that there is a major correlation with these series since in most of decomposition at various frequencies showed large runs of wave motion remainders showing their may be some other pattern to the data. each variable had a few missing variables which were imputed where necessary being replaced with the most recent non-NA value before it.</p>
-<p>Var01- This variable shows an upward trend through the time series with what seems to be plateaus at either end with the mid section appearing linear and two almost camel humps at either end of the linear phase.</p>
-<p>Var02- This time series shows a very slight downward trend but generally appears to be near white noise.</p>
+<p><strong>Variable 01</strong> shows an upward trend through the time series with what seems to be plateaus at either end with the mid section appearing linear and two almost camel humps at either end of the linear phase.</p>
 <div class="cell quarto-layout-panel">
 <div class="quarto-layout-row quarto-layout-valign-top">
 <div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
@@ -127,19 +126,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-2-2.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<div class="quarto-layout-row quarto-layout-valign-top">
-<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-2-3.png" class="img-fluid" width="672"></p>
 </div>
-<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-2-4.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-</div>
-</section>
-<section id="analysis" class="level2">
-<h2 class="anchored" data-anchor-id="analysis">Analysis</h2>
-<p>Both Var01 and Var02 showed a very high amount of correlation as seen with the lag plots with Var01 having near 1.0 correlation almost 40 points out and Var02 with many values hovering around 0.5.</p>
+<p><strong>Variable 02</strong> shows a very slight downward trend but generally appears to be near white noise.</p>
 <div class="cell quarto-layout-panel">
 <div class="quarto-layout-row quarto-layout-valign-top">
 <div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
@@ -150,159 +138,42 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Because of the non seasonal pattern of the data we moved forward using the forecast function which implemented an STL+ETS method and SES with a tuned alpha variable. After comparing these forecasts with a 80/20 training/testing split with the last 20 on the last half we tested the forecast optimizing the MAPE. We found that in all cases the tuned alpha performed better so used this for the Forecast. we found the alpha values optimized at a=0.03 for Var01 and a=0.27.</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code> [1] 0.07783700 0.06236828 0.06091018 0.06224150 0.06414992 0.06599844
- [7] 0.06805789 0.07008038 0.07199444 0.07384123 0.07558684 0.07720276
-[13] 0.07862269 0.07987636 0.08098227 0.08194486 0.08277892 0.08350582
-[19] 0.08412363 0.08464540 0.08508411 0.08544978 0.08575241 0.08599876
-[25] 0.08619699 0.08635274 0.08647099 0.08655652 0.08661348 0.08664548
-[31] 0.08665567 0.08664681 0.08662130 0.08658126 0.08652853 0.08646475
-[37] 0.08639136 0.08630964 0.08622071 0.08612558 0.08602547 0.08592126
-[43] 0.08581329 0.08570219 0.08558854 0.08547287 0.08535563 0.08523784
-[49] 0.08511956 0.08500089 0.08488215 0.08476364 0.08464562 0.08452833
-[55] 0.08441212 0.08429779 0.08418482 0.08407338 0.08396363 0.08385573
-[61] 0.08374981 0.08364600 0.08354442 0.08344518 0.08334838 0.08325411
-[67] 0.08316246 0.08307366 0.08298810 0.08290567 0.08282639 0.08275041
-[73] 0.08267757 0.08260773 0.08254094 0.08247773 0.08241804 0.08236146
-[79] 0.08230803 0.08225777 0.08221071 0.08216686 0.08212626 0.08208891
-[85] 0.08205484 0.08202405 0.08199656 0.08197237 0.08195150 0.08193394
-[91] 0.08191971 0.08190880 0.08190121 0.08189694 0.08189598 0.08189833
-[97] 0.08190399 0.08191294 0.08192516</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "...forcast..."</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.1193365</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.06091018</code></pre>
-</div>
-<div class="cell-output-display">
+<p>Both Var01 and Var02 showed a very high amount of correlation as seen with the lag plots with Var01 having near 1.0 correlation almost 40 points out and Var02 with many values hovering around 0.5.</p>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
 </div>
-<div class="cell-output-display">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-4-2.png" class="img-fluid" width="672"></p>
 </div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.06091018</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.1193365</code></pre>
 </div>
 </div>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code> [1] 0.3637015 0.3472043 0.3362121 0.3279306 0.3217976 0.3173190 0.3140166
- [8] 0.3112250 0.3088911 0.3071129 0.3058143 0.3047058 0.3038389 0.3032063
-[15] 0.3026918 0.3022992 0.3020208 0.3017857 0.3016046 0.3014645 0.3013426
-[22] 0.3012623 0.3011924 0.3011387 0.3011109 0.3011003 0.3010988 0.3011010
-[29] 0.3011040 0.3011256 0.3011548 0.3011849 0.3012160 0.3012482 0.3012944
-[36] 0.3013549 0.3014311 0.3015640 0.3017264 0.3018934 0.3020706 0.3022775
-[43] 0.3025731 0.3028953 0.3032473 0.3036187 0.3040365 0.3044691 0.3049063
-[50] 0.3053581 0.3058426 0.3063731 0.3069502 0.3075896 0.3082505 0.3089527
-[57] 0.3097466 0.3105766 0.3114243 0.3122996 0.3131912 0.3141268 0.3151011
-[64] 0.3160874 0.3170722 0.3180651 0.3190573 0.3200787 0.3211565 0.3222697
-[71] 0.3234081 0.3245645 0.3257616 0.3269461 0.3281156 0.3292696 0.3304078
-[78] 0.3315512 0.3327084 0.3338594 0.3349969 0.3361352 0.3372720 0.3384073
-[85] 0.3395217 0.3406151 0.3416869 0.3427543 0.3438181 0.3448582 0.3458819
-[92] 0.3468921 0.3478914 0.3488789 0.3498400 0.3507725 0.3516758 0.3525587
-[99] 0.3534152</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "...forcast..."</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.3950952</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.3010988</code></pre>
-</div>
-<div class="cell-output-display">
+<p>Because of the non seasonal pattern of the data we moved forward using the forecast function which implemented an STL+ETS method and SES with a tuned alpha variable. After comparing these forecasts with a 80/20 training/testing split with the last 20 on the last half we tested the forecast optimizing the MAPE. We found that in all cases the tuned alpha performed better so used this for the Forecast. we found the alpha values optimized at a=0.03 for Var01 and a=0.27.</p>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
 </div>
-<div class="cell-output-display">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-5-2.png" class="img-fluid" width="672"></p>
 </div>
-<div class="cell-output-display">
-<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-5-3.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.3010988</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.3950952</code></pre>
 </div>
 </div>
-</section>
-<section id="forecast" class="level2">
-<h2 class="anchored" data-anchor-id="forecast">Forecast</h2>
-<p>Since the SES models performed slightly better these were chosen for the forecast.</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>Time Series:
-Start = c(7, 63) 
-End = c(7, 202) 
-Frequency = 260 
-  [1] 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741
-  [9] 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741
- [17] 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741
- [25] 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741
- [33] 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741
- [41] 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741
- [49] 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741
- [57] 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741
- [65] 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741
- [73] 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741
- [81] 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741
- [89] 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741
- [97] 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741
-[105] 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741
-[113] 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741
-[121] 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741
-[129] 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741 58.75741
-[137] 58.75741 58.75741 58.75741 58.75741</code></pre>
-</div>
-<div class="cell-output-display">
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
 </div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Time Series:
-Start = c(7, 63) 
-End = c(7, 202) 
-Frequency = 260 
-  [1] 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086
- [10] 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086
- [19] 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086
- [28] 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086
- [37] 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086
- [46] 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086
- [55] 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086
- [64] 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086
- [73] 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086
- [82] 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086
- [91] 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086
-[100] 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086
-[109] 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086
-[118] 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086
-[127] 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086 5981086
-[136] 5981086 5981086 5981086 5981086 5981086</code></pre>
-</div>
-<div class="cell-output-display">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-6-2.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<div style="page-break-after: always;"></div>
+</div>
 </section>
-</section>
-<section id="series-two" class="level1">
-<h1>Series Two</h1>
-<p>For the second category we examined time series data for Variables 2 and 3.</p>
-<section id="variables-1" class="level2">
-<h2 class="anchored" data-anchor-id="variables-1">Variables</h2>
-<p><strong>Variable 02</strong> seems to represent a product or activity with a high volume, approximately 40 million units per day! Overall there seems to be a gradually decreasing trend for this item, with neither seasonality nor long-term cyclic patterns detected. The presence of many extreme values for this variable could possibly interfere with the accuracy of our forecasts. In order to correct for these conditions while preserving as much information as possible, we chose to identify and smooth those 66 outliers with a linear interpolation.</p>
+<section id="model-selection-forecasts" class="level2">
+<h2 class="anchored" data-anchor-id="model-selection-forecasts">Model Selection &amp; Forecasts</h2>
+<p>Since the SES models performed slightly better, these were chosen for the forecast.</p>
 <div class="cell quarto-layout-panel">
 <div class="quarto-layout-row quarto-layout-valign-top">
 <div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
@@ -313,7 +184,15 @@ Frequency = 260
 </div>
 </div>
 </div>
-<p><strong>Variable 03</strong> seems to represent a product or activity with low volume, approximately 14 units per day. Overall there seems to be a steady trend for this item, with no seasonality detected. This dataset has only two missing values, and one notable extreme value toward the end of the series, smoothed here with a linear interpolation.</p>
+<div style="page-break-after: always;"></div>
+</section>
+</section>
+<section id="series-two" class="level1">
+<h1>Series Two</h1>
+<p>For the second category we examined time series data for Variables 2 and 3.</p>
+<section id="variables" class="level2">
+<h2 class="anchored" data-anchor-id="variables">Variables</h2>
+<p><strong>Variable 02</strong> seems to represent a product or activity with a high volume, approximately 40 million units per day! Overall there seems to be a gradually decreasing trend for this item, with neither seasonality nor long-term cyclic patterns detected. The presence of many extreme values for this variable could possibly interfere with the accuracy of our forecasts. In order to correct for these conditions while preserving as much information as possible, we chose to identify and smooth those 66 outliers with a linear interpolation.</p>
 <div class="cell quarto-layout-panel">
 <div class="quarto-layout-row quarto-layout-valign-top">
 <div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
@@ -324,8 +203,20 @@ Frequency = 260
 </div>
 </div>
 </div>
-<section id="model-selection-forecasts" class="level4">
-<h4 class="anchored" data-anchor-id="model-selection-forecasts">Model Selection &amp; Forecasts</h4>
+<p><strong>Variable 03</strong> seems to represent a product or activity with low volume, approximately 14 units per day. Overall there seems to be a steady trend for this item, with no seasonality detected. This dataset has only two missing values, and one notable extreme value toward the end of the series, smoothed here with a linear interpolation.</p>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-9-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</section>
+<section id="model-selection-forecasts-1" class="level2">
+<h2 class="anchored" data-anchor-id="model-selection-forecasts-1">Model Selection &amp; Forecasts</h2>
 <p>To evaluate and select models, we created 80/20 train/test split and score performance using the Mean Absolute Percentage Error (MAPE) statistic.</p>
 <p>The three models evaluated for Variable 02 were:</p>
 <ul>
@@ -337,7 +228,7 @@ Frequency = 260
 <p>Our resulting forecast for the next 140 days has a stable mean of approximately 20.7M units daily, but with a fairly large predictive interval.</p>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>The three models evaluated for Variable 03 were:</p>
@@ -350,207 +241,101 @@ Frequency = 260
 <p>Our resulting forecast for the next 140 days has a stable mean of approximately 16.2 units daily, but with a fairly large predictive interval.</p>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div style="page-break-after: always;"></div>
 </section>
 </section>
-</section>
 <section id="series-three" class="level1">
 <h1>Series Three</h1>
-<section id="variables-2" class="level2">
-<h2 class="anchored" data-anchor-id="variables-2">Variables</h2>
+<section id="variables-analysis-1" class="level2">
+<h2 class="anchored" data-anchor-id="variables-analysis-1">Variables &amp; Analysis</h2>
 </section>
-<section id="analysis-1" class="level2">
-<h2 class="anchored" data-anchor-id="analysis-1">Analysis</h2>
-</section>
-<section id="forecast-1" class="level2">
-<h2 class="anchored" data-anchor-id="forecast-1">Forecast</h2>
+<section id="model-selection-forecasts-2" class="level2">
+<h2 class="anchored" data-anchor-id="model-selection-forecasts-2">Model Selection &amp; Forecasts</h2>
 <div style="page-break-after: always;"></div>
 </section>
 </section>
 <section id="series-four" class="level1">
 <h1>Series Four</h1>
-<section id="variables-3" class="level2">
-<h2 class="anchored" data-anchor-id="variables-3">Variables</h2>
+<section id="variables-analysis-2" class="level2">
+<h2 class="anchored" data-anchor-id="variables-analysis-2">Variables &amp; Analysis</h2>
 </section>
-<section id="analysis-2" class="level2">
-<h2 class="anchored" data-anchor-id="analysis-2">Analysis</h2>
-</section>
-<section id="forecast-2" class="level2">
-<h2 class="anchored" data-anchor-id="forecast-2">Forecast</h2>
+<section id="model-selection-forecasts-3" class="level2">
+<h2 class="anchored" data-anchor-id="model-selection-forecasts-3">Model Selection &amp; Forecasts</h2>
 <div style="page-break-after: always;"></div>
 </section>
 </section>
 <section id="series-five" class="level1">
 <h1>Series Five</h1>
-<section id="variables-4" class="level2">
-<h2 class="anchored" data-anchor-id="variables-4">Variables</h2>
+<section id="variables-analysis-3" class="level2">
+<h2 class="anchored" data-anchor-id="variables-analysis-3">Variables &amp; Analysis</h2>
 <p>Series five consisted of two variables var02 and var03. both contained small amounts of missing values and where applicable were replaced based on the previous held value. Additionally since all of these data sets appear to be on a 5 day cycle the work year(260) days was used for establishing frequency.</p>
 <p>Var02- In the variable 2 plots we see a gradual small decrease in value with an almost white noise looking fluctuation. It does not seem to show any seasonality as in the decomposition plots we found in most cases there were runs of remainders that formed an almost Wave like pattern.</p>
 <p>Var03- variable 3 has what seems to be three patterns in the center of the plot there seems to be slow steady growth that is near linear with a fair amount of fluctuation. Additionally at the start of the data set there is a steep rise and at the end a steep fall. The seasonal patterns seem to make these more gradual however there is a good amount of wave motion in the remainders so there is an aspect of the data this is not accounted for despite the seasonal graph matching a few of the data motifs.</p>
-<div class="cell">
-<div class="cell-output-display">
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-16-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-16-3.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-16-4.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+<p>Both variable three and variable five show high levels of corelation within the lag plot with var02 hovering near 0.5-0.4 and var03 hovering around 1-0.8 for over 40 values.</p>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
 </div>
-<div class="cell-output-display">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-17-2.png" class="img-fluid" width="672"></p>
 </div>
-<div class="cell-output-display">
-<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-17-3.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-17-4.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-</section>
-<section id="analysis-3" class="level2">
-<h2 class="anchored" data-anchor-id="analysis-3">Analysis</h2>
-<p>Both variable three and variable five show high levels of corelation within the lag plot with var02 hovering near 0.5-0.4 and var03 hovering around 1-0.8 for over 40 values.</p>
-<div class="cell">
-<div class="cell-output-display">
-<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-18-2.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>For this analysis we compared how the forcast() function performed using an STL+ETS model and how an SES(simply exponential smoothing) model with tuned alpha variable performed. We tuned the SES by using an algorithm to reduce MAPE to determine the alpha value. We found using the highest alpha=0.99 in both cases gave the most accurate forecast when testing on the last 20% of the data with an 80/20 training testing split and when we compared this to the forecast function performed slightly better.</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code> [1] 0.2861805 0.3194149 0.3317230 0.3302441 0.3238431 0.3164657 0.3098603
- [8] 0.3042028 0.2993842 0.2952883 0.2918875 0.2890601 0.2867047 0.2847578
-[15] 0.2831425 0.2817616 0.2805684 0.2795637 0.2787071 0.2779664 0.2773254
-[22] 0.2767639 0.2762894 0.2758807 0.2755352 0.2752319 0.2749655 0.2747274
-[29] 0.2745134 0.2743198 0.2741435 0.2739817 0.2738318 0.2736917 0.2735593
-[36] 0.2734331 0.2733113 0.2731928 0.2730762 0.2729604 0.2728447 0.2727281
-[43] 0.2726099 0.2724896 0.2723666 0.2722406 0.2721172 0.2719932 0.2718655
-[50] 0.2717341 0.2716014 0.2714658 0.2713264 0.2711854 0.2710424 0.2708960
-[57] 0.2707464 0.2705935 0.2704377 0.2702791 0.2701178 0.2699550 0.2697933
-[64] 0.2696295 0.2694638 0.2692965 0.2691276 0.2689574 0.2687861 0.2686136
-[71] 0.2684403 0.2682663 0.2680916 0.2679164 0.2677408 0.2675649 0.2673898
-[78] 0.2672188 0.2670520 0.2668851 0.2667183 0.2665517 0.2663851 0.2662188
-[85] 0.2660527 0.2658868 0.2657211 0.2655557 0.2653906 0.2652257 0.2650611
-[92] 0.2648988 0.2647394 0.2645803 0.2644222 0.2642681 0.2641142 0.2639605
-[99] 0.2638069</code></pre>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
 </div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "...forcast..."</code></pre>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-18-2.png" class="img-fluid" width="672"></p>
 </div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.289914</code></pre>
 </div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.2638069</code></pre>
 </div>
-<div class="cell-output-display">
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
 </div>
-<div class="cell-output-display">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-19-2.png" class="img-fluid" width="672"></p>
 </div>
-<div class="cell-output-display">
-<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-19-3.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code> [1] 0.14783219 0.12604814 0.11388521 0.10758079 0.10386914 0.10131406
- [7] 0.09935628 0.09772787 0.09629813 0.09501290 0.09383223 0.09273701
-[13] 0.09172065 0.09075714 0.08984298 0.08897904 0.08816909 0.08740564
-[19] 0.08668310 0.08600121 0.08536356 0.08476746 0.08420734 0.08368616
-[25] 0.08319764 0.08273796 0.08230742 0.08190218 0.08151949 0.08116081
-[31] 0.08082504 0.08050788 0.08020795 0.07992708 0.07966064 0.07940770
-[37] 0.07916889 0.07894316 0.07872937 0.07852731 0.07833613 0.07815385
-[43] 0.07797965 0.07781304 0.07765519 0.07750484 0.07736100 0.07722453
-[49] 0.07709396 0.07696857 0.07684806 0.07673219 0.07662070 0.07651337
-[55] 0.07641078 0.07631196 0.07621666 0.07612496 0.07603693 0.07595213
-[61] 0.07587082 0.07579266 0.07571705 0.07564384 0.07557293 0.07550421
-[67] 0.07543755 0.07537291 0.07531062 0.07525009 0.07519124 0.07513397
-[73] 0.07507858 0.07502481 0.07497273 0.07492191 0.07487229 0.07482380
-[79] 0.07477638 0.07472998 0.07468453 0.07464000 0.07459651 0.07455401
-[85] 0.07451227 0.07447124 0.07443090 0.07439119 0.07435224 0.07431404
-[91] 0.07427637 0.07423921 0.07420253 0.07416630 0.07413050 0.07409511
-[97] 0.07406011 0.07402548 0.07399120</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "…forcast…"</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.07461779</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.0739912</code></pre>
-</div>
-<div class="cell-output-display">
-<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-20-2.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-20-3.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
-<section id="forecast-3" class="level2">
-<h2 class="anchored" data-anchor-id="forecast-3">Forecast</h2>
+<section id="model-selection-forecasts-4" class="level2">
+<h2 class="anchored" data-anchor-id="model-selection-forecasts-4">Model Selection &amp; Forecasts</h2>
 <p>Since the SES models performed slightly better these were chosen for the forecast.</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>Time Series:
-Start = c(7, 63) 
-End = c(7, 202) 
-Frequency = 260 
-  [1] 11359701 11359701 11359701 11359701 11359701 11359701 11359701 11359701
-  [9] 11359701 11359701 11359701 11359701 11359701 11359701 11359701 11359701
- [17] 11359701 11359701 11359701 11359701 11359701 11359701 11359701 11359701
- [25] 11359701 11359701 11359701 11359701 11359701 11359701 11359701 11359701
- [33] 11359701 11359701 11359701 11359701 11359701 11359701 11359701 11359701
- [41] 11359701 11359701 11359701 11359701 11359701 11359701 11359701 11359701
- [49] 11359701 11359701 11359701 11359701 11359701 11359701 11359701 11359701
- [57] 11359701 11359701 11359701 11359701 11359701 11359701 11359701 11359701
- [65] 11359701 11359701 11359701 11359701 11359701 11359701 11359701 11359701
- [73] 11359701 11359701 11359701 11359701 11359701 11359701 11359701 11359701
- [81] 11359701 11359701 11359701 11359701 11359701 11359701 11359701 11359701
- [89] 11359701 11359701 11359701 11359701 11359701 11359701 11359701 11359701
- [97] 11359701 11359701 11359701 11359701 11359701 11359701 11359701 11359701
-[105] 11359701 11359701 11359701 11359701 11359701 11359701 11359701 11359701
-[113] 11359701 11359701 11359701 11359701 11359701 11359701 11359701 11359701
-[121] 11359701 11359701 11359701 11359701 11359701 11359701 11359701 11359701
-[129] 11359701 11359701 11359701 11359701 11359701 11359701 11359701 11359701
-[137] 11359701 11359701 11359701 11359701</code></pre>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="672"></p>
 </div>
-<div class="cell-output-display">
-<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="672"></p>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-20-2.png" class="img-fluid" width="672"></p>
 </div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Time Series:
-Start = c(7, 63) 
-End = c(7, 202) 
-Frequency = 260 
-  [1] 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083
-  [9] 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083
- [17] 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083
- [25] 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083
- [33] 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083
- [41] 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083
- [49] 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083
- [57] 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083
- [65] 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083
- [73] 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083
- [81] 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083
- [89] 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083
- [97] 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083
-[105] 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083
-[113] 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083
-[121] 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083
-[129] 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083 89.70083
-[137] 89.70083 89.70083 89.70083 89.70083</code></pre>
-</div>
-<div class="cell-output-display">
-<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-21-2.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div style="page-break-after: always;"></div>
@@ -558,14 +343,11 @@ Frequency = 260
 </section>
 <section id="series-six" class="level1">
 <h1>Series Six</h1>
-<section id="variables-5" class="level2">
-<h2 class="anchored" data-anchor-id="variables-5">Variables</h2>
+<section id="variables-analysis-4" class="level2">
+<h2 class="anchored" data-anchor-id="variables-analysis-4">Variables &amp; Analysis</h2>
 </section>
-<section id="analysis-4" class="level2">
-<h2 class="anchored" data-anchor-id="analysis-4">Analysis</h2>
-</section>
-<section id="forecast-4" class="level2">
-<h2 class="anchored" data-anchor-id="forecast-4">Forecast</h2>
+<section id="model-selection-forecasts-5" class="level2">
+<h2 class="anchored" data-anchor-id="model-selection-forecasts-5">Model Selection &amp; Forecasts</h2>
 <div style="page-break-after: always;"></div>
 </section>
 </section>
@@ -578,7 +360,7 @@ Frequency = 260
 <section id="r-code" class="level2">
 <h2 class="anchored" data-anchor-id="r-code">R Code</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
