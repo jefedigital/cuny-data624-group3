@@ -622,18 +622,148 @@ df_s06 <- df %>%
   filter(category == 'S06') %>%
   select(c(Date,Var05,Var07)) %>%
   head(1622)
+
+data_S06 <- subset(df, category == 'S06', select = c(SeriesInd, Var05, Var07)) %>%
+  mutate(date = as.Date(SeriesInd, origin = "1900-01-01"))
+#data_S06 <- filter(data_S06, SeriesInd <= 43221)
+#summary(data_S06)
+#str(data_S06)
 ```
 
 ## Variables & Analysis
 
-```{r}
+Data set S06 contains two strikingly similar data sets var06 and var07. Each shows a mostly linear patterns with a few humps with larger increases and dramatic dips with one point that is drastically larger then any other. the autocorrelation showed that between time points there is a very high level of correlation hovering around one for both of these time points as seen in the ACF plot. to help make clean prediction for these variables the single high value was omitted from the data set and all five empty values were imputed using linear imputation. While the graphs look extraordinarily similar these plots data sets ar not identicle
 
+```{r}
+data_S06_v5 <- data_S06 %>% select(Var05)
+data_S06_v5 <- data_S06_v5[1:1622,]
+#summary(data_S06_v5)
+#str(data_S06_v5)
+data_S06_v7 <- data_S06 %>% select(Var07)
+data_S06_v7 <- data_S06_v7[1:1622,]
+#summary(data_S06_v7)
+#str(data_S06_v7)
+
+data_S06_Var05 <- ts(data_S06_v5)
+ggtsdisplay(data_S06_Var05)
+data_S06_Var07 <- ts(data_S06_v7)
+ggtsdisplay(data_S06_Var07)
+
+data_S06_Var05 <- data_S06_Var05 |>
+  tsclean() 
+ggtsdisplay(data_S06_Var05)
+data_S06_Var07 <- data_S06_Var07 |>
+  tsclean() 
+ggtsdisplay(data_S06_Var07)
+
+```
+
+```{r}
+set.seed(123)
+train_index5 <- createDataPartition(data_S06_Var05, times = 1, p = 0.912, list = FALSE)
+train5 <- data_S06_Var05[train_index5]
+test5 <- data_S06_Var05[-train_index5]
+horizon5 <- length(test5)
+#print(dim(train5))
+#print(dim(test5))
+#print(horizon5)
+
+train_index7 <- createDataPartition(data_S06_Var07, times = 1, p = 0.912, list = FALSE)
+train7 <- data_S06_Var07[train_index7]
+test7 <- data_S06_Var07[-train_index7]
+horizon7 <- length(test7)
+#print(dim(train7))
+#print(dim(test7))
+#print(horizon7)
+
+
+
+ses.fit5 <- ses(train5, h = horizon5)
+ses_accuracy_Var05 <- c(data_S06_Var05 = accuracy(ses.fit5, test5)['Test set', 'MAPE'])
+holt.fit5 <- holt(train5, damped=TRUE, h = horizon5)
+holt_accuracy_Var05 <- c(data_S06_Var05 = accuracy(holt.fit5, test5)['Test set', 'MAPE'])
+
+#autoplot(ses.fit5) + ggtitle("ses.fit")
+#autoplot(holt.fit5) + ggtitle("holt.fit")
+
+
+ses.fit7 <- ses(train7, h = horizon7)
+ses_accuracy_Var07<- c(data_S06_Var07 = accuracy(ses.fit7, test7)['Test set', 'MAPE'])
+holt.fit7 <- holt(train7, damped=TRUE, h = horizon7)
+holt_accuracy_Var07 <- c(data_S06_Var07 = accuracy(holt.fit7, test7)['Test set', 'MAPE'])
+
+#autoplot(ses.fit7) + ggtitle("ses.fit")
+#autoplot(holt.fit7) + ggtitle("holt.fit")
+
+rbind(holt_pval5 = Box.test(residuals(holt.fit5))$p.value,
+      ses_pval5 = Box.test(residuals(ses.fit5))$p.value)
+rbind(holt_pval7 = Box.test(residuals(holt.fit7))$p.value,
+      ses_pval7 = Box.test(residuals(ses.fit7))$p.value)
+
+
+set.seed(123)
+ets.fit5 <- ets(train5)
+#ets.fit5
+ets.fit7 <- ets(train7)
+#ets.fit7
+
+ets.fc5 <- forecast(ets.fit5, h = horizon5)
+ets_accuray_Var05 <- c(data_S06_Var05 = accuracy(ets.fc5, test5)['Test set', 'MAPE'])
+ets_accuray_Var05
+checkresiduals(ets.fc5)
+#autoplot(ets.fit5) + ggtitle("ets.fit")
+#autoplot(ets.fc5) + ggtitle("ets.fc")
+set.seed(123)
+ets.fc7 <- forecast(ets.fit7, h = horizon7)
+ets_accuray_Var07 <- c(data_S06_Var07 = accuracy(ets.fc7, test7)['Test set', 'MAPE'])
+ets_accuray_Var07
+checkresiduals(ets.fc7)
+#autoplot(ets.fit7) + ggtitle("ets.fit")
+#autoplot(ets.fc7) + ggtitle("ets.fc")
+
+
+set.seed(123)
+train5 |>
+  auto.arima() |>
+  forecast(h = horizon5) |>
+  checkresiduals()
+arima.fc <- train5 |>
+  auto.arima() |>
+  forecast(h=horizon5)
+arima_accuray_Var05 <- c(data_S06_Var05= accuracy(arima.fc, test5)['Test set', 'MAPE'])
+
+#autoplot(arima.fc) + ggtitle("data_S06_Var05")
+train7 |>
+  auto.arima() |>
+  forecast(h = horizon7) |>
+  checkresiduals()
+arima.fc <- train7 |>
+  auto.arima() |>
+  forecast(h=horizon7)
+
+arima_accuray_Var07 <- c(data_S06_Var07= accuracy(arima.fc, test7)['Test set', 'MAPE'])
+
+```
+
+It seems after testing all of these models most of them perform relatively similar with ARIMA being the worst model in both variable cases and SES being the best for var05 and ets being the best for var07. However these are such small differences that these may be performing the same and just one is effected more because of the randomness in data partitions. altogether we chose to move forward to forcast with the SES for variable 05 and ETS for variable 07
+
+```{r}
+S06_Var05.result <- cbind(ses = ses_accuracy_Var05, holt = holt_accuracy_Var05, ets = ets_accuray_Var05, arima = arima_accuray_Var05)
+cat("\tMAPE results by model - S06_Var05\n\n")
+S06_Var05.result
+
+S06_Var07.result <- cbind(ses = ses_accuracy_Var07, holt = holt_accuracy_Var07, ets = ets_accuray_Var07, arima = arima_accuray_Var07)
+cat("\tMAPE results by model - S06_Var07\n\n")
+S06_Var07.result
 ```
 
 ## Model Selection & Forecasts
 
-```{r}
-
+```{r,include=TRUE}
+autoplot(ses.fit5)
+#ses.fit5$mean
+autoplot(ets.fc7)
+#ets.fc7$mean
 ```
 
 {{< pagebreak >}}
