@@ -18,18 +18,13 @@ library(tsoutliers)
 library(forecast)
 ```
 
-
-
 ```{r reading-dataset}
 library(readxl)
 DATA624_Project1_Data_S03 <- read_excel("~/DATA624_Project1_Data_S03.xlsx")
 View(DATA624_Project1_Data_S03)
 ```
 
-
-
 ```{r subsetan-filter-dataset}
-
 data_S03 <- subset(DATA624_Project1_Data_S03, category == 'S03', select = c(SeriesInd, Var05, Var07)) %>%
   mutate(date = as.Date(SeriesInd, origin = "1900-01-01"))
 summary(data_S03)
