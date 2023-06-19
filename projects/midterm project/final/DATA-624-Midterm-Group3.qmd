@@ -571,9 +571,44 @@ df_s04 <- df %>%
   filter(category == 'S04') %>%
   select(c(Date,Var01,Var02)) %>%
   head(1622)
+
+
+s04 <- subset(df, category == 'S04', select = c(SeriesInd, Var01, Var02)) %>%
+  mutate(date = as.Date(SeriesInd, origin = "1900-01-01"))
+summary(s04)
+s04_1 <- s04 %>% select(Var01)
+s04_1 <- s04_1[1:1622,]
+s04_2 <- s04 %>% select(Var02)
+s04_2 <- s04_2[1:1622,]
+
+s04_1 <- na_interpolation(s04_1)
+s04_2 <- na_interpolation(s04_2)
+s04_1 <- ts(s04_1)
+s04_2 <- ts(s04_2)
+s04_1 <- tsclean(s04_1)
+s04_2 <- tsclean(s04_2)
 ```
 
 ## Variables & Analysis
+
+The Variable for S04 are variable 01 and variable 02. variable one has two main phases with one early plateau and a hump of rapid growth towards the end. Variable two looks mostly like white noise with a hump towards the beginning with what may be a steep hump towards the end and a more middle hump towards the middle. However these humps are difficult to pick out because of the noise.
+
+```{r,include=TRUE}
+
+autoplot(s04_1)
+autoplot(s04_2)
+```
+
+we chose to approach these variables with a dual forecasting approach using an ARIMA and naive model for both variables. The time series were split into an 80/20 train/test split to test the model for accuracy.
+
+```{r}
+V1train <- window(s04_1, end = as.integer(length(s04_1)*0.8))
+V2train <- window(s04_2, end = as.integer(length(s04_2)*0.8))
+farimafit_1 <- V1train %>% auto.arima(lambda = (BoxCox.lambda(s04_1)), stepwise = FALSE) %>% forecast(h = 325)
+farimafit_2 <- V2train %>% auto.arima(lambda = (BoxCox.lambda(s04_2)), stepwise = FALSE) %>% forecast(h = 325)
+naive_1 <- naive(V1train, h=325)
+naive_2 <- naive(V2train, h=325)
+```
 
 ```{r}
 
@@ -581,8 +616,28 @@ df_s04 <- df %>%
 
 ## Model Selection & Forecasts
 
-```{r}
+comparing the MAPE output we found that the naive model was best at predicting both variables one and two and will be using these for forecasting..
 
+```{r}
+print("variable 01 ")
+print("MAPE Var01 ARIMA:")
+print(accuracy(farimafit_1, s04_1)["Test set", "MAPE"])
+print("MAPE Var01 naive:")
+print(accuracy(naive_1, s04_1)["Test set", "MAPE"])
+print("variable 02")
+print("MAPE Var01 ARIMA:")
+print(accuracy(farimafit_2, s04_2)["Test set", "MAPE"])
+print("MAPE Var01 naive:")
+print(accuracy(naive_2, s04_2)["Test set", "MAPE"])
+```
+
+```{r}
+naive_1 <- naive(s04_1, h=140)
+naive_2 <- naive(s04_2, h=140)
+autoplot(naive_1)
+naive_2$mean
+autoplot(naive_2)
+naive_2$mean
 ```
 
 {{< pagebreak >}}
