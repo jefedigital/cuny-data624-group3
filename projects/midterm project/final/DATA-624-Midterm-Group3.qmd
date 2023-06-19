@@ -3,15 +3,15 @@ title: 'Midterm Project'
 subtitle: 'CUNY DATA 624 | 2023 Summer I'
 author: 'Group 3: Daniel Sullivan, Jeff Parks, Lwin Shwe, Matthew Katz'
 # abstract: 'abstract text'
-# format:
-#   docx:
-#     highlight-style: arrow
-#     number-sections: false
-#     number-depth: 2
-#     reference-doc: ../../../templates/quarto-word-template.docx
-#     toc: true
-#     toc-depth: 1
-#     toc-title: Contents
+format:
+  docx:
+    highlight-style: arrow
+    number-sections: false
+    number-depth: 2
+    reference-doc: ../../../templates/quarto-word-template.docx
+    toc: true
+    toc-depth: 1
+    toc-title: Contents
 editor: visual
 execute:
   echo: false
@@ -19,11 +19,11 @@ execute:
   include: true
   message: false
   warning: false
-output:
-  html_document:
-    toc: yes
-    toc_float: yes
-    theme: united
+# output:
+#   html_document:
+#     toc: yes
+#     toc_float: yes
+#     theme: united
 page-layout: article
 ---
 
@@ -37,6 +37,7 @@ library(seasonal)
 library(kableExtra)
 library(MLmetrics)
 library(imputeTS)
+library(caret)
 
 # ggplot
 theme_set(theme_light())
@@ -107,13 +108,9 @@ df_s06 <- df %>%
 
 For this project, we were presented with six batches of blinded time series data, containing historical performance on twelve separate variables. Our goal is to provide you with statistically rigorous, but actionable advice on expected performance for each of these twelve variables - whether they correspond to product sales, web traffic, or other important business metrics.
 
-In this report we will illustrate for you the overall performance of each of the variables, as well as any relationships we suspect might exist between them. We will also briefly cover any adjustments that were made to the data in order to aid in clean and accurate forecast models. Finally, we will provide you our best estimates for future performance along with guidance on measures of uncertainty in the models.
-
-{{< pagebreak >}}
+In this report, we will illustrate for you the overall performance of each of the variables, as well as any relationships we suspect, might exist between them. We will also briefly cover any adjustments that were made to the data to aid in clean and accurate forecast models. Finally, we will provide you with our best estimates for future performance along with guidance on measures of uncertainty in the models.
 
 # Series One
-
-Praesent ac ipsum ut leo facilisis consequat. Sed aliquam odio vitae est volutpat, sed tincidunt eros imperdiet. Maecenas sit amet dictum massa. Cras ultricies neque lorem, in fermentum turpis venenatis nec.
 
 ```{r data_s01}
 s01 <- df %>%
@@ -132,9 +129,11 @@ var02 <- df %>%
 
 ## Variables & Analysis
 
-Series one used two variables, Var01 and Var02. It seems that for both there was little if any seasonality but where the data seemed to have 5 day intervals with scattered gaps. A work days per year pattern was used however I do not believe that there is a major correlation with these series since in most of decomposition at various frequencies showed large runs of wave motion remainders showing their may be some other pattern to the data. each variable had a few missing variables which were imputed where necessary being replaced with the most recent non-NA value before it.
+For the first series we examined data for **Variable 01** and **Variable 02**.
 
-**Variable 01** shows an upward trend through the time series with what seems to be plateaus at either end with the mid section appearing linear and two almost camel humps at either end of the linear phase.
+It seems that for both there was little if any seasonality but where the data seemed to have 5-day intervals with scattered gaps. A work days per year pattern was used however I do not believe that there is a major correlation with these series since most of the decomposition at various frequencies showed large runs of wave motion remainders showing there may be some other pattern to the data. each variable had a few missing variables which were imputed where necessary being replaced with the most recent non-NA value before it.
+
+**Variable 01** shows an upward trend through the time series with what seems to be plateaus at either end with the midsection appearing linear and two almost camel humps at either end of the linear phase.
 
 ```{r}
 #| layout-ncol: 2
@@ -144,6 +143,8 @@ autoplot(var01ts)
 decompose(var01ts) %>%
   autoplot()
 ```
+
+{{< pagebreak >}}
 
 **Variable 02** shows a very slight downward trend but generally appears to be near white noise.
 
@@ -156,7 +157,7 @@ decompose(var02ts) %>%
   autoplot()
 ```
 
-Both Var01 and Var02 showed a very high amount of correlation as seen with the lag plots with Var01 having near 1.0 correlation almost 40 points out and Var02 with many values hovering around 0.5.
+Both Var01 and Var02 showed a very high amount of correlation as seen with the lag plots with Var01 having a near 1.0 correlation almost 40 points out and Var02 with many values hovering around 0.5.
 
 ```{r}
 #| layout-ncol: 2
@@ -164,7 +165,7 @@ ggAcf(var01ts,40)
 ggAcf(var02ts,40)
 ```
 
-Because of the non seasonal pattern of the data we moved forward using the forecast function which implemented an STL+ETS method and SES with a tuned alpha variable. After comparing these forecasts with a 80/20 training/testing split with the last 20 on the last half we tested the forecast optimizing the MAPE. We found that in all cases the tuned alpha performed better so used this for the Forecast. we found the alpha values optimized at a=0.03 for Var01 and a=0.27.
+Because of the non-seasonal pattern of the data we moved forward using the forecast function which implemented an STL+ETS method and SES with a tuned alpha variable. After comparing these forecasts with an 80/20 training/testing split with the last 20 on the last half we tested the forecast optimizing the MAPE. We found that in all cases the tuned alpha performed better so used this for the Forecast. we found the alpha values optimized at a=0.03 for Var01 and a=0.27.
 
 ```{r}
 #| layout-ncol: 2
@@ -270,11 +271,11 @@ ses(var02ts, alpha = 0.03, h = 325) %>%
 
 # Series Two
 
-For the second category we examined time series data for Variables 2 and 3.
+## Variables & Analysis
 
-## Variables
+For the second series we examined data for **Variable 02** and **Variable 03**.
 
-**Variable 02** seems to represent a product or activity with a high volume, approximately 40 million units per day! Overall there seems to be a gradually decreasing trend for this item, with neither seasonality nor long-term cyclic patterns detected. The presence of many extreme values for this variable could possibly interfere with the accuracy of our forecasts. In order to correct for these conditions while preserving as much information as possible, we chose to identify and smooth those 66 outliers with a linear interpolation.
+**Variable 02** seems to represent a product or activity with a high volume, approximately 40 million units per day. Overall there seems to be a gradually decreasing trend for this item, with neither seasonality nor long-term cyclic patterns detected. The presence of many extreme values for this variable could interfere with the accuracy of our forecasts. To correct these conditions while preserving as much information as possible, we chose to identify and smooth those 66 outliers with linear interpolation.
 
 ```{r}
 #| layout-ncol: 2
@@ -295,7 +296,7 @@ autoplot(ts_s02_v02, series = 'Orig') +
   autolayer(ts_s02_v02_clean, series = 'Clean')
 ```
 
-**Variable 03** seems to represent a product or activity with low volume, approximately 14 units per day. Overall there seems to be a steady trend for this item, with no seasonality detected. This dataset has only two missing values, and one notable extreme value toward the end of the series, smoothed here with a linear interpolation.
+**Variable 03** seems to represent a product or activity with low volume, approximately 14 units per day. Overall there seems to be a steady trend for this item, with no seasonality detected. This dataset has only two missing values, and one notable extreme value toward the end of the series, smoothed here with linear interpolation.
 
 ```{r}
 #| layout-ncol: 2
@@ -319,15 +320,22 @@ autoplot(ts_s02_v03, series = 'Orig') +
   autolayer(ts_s02_v03_clean, series = 'Clean')
 ```
 
+{{< pagebreak >}}
+
 ## Model Selection & Forecasts
 
-To evaluate and select models, we created 80/20 train/test split and score performance using the Mean Absolute Percentage Error (MAPE) statistic.
+To evaluate and select models, we created an 80/20 train/test split and score performance using the Mean Absolute Percentage Error (MAPE) statistic.
 
 The three models evaluated for Variable 02 were ARIMA(2,1,3) with drift, Holt (Damped), and Simple Exponential Smoothing (SES). We selected the SES method for this forecast since it produced the smallest MAPE score (30.22).
 
-Our resulting forecast for the next 140 days has a stable mean of approximately 20.7M units daily, but with a fairly large predictive interval.
+Our resulting forecast for the next 140 days has a stable mean of approximately 20.7M units daily but with a fairly large predictive interval.
+
+The three models evaluated for Variable 03 were ARIMA(2,1,0), Holt (Damped), and Simple Exponential Smoothing (SES). We selected the ARIMA(2,1,0) method for this forecast since it produced the smallest MAPE score (16.19).
+
+Our resulting forecast for the next 140 days has a stable mean of approximately 16.2 units daily but with a fairly large predictive interval.
 
 ```{r}
+#| layout-ncol: 2
 ## v02
 # split
 split_idx <- floor(length(ts_s02_v02_clean)*.8)
@@ -362,13 +370,7 @@ autoplot(ts_s02_v02_forecast) +
 
 # export
 forecast_s02_v02 <- ts_s02_v02_forecast$mean
-```
 
-The three models evaluated for Variable 03 were ARIMA(2,1,0), Holt (Damped), and Simple Exponential Smoothing (SES). We selected the ARIMA(2,1,0) method for this forecast since it produced the smallest MAPE score (16.19).
-
-Our resulting forecast for the next 140 days has a stable mean of approximately 16.2 units daily, but with a fairly large predictive interval.
-
-```{r}
 ## v03
 # split
 split_idx <- floor(length(ts_s02_v03_clean)*.8)
@@ -409,11 +411,11 @@ forecast_s02_v03 <- ts_s02_v03_forecast$mean
 
 # Series Three
 
-For the third category we examined time series data for Variables 5 and 7.
+## Variables & Analysis
 
-## Variables
+For the third series we examined data for **Variable 05** and **Variable 07**.
 
-**Variable 05** seems to represent a product or activity with low volume, approximately 76 units per day. Overall there seems to be a gradually increasing trend, but thi does not appear to be a stationary dataset. By examining the differenced time series were able to confirm the lack of autocorrelations and seasonality. We also identified and smoothed several outliers and missing values with a linear interpolation before modeling.
+**Variable 05** seems to represent a product or activity with low volume, approximately 76 units per day. Overall there seems to be a gradually increasing trend, but this does not appear to be a stationary dataset. By examining the differenced time series were able to confirm the lack of autocorrelations and seasonality. We also identified and smoothed several outliers and missing values with linear interpolation before modeling.
 
 ```{r}
 #| layout-ncol: 2
@@ -474,15 +476,22 @@ correlation <- cor(ts_s03_v05, ts_s03_v07)
 squared_correlation <- correlation^2 # 0.9984582
 ```
 
+{{< pagebreak >}}
+
 ## Model Selection & Forecasts
 
-To evaluate and select models, we created 80/20 train/test split and score performance using the Mean Absolute Percentage Error (MAPE) statistic.
+To evaluate and select models, we created an 80/20 train/test split and score performance using the Mean Absolute Percentage Error (MAPE) statistic.
 
 The three models evaluated for Variable 05 were: ARIMA(1,1,1) with drift, ETS, and Naive. We selected the Naive method for this forecast since it produced the smallest MAPE score (15.91).
 
-Our resulting forecast for the next 140 days has a stable mean of approximately 130 units daily, but with a fairly large predictive interval.
+Our resulting forecast for the next 140 days has a stable mean of approximately 130 units daily but with a fairly large predictive interval.
+
+The three models evaluated for Variable 07 were ARIMA(3,1,2) with drift, ETS, and Naive. We selected the Naive method for this forecast since it produced the smallest MAPE score (14.79).
+
+Our resulting forecast for the next 140 days has a stable mean of approximately 128.5 units daily but with a fairly large predictive interval.
 
 ```{r}
+#| layout-ncol: 2
 ## v05
 # split
 split_idx <- floor(length(ts_s03_v05_clean)*.8)
@@ -518,13 +527,7 @@ autoplot(ts_s03_v05_forecast) +
 
 # export
 forecast_s03_v05 <- ts_s03_v05_forecast$mean
-```
 
-The three models evaluated for Variable 07 were ARIMA(3,1,2) with drift, ETS and Naive. We selected the Naive method for this forecast since it produced the smallest MAPE score (14.79).
-
-Our resulting forecast for the next 140 days has a stable mean of approximately 128.5 units daily, but with a fairly large predictive interval.
-
-```{r}
 ## v07
 # split
 split_idx <- floor(length(ts_s03_v07_clean)*.8)
@@ -571,18 +574,75 @@ df_s04 <- df %>%
   filter(category == 'S04') %>%
   select(c(Date,Var01,Var02)) %>%
   head(1622)
+
+
+s04 <- subset(df, category == 'S04', select = c(SeriesInd, Var01, Var02)) %>%
+  mutate(date = as.Date(SeriesInd, origin = "1900-01-01"))
+# summary(s04)
+
+s04_1 <- s04 %>% select(Var01)
+s04_1 <- s04_1[1:1622,]
+s04_2 <- s04 %>% select(Var02)
+s04_2 <- s04_2[1:1622,]
+
+s04_1 <- na_interpolation(s04_1)
+s04_2 <- na_interpolation(s04_2)
+s04_1 <- ts(s04_1)
+s04_2 <- ts(s04_2)
+s04_1 <- tsclean(s04_1)
+s04_2 <- tsclean(s04_2)
 ```
 
 ## Variables & Analysis
 
-```{r}
+For the fourth series we examined data for **Variable 01** and **Variable 02**.
 
+Variable 01 has two main phases with one early plateau and a hump of rapid growth towards the end. Variable 02 looks mostly like white noise with a hump towards the beginning with what may be a steep hump towards the end and a more middle hump towards the middle. However these humps are difficult to pick out because of the noise.
+
+```{r,include=TRUE}
+#| layout-ncol: 2
+autoplot(s04_1)
+autoplot(s04_2)
+```
+
+We chose to approach these variables with a dual forecasting approach using an ARIMA and Naive model for both variables. The time series were split into an 80/20 train/test split to test the model for accuracy.
+
+```{r}
+V1train <- window(s04_1, end = as.integer(length(s04_1)*0.8))
+V2train <- window(s04_2, end = as.integer(length(s04_2)*0.8))
+
+farimafit_1 <- V1train %>% auto.arima(lambda = (BoxCox.lambda(s04_1)), stepwise = FALSE) %>% forecast(h = 325)
+farimafit_2 <- V2train %>% auto.arima(lambda = (BoxCox.lambda(s04_2)), stepwise = FALSE) %>% forecast(h = 325)
+
+naive_1 <- naive(V1train, h=325)
+naive_2 <- naive(V2train, h=325)
 ```
 
 ## Model Selection & Forecasts
 
-```{r}
+Comparing the MAPE output we found that the Naive model was best at predicting both variables, and was used to forecast both series.
 
+```{r}
+# print("variable 01 ")
+# print("MAPE Var01 ARIMA:")
+# print(accuracy(farimafit_1, s04_1)["Test set", "MAPE"])
+# print("MAPE Var01 naive:")
+# print(accuracy(naive_1, s04_1)["Test set", "MAPE"])
+# print("variable 02")
+# print("MAPE Var01 ARIMA:")
+# print(accuracy(farimafit_2, s04_2)["Test set", "MAPE"])
+# print("MAPE Var01 naive:")
+# print(accuracy(naive_2, s04_2)["Test set", "MAPE"])
+```
+
+```{r}
+#| layout-ncol: 2
+naive_1 <- naive(s04_1, h=140)
+naive_2 <- naive(s04_2, h=140)
+autoplot(naive_1)
+# naive_2$mean
+autoplot(naive_2)
+# naive_2$mean
 ```
 
 {{< pagebreak >}}
@@ -604,11 +664,13 @@ s05_var03 <- s05 %>%
 
 ## Variables & Analysis
 
-Series five consisted of two variables var02 and var03. both contained small amounts of missing values and where applicable were replaced based on the previous held value. Additionally since all of these data sets appear to be on a 5 day cycle the work year(260) days was used for establishing frequency.
+For the fifth series we examined data for **Variable 02** and **Variable 03**.
 
-Var02- In the variable 2 plots we see a gradual small decrease in value with an almost white noise looking fluctuation. It does not seem to show any seasonality as in the decomposition plots we found in most cases there were runs of remainders that formed an almost Wave like pattern.
+Both contained small amounts of missing values and where applicable were replaced based on the previously held value. Additionally, since all of these data sets appear to be on a 5-day cycle the work year(260) days was used for establishing frequency.
 
-Var03- variable 3 has what seems to be three patterns in the center of the plot there seems to be slow steady growth that is near linear with a fair amount of fluctuation. Additionally at the start of the data set there is a steep rise and at the end a steep fall. The seasonal patterns seem to make these more gradual however there is a good amount of wave motion in the remainders so there is an aspect of the data this is not accounted for despite the seasonal graph matching a few of the data motifs.
+In the **Variable 2** plots we see a gradual small decrease in value with an almost white noise-looking fluctuation. It does not seem to show any seasonality as in the decomposition plots we found in most cases there were runs of remainders that formed an almost Wave-like pattern.
+
+**Variable 3** has what seems to be three patterns in the center of the plot there seems to be slow steady growth that is near linear with a fair amount of fluctuation. Additionally, at the start of the data set, there is a steep rise and at the end a steep fall. The seasonal patterns seem to make these more gradual however there is a good amount of wave motion in the remainder so there is an aspect of the data this is not accounted for despite the seasonal graph matching a few of the data motifs.
 
 ```{r}
 #| layout-ncol: 2
@@ -626,7 +688,7 @@ decompose(s05_var03ts) %>%
 
 ```
 
-Both variable three and variable five show high levels of corelation within the lag plot with var02 hovering near 0.5-0.4 and var03 hovering around 1-0.8 for over 40 values.
+Both variable three and variable five show high levels of correlation within the lag plot with var02 hovering near 0.5-0.4 and var03 hovering around 1-0.8 for over 40 values.
 
 ```{r}
 #| layout-ncol: 2
@@ -634,7 +696,7 @@ ggAcf(s05_var02ts,40)
 ggAcf(s05_var03ts,40)
 ```
 
-For this analysis we compared how the forcast() function performed using an STL+ETS model and how an SES(simply exponential smoothing) model with tuned alpha variable performed. We tuned the SES by using an algorithm to reduce MAPE to determine the alpha value. We found using the highest alpha=0.99 in both cases gave the most accurate forecast when testing on the last 20% of the data with an 80/20 training testing split and when we compared this to the forecast function performed slightly better.
+For this analysis, we compared how the forecast () function performed using a STL+ETS model and how an SES(simply exponential smoothing) model with a tuned alpha variable performed. We tuned the SES by using an algorithm to reduce MAPE to determine the alpha value. We found using the highest alpha=0.99 in both cases gave the most accurate forecast when testing on the last 20% of the data with an 80/20 training testing split and when we compared this to the forecast function performed slightly better.
 
 ```{r}
 #| layout-ncol: 2
@@ -748,9 +810,14 @@ data_S06 <- subset(df, category == 'S06', select = c(SeriesInd, Var05, Var07)) %
 
 ## Variables & Analysis
 
-Data set S06 contains two strikingly similar data sets var06 and var07. Each shows a mostly linear patterns with a few humps with larger increases and dramatic dips with one point that is drastically larger then any other. the autocorrelation showed that between time points there is a very high level of correlation hovering around one for both of these time points as seen in the ACF plot. to help make clean prediction for these variables the single high value was omitted from the data set and all five empty values were imputed using linear imputation. While the graphs look extraordinarily similar these plots data sets ar not identicle
+For the sixth series we examined data for **Variable 06** and **Variable 07**.
+
+These strikingly-similar datasets show mostly linear patterns with a few humps with larger increases and dramatic dips with one drastically larger point than any other.
+
+The autocorrelation shows that between time points there is a very high level of correlation hovering around one for both of these time points as seen in the ACF plot. To help make clean predictions for these variables, a single high value was omitted from the dataset and all five empty values were imputed using linear imputation. While the graphs look extraordinarily similar, these datasets are not identical.
 
 ```{r}
+#| layout-ncol: 2
 data_S06_v5 <- data_S06 %>% select(Var05)
 data_S06_v5 <- data_S06_v5[1:1622,]
 #summary(data_S06_v5)
@@ -761,9 +828,9 @@ data_S06_v7 <- data_S06_v7[1:1622,]
 #str(data_S06_v7)
 
 data_S06_Var05 <- ts(data_S06_v5)
-ggtsdisplay(data_S06_Var05)
+# ggtsdisplay(data_S06_Var05)
 data_S06_Var07 <- ts(data_S06_v7)
-ggtsdisplay(data_S06_Var07)
+# ggtsdisplay(data_S06_Var07)
 
 data_S06_Var05 <- data_S06_Var05 |>
   tsclean() 
@@ -825,34 +892,34 @@ ets.fit7 <- ets(train7)
 
 ets.fc5 <- forecast(ets.fit5, h = horizon5)
 ets_accuray_Var05 <- c(data_S06_Var05 = accuracy(ets.fc5, test5)['Test set', 'MAPE'])
-ets_accuray_Var05
-checkresiduals(ets.fc5)
+# ets_accuray_Var05
+# checkresiduals(ets.fc5)
 #autoplot(ets.fit5) + ggtitle("ets.fit")
 #autoplot(ets.fc5) + ggtitle("ets.fc")
 set.seed(123)
 ets.fc7 <- forecast(ets.fit7, h = horizon7)
 ets_accuray_Var07 <- c(data_S06_Var07 = accuracy(ets.fc7, test7)['Test set', 'MAPE'])
-ets_accuray_Var07
-checkresiduals(ets.fc7)
+# ets_accuray_Var07
+# checkresiduals(ets.fc7)
 #autoplot(ets.fit7) + ggtitle("ets.fit")
 #autoplot(ets.fc7) + ggtitle("ets.fc")
 
 
 set.seed(123)
-train5 |>
-  auto.arima() |>
-  forecast(h = horizon5) |>
-  checkresiduals()
+# train5 |>
+#   auto.arima() |>
+#   forecast(h = horizon5) |>
+#   checkresiduals()
 arima.fc <- train5 |>
   auto.arima() |>
   forecast(h=horizon5)
 arima_accuray_Var05 <- c(data_S06_Var05= accuracy(arima.fc, test5)['Test set', 'MAPE'])
 
 #autoplot(arima.fc) + ggtitle("data_S06_Var05")
-train7 |>
-  auto.arima() |>
-  forecast(h = horizon7) |>
-  checkresiduals()
+# train7 |>
+#   auto.arima() |>
+#   forecast(h = horizon7) |>
+#   checkresiduals()
 arima.fc <- train7 |>
   auto.arima() |>
   forecast(h=horizon7)
@@ -861,7 +928,7 @@ arima_accuray_Var07 <- c(data_S06_Var07= accuracy(arima.fc, test7)['Test set', '
 
 ```
 
-It seems after testing all of these models most of them perform relatively similar with ARIMA being the worst model in both variable cases and SES being the best for var05 and ets being the best for var07. However these are such small differences that these may be performing the same and just one is effected more because of the randomness in data partitions. altogether we chose to move forward to forcast with the SES for variable 05 and ETS for variable 07
+It seems after testing all of these models most of them perform relatively similarly with ARIMA being the worst model in both variable cases, SES being the best for Variable 06 and ETS being the best for Variable 07. However, these are such small differences that these may be performing the same and just one is affected more because of the randomness in data partitions. altogether we chose to move forward to forecast with the SES for variable 05 and ETS for Variable 07
 
 ```{r}
 S06_Var05.result <- cbind(ses = ses_accuracy_Var05, holt = holt_accuracy_Var05, ets = ets_accuray_Var05, arima = arima_accuray_Var05)
@@ -876,17 +943,12 @@ S06_Var07.result
 ## Model Selection & Forecasts
 
 ```{r,include=TRUE}
+#| layout-ncol: 2
 autoplot(ses.fit5)
 #ses.fit5$mean
 autoplot(ets.fc7)
 #ets.fc7$mean
 ```
-
-{{< pagebreak >}}
-
-# Conclusions
-
-{{< pagebreak >}}
 
 # Appendix
 
@@ -894,7 +956,5 @@ autoplot(ets.fc7)
 
 ```{r}
 #| echo: true
-#| eval: false
-
-# code here
+# Available upon request.
 ```
