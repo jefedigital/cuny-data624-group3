@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">Midterm Project</h1>
-<p class="subtitle lead">CUNY DATA 624|2023 Summer I</p>
+<p class="subtitle lead">CUNY DATA 624 | 2023 Summer I</p>
 </div>
 
 
@@ -249,18 +249,62 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="series-three" class="level1">
 <h1>Series Three</h1>
-<section id="variables-analysis-1" class="level2">
-<h2 class="anchored" data-anchor-id="variables-analysis-1">Variables &amp; Analysis</h2>
+<p>For the third category we examined time series data for Variables 5 and 7.</p>
+<section id="variables-1" class="level2">
+<h2 class="anchored" data-anchor-id="variables-1">Variables</h2>
+<p><strong>Variable 05</strong> seems to represent a product or activity with low volume, approximately 76 units per day. Overall there seems to be a gradually increasing trend for this item with no seasonality detected. This does not appear to be a stationary dataset, but by examining the differenced time series were able to confirm the lack of autocorrelations and seasonality. We also identified and smoothed several outliers and missing values with a linear interpolation before modeling.</p>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-12-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-12-3.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+<p><strong>Variable 07</strong> seems to represent an almost-identical time series as Variable 05 - in fact, the two datasets are 98% corelated. With some variation, the Variable 07 dataset is approximately 75 units higher than Variable 05 across the board, but appears to be similar in every other regard.</p>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  27.48   51.52   74.65   75.43   96.44  134.46 </code></pre>
+</div>
+</div>
+</div>
 </section>
 <section id="model-selection-forecasts-2" class="level2">
 <h2 class="anchored" data-anchor-id="model-selection-forecasts-2">Model Selection &amp; Forecasts</h2>
+<p>To evaluate and select models, we created 80/20 train/test split and score performance using the Mean Absolute Percentage Error (MAPE) statistic.</p>
+<p>The three models evaluated for Variable 05 were: ARIMA(1,1,1) with drift, ETS, and Naive. We selected the Naive method for this forecast since it produced the smallest MAPE score (15.91).</p>
+<p>Our resulting forecast for the next 140 days has a stable mean of approximately 130 units daily, but with a fairly large predictive interval.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The three models evaluated for Variable 03 were ARIMA(3,1,2) with drift, ETS and Naive. We selected the Naive method for this forecast since it produced the smallest MAPE score (14.79).</p>
+<p>Our resulting forecast for the next 140 days has a stable mean of approximately 128.5 units daily, but with a fairly large predictive interval.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
 <div style="page-break-after: always;"></div>
 </section>
 </section>
 <section id="series-four" class="level1">
 <h1>Series Four</h1>
-<section id="variables-analysis-2" class="level2">
-<h2 class="anchored" data-anchor-id="variables-analysis-2">Variables &amp; Analysis</h2>
+<section id="variables-analysis-1" class="level2">
+<h2 class="anchored" data-anchor-id="variables-analysis-1">Variables &amp; Analysis</h2>
 </section>
 <section id="model-selection-forecasts-3" class="level2">
 <h2 class="anchored" data-anchor-id="model-selection-forecasts-3">Model Selection &amp; Forecasts</h2>
@@ -269,41 +313,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="series-five" class="level1">
 <h1>Series Five</h1>
-<section id="variables-analysis-3" class="level2">
-<h2 class="anchored" data-anchor-id="variables-analysis-3">Variables &amp; Analysis</h2>
+<section id="variables-analysis-2" class="level2">
+<h2 class="anchored" data-anchor-id="variables-analysis-2">Variables &amp; Analysis</h2>
 <p>Series five consisted of two variables var02 and var03. both contained small amounts of missing values and where applicable were replaced based on the previous held value. Additionally since all of these data sets appear to be on a 5 day cycle the work year(260) days was used for establishing frequency.</p>
 <p>Var02- In the variable 2 plots we see a gradual small decrease in value with an almost white noise looking fluctuation. It does not seem to show any seasonality as in the decomposition plots we found in most cases there were runs of remainders that formed an almost Wave like pattern.</p>
 <p>Var03- variable 3 has what seems to be three patterns in the center of the plot there seems to be slow steady growth that is near linear with a fair amount of fluctuation. Additionally at the start of the data set there is a steep rise and at the end a steep fall. The seasonal patterns seem to make these more gradual however there is a good amount of wave motion in the remainders so there is an aspect of the data this is not accounted for despite the seasonal graph matching a few of the data motifs.</p>
-<div class="cell quarto-layout-panel">
-<div class="quarto-layout-row quarto-layout-valign-top">
-<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-16-2.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<div class="quarto-layout-row quarto-layout-valign-top">
-<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-16-3.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-16-4.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-</div>
-<p>Both variable three and variable five show high levels of corelation within the lag plot with var02 hovering near 0.5-0.4 and var03 hovering around 1-0.8 for over 40 values.</p>
-<div class="cell quarto-layout-panel">
-<div class="quarto-layout-row quarto-layout-valign-top">
-<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-17-2.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-</div>
-<p>For this analysis we compared how the forcast() function performed using an STL+ETS model and how an SES(simply exponential smoothing) model with tuned alpha variable performed. We tuned the SES by using an algorithm to reduce MAPE to determine the alpha value. We found using the highest alpha=0.99 in both cases gave the most accurate forecast when testing on the last 20% of the data with an 80/20 training testing split and when we compared this to the forecast function performed slightly better.</p>
 <div class="cell quarto-layout-panel">
 <div class="quarto-layout-row quarto-layout-valign-top">
 <div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
@@ -313,7 +327,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-18-2.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-18-3.png" class="img-fluid" width="672"></p>
 </div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-18-4.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+<p>Both variable three and variable five show high levels of corelation within the lag plot with var02 hovering near 0.5-0.4 and var03 hovering around 1-0.8 for over 40 values.</p>
 <div class="cell quarto-layout-panel">
 <div class="quarto-layout-row quarto-layout-valign-top">
 <div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
@@ -324,10 +347,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-</section>
-<section id="model-selection-forecasts-4" class="level2">
-<h2 class="anchored" data-anchor-id="model-selection-forecasts-4">Model Selection &amp; Forecasts</h2>
-<p>Since the SES models performed slightly better these were chosen for the forecast.</p>
+<p>For this analysis we compared how the forcast() function performed using an STL+ETS model and how an SES(simply exponential smoothing) model with tuned alpha variable performed. We tuned the SES by using an algorithm to reduce MAPE to determine the alpha value. We found using the highest alpha=0.99 in both cases gave the most accurate forecast when testing on the last 20% of the data with an 80/20 training testing split and when we compared this to the forecast function performed slightly better.</p>
 <div class="cell quarto-layout-panel">
 <div class="quarto-layout-row quarto-layout-valign-top">
 <div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
@@ -338,13 +358,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-21-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</section>
+<section id="model-selection-forecasts-4" class="level2">
+<h2 class="anchored" data-anchor-id="model-selection-forecasts-4">Model Selection &amp; Forecasts</h2>
+<p>Since the SES models performed slightly better these were chosen for the forecast.</p>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="DATA-624-Midterm-Group3_files/figure-html/unnamed-chunk-22-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
 <div style="page-break-after: always;"></div>
 </section>
 </section>
 <section id="series-six" class="level1">
 <h1>Series Six</h1>
-<section id="variables-analysis-4" class="level2">
-<h2 class="anchored" data-anchor-id="variables-analysis-4">Variables &amp; Analysis</h2>
+<section id="variables-analysis-3" class="level2">
+<h2 class="anchored" data-anchor-id="variables-analysis-3">Variables &amp; Analysis</h2>
 </section>
 <section id="model-selection-forecasts-5" class="level2">
 <h2 class="anchored" data-anchor-id="model-selection-forecasts-5">Model Selection &amp; Forecasts</h2>
@@ -360,7 +404,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="r-code" class="level2">
 <h2 class="anchored" data-anchor-id="r-code">R Code</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
