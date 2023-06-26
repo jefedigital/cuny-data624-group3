@@ -265,9 +265,6 @@ ses(var02ts, alpha = 0.03, h = 325) %>%
   autoplot() +
   autolayer(var02ts)
 
-# export
-forecast_s01_v01_export <- forcast_s01_var01$mean
-forecast_s01_v02_export <- forcast_s01_var02$mean
 ```
 
 {{< pagebreak >}}
@@ -407,8 +404,7 @@ autoplot(ts_s02_v03_forecast) +
   ggtitle('Series Two - Var 03: Forecast')
 
 # export
-forecast_s02_v02_export <- ts_s02_v02_forecast$mean
-forecast_s02_v03_export <- ts_s02_v03_forecast$mean
+forecast_s02_v03 <- ts_s02_v03_forecast$mean
 ```
 
 {{< pagebreak >}}
@@ -814,7 +810,7 @@ data_S06 <- subset(df, category == 'S06', select = c(SeriesInd, Var05, Var07)) %
 
 ## Variables & Analysis
 
-For the sixth series we examined data for **Variable 06** and **Variable 07**.
+For the sixth series we examined data for **Variable 05** and **Variable 07**.
 
 These strikingly-similar datasets show mostly linear patterns with a few humps with larger increases and dramatic dips with one drastically larger point than any other.
 
@@ -932,7 +928,7 @@ arima_accuray_Var07 <- c(data_S06_Var07= accuracy(arima.fc, test7)['Test set', '
 
 ```
 
-It seems after testing all of these models most of them perform relatively similarly with ARIMA being the worst model in both variable cases, SES being the best for Variable 06 and ETS being the best for Variable 07. However, these are such small differences that these may be performing the same and just one is affected more because of the randomness in data partitions. altogether we chose to move forward to forecast with the SES for variable 05 and ETS for Variable 07
+It seems after testing all of these models most of them perform relatively similarly with ARIMA being the worst model in both variable cases, SES being the best for Variable 05 and ETS being the best for Variable 07. However, these are such small differences that these may be performing the same and just one is affected more because of the randomness in data partitions. altogether we chose to move forward to forecast with the SES for variable 05 and ETS for Variable 07
 
 ```{r}
 S06_Var05.result <- cbind(ses = ses_accuracy_Var05, holt = holt_accuracy_Var05, ets = ets_accuray_Var05, arima = arima_accuray_Var05)

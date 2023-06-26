@@ -1,0 +1,112 @@
+---
+title: 'Homework 2'
+subtitle: 'CUNY DATA 624 - 2023 Summer I'
+author: 'Jeff Parks'
+# abstract: 'abstract text'
+# format:
+#   docx:
+#     highlight-style: arrow
+#     number-sections: false
+#     number-depth: 2
+#     reference-doc: ../../../templates/quarto-word-template.docx
+#     toc: true
+#     toc-depth: 1
+#     toc-title: Contents
+editor: visual
+execute:
+  echo: true
+  eval: true
+  include: true
+  message: false
+  warning: false
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+    theme: united
+page-layout: article
+---
+
+```{r setup}
+#| echo: false
+# libraries
+library(tidyverse)
+library(naniar)
+library(kableExtra)
+library(AppliedPredictiveModeling)
+
+# ggplot
+theme_set(theme_light())
+```
+
+```{r functions}
+#| echo: false
+nice_table <- function(df, cap=NULL, cols=NULL, dig=3, fw=F){
+  if (is.null(cols)) {c <- colnames(df)} else {c <- cols}
+  table <- df %>% 
+    kable(caption=cap, col.names=c, digits=dig) %>% 
+    kable_styling(
+      bootstrap_options = c("striped", "hover", "condensed"),
+      html_font = 'monospace',
+      full_width = fw)
+  return(table)
+}
+```
+
+# KJ Exercise 6.3
+
+A chemical manufacturing process for a pharmaceutical product was discussed in Sect. 1.4. In this problem, the objective is to understand the relationship between biological measurements of the raw materials (predictors), measurements of the manufacturing process (predictors), and the response of product yield. 
+
+Biological predictors cannot be changed but can be used to assess the quality of the raw material before processing. On the other hand, manufacturing process predictors can be changed in the manufacturing process. Improving product yield by 1% will boost revenue by approximately one hundred thousand dollars per batch:
+
+(a) Start R and use these commands to load the data: 
+
+```{r}
+data(ChemicalManufacturingProcess)
+df <- ChemicalManufacturingProcess
+```
+
+The matrix processPredictors contains the 57 predictors (12 describing the input biological material and 45 describing the process predictors) for the 176 manufacturing runs. `Yield` contains the percent yield for each run.
+
+(b) A small percentage of cells in the predictor set contain missing values. Use an imputation function to fill in these missing values (e.g., see Sect. 3.8).
+
+```{r}
+#| layout-ncol: 2
+# summary(df)
+gg_miss_var(df, show_pct=TRUE)
+
+ggplot(df, aes(x=ManufacturingProcess03, y=Yield)) +
+  geom_miss_point()
+
+# simputation - linear
+cols_missing <- df %>%
+  select(names(df)[sapply(df, anyNA)]) %>%
+  colnames() # 28 cols
+
+df_imputed <- df
+
+for(col in cols_missing){
+  f <- as.formula(paste(col, '~ Yield'))
+  df_imputed <- impute_lm(df_imputed, f)
+}
+
+# plot after imputation
+ggplot(df_imputed, aes(x=ManufacturingProcess03, y=Yield)) +
+  geom_point(aes(alpha=0.1))
+```
+
+(c) Split the data into a training and a test set, pre-process the data, and tune a model of your choice from this chapter. What is the optimal value of the performance metric?
+
+```{r}
+sample <- sample(c(TRUE, FALSE), nrow(df_imputed), replace=TRUE, prob=c(0.85,0.15))
+
+df_train  <- df_imputed[sample,]
+df_test   <- df_imputed[!sample,]
+```
+
+(d) Predict the response for the test set. What is the value of the performance metric and how does this compare with the resampled performance metric on the training set?
+
+(e) Which predictors are most important in the model you have trained? Do either the biological or process predictors dominate the list?
+
+(f) Explore the relationships between each of the top predictors and the response. How could this information be helpful in improving yield in future runs of the manufacturing process?
+
